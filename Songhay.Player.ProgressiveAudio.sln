@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Songhay.Player.ProgressiveAudio", "Songhay.Player.ProgressiveAudio\Songhay.Player.ProgressiveAudio.fsproj", "{0A4D9BB3-9141-497D-8D38-848896837381}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Songhay.StudioFloor.Client", "Songhay.StudioFloor.Client\Songhay.StudioFloor.Client.fsproj", "{5508FF80-A92F-45DA-94D8-6E1269F3871B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,18 @@ Global
 		{0A4D9BB3-9141-497D-8D38-848896837381}.Release|x64.Build.0 = Release|Any CPU
 		{0A4D9BB3-9141-497D-8D38-848896837381}.Release|x86.ActiveCfg = Release|Any CPU
 		{0A4D9BB3-9141-497D-8D38-848896837381}.Release|x86.Build.0 = Release|Any CPU
+		{5508FF80-A92F-45DA-94D8-6E1269F3871B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5508FF80-A92F-45DA-94D8-6E1269F3871B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5508FF80-A92F-45DA-94D8-6E1269F3871B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5508FF80-A92F-45DA-94D8-6E1269F3871B}.Debug|x64.Build.0 = Debug|Any CPU
+		{5508FF80-A92F-45DA-94D8-6E1269F3871B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5508FF80-A92F-45DA-94D8-6E1269F3871B}.Debug|x86.Build.0 = Debug|Any CPU
+		{5508FF80-A92F-45DA-94D8-6E1269F3871B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5508FF80-A92F-45DA-94D8-6E1269F3871B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5508FF80-A92F-45DA-94D8-6E1269F3871B}.Release|x64.ActiveCfg = Release|Any CPU
+		{5508FF80-A92F-45DA-94D8-6E1269F3871B}.Release|x64.Build.0 = Release|Any CPU
+		{5508FF80-A92F-45DA-94D8-6E1269F3871B}.Release|x86.ActiveCfg = Release|Any CPU
+		{5508FF80-A92F-45DA-94D8-6E1269F3871B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
