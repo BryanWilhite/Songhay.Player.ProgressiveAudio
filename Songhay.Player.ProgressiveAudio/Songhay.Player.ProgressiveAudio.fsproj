@@ -6,11 +6,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Library.fs" />
+        <Compile Include="Models\CssPrimitives.fs" />
+        <Compile Include="Models\PresentationPrimitives.fs" />
+        <Compile Include="Models\Presentation.fs" />
     </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="Songhay.Modules.Bolero" Version="6.1.0" />
+      <PackageReference Include="Songhay.Modules.Publications" Version="6.0.1" />
     </ItemGroup>
 
 </Project>
