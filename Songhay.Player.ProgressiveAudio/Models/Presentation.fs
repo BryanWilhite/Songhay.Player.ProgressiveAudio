@@ -6,10 +6,9 @@ type Presentation =
     {
         id: Id
         title: Title
-        cssVariables: CssVariable list
-        description: Description
-        credits: RoleCredit list
         copyright: Copyright
-        playlist: Playlist option
-        introUri: IntroUri option
+        credits: RoleCredit list
+        description: Description
+        cssVariables: CssVariable list
+        parts: PresentationParts
     }
