@@ -17,9 +17,16 @@ type RoleCredit =
         name: DisplayText
     }
 
+type StreamSegment =
+    {
+        id: Id
+        thumbnailUri: Uri
+    }
+
 type PresentationParts =
     | CopyRights of Copyright list
     | Credits of RoleCredit list
     | Description of Description
     | Pages of string list
     | Playlist of (Title * Uri) list
+    | Stream of StreamSegment list
