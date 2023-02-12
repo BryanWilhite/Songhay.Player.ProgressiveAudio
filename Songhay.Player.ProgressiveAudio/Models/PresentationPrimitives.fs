@@ -11,12 +11,15 @@ type Description = | Description of DisplayText
 
 type IntroUri = | IntroUri of Uri
 
-type PresentationParts =
-    | Pages of string list
-    | Playlist of (Title * Uri) list
-
 type RoleCredit =
     {
         role: DisplayText
         name: DisplayText
     }
+
+type PresentationParts =
+    | CopyRights of Copyright list
+    | Credits of RoleCredit list
+    | Description of Description
+    | Pages of string list
+    | Playlist of (Title * Uri) list
