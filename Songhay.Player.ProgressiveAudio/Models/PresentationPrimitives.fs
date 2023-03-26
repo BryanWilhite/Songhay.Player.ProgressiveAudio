@@ -23,10 +23,22 @@ type StreamSegment =
         thumbnailUri: Uri
     }
 
-type PresentationParts =
+type PresentationPart =
     | CopyRights of Copyright list
     | Credits of RoleCredit list
-    | Description of Description
+    | PresentationDescription of Description
     | Pages of string list
     | Playlist of (Title * Uri) list
     | Stream of StreamSegment list
+
+    member this.StringValue =
+        match this with
+        | PresentationDescription (Description dt) -> dt.Value
+        | _ -> this.ToString()
+
+    member this.StringValues =
+        match this with
+        | CopyRights l -> l |> List.map (fun (Copyright dt) -> dt.Value)
+        | Pages l -> l
+        | PresentationDescription (Description dt) -> [dt.Value]
+        | _ -> [this.ToString()]

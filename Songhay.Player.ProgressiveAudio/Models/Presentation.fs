@@ -7,5 +7,5 @@ type Presentation =
         id: Id
         title: Title
         cssVariables: CssVariable list
-        parts: PresentationParts
+        parts: PresentationPart list
     }
