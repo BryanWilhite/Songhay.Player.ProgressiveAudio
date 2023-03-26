@@ -33,7 +33,7 @@ module PresentationTests =
 
     [<Fact>]
     let ``validate root element test`` () =
-        let actual = audioJsonDocument.RootElement |> toPropertyName
+        let actual = audioJsonDocument |> toFirstPropertyName
         let expected = nameof(Presentation) |> Some
         actual |> should equal expected
 
