@@ -4,20 +4,23 @@ open System
 open System.Data
 open System.IO
 open System.Reflection
-open Xunit
 open System.Text.Json
 open System.Text.RegularExpressions
-open FsUnit.Xunit
-open FsUnit.CustomMatchers
+
 open FsToolkit.ErrorHandling
+open FsUnit.CustomMatchers
+open FsUnit.Xunit
+open Xunit
 
 open Songhay.Modules.Models
 open Songhay.Modules.JsonDocumentUtility
 open Songhay.Modules.ProgramFileUtility
+open Songhay.Modules.Publications.Models
 
 open Songhay.Player.ProgressiveAudio.Models
+open Songhay.Player.ProgressiveAudio.LegacyPresentationUtility
 
-module PresentationTests =
+module LegacyPresentationUtilityTests =
 
     let projectDirectoryInfo =
         Assembly.GetExecutingAssembly()
@@ -30,21 +33,15 @@ module PresentationTests =
         |> tryGetCombinedPath projectDirectoryInfo.FullName
         |> Result.valueOr raiseProgramFileError
 
-    let audioJsonDocument =
-        JsonDocument.Parse(File.ReadAllText(audioJsonDocumentPath))
-
-    [<Fact>]
-    let ``validate root element test`` () =
-        let actual = audioJsonDocument |> toFirstPropertyName
-        let expected = nameof(Presentation) |> Some
-        actual |> should equal expected
+    let presentationElementResult =
+        File.ReadAllText(audioJsonDocumentPath)
+        |> tryGetPresentationElementResult
 
     [<Theory>]
     [<InlineData("2005-12-10-22-19-14-IDAMAQDBIDANAQDB-1")>]
     let ``Presentation.id test`` (expected: string) =
         let result =
-            audioJsonDocument.RootElement
-            |> tryGetProperty (nameof(Presentation))
+            presentationElementResult
             |> Result.bind (tryGetProperty "@ClientId")
         result |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
 
@@ -55,9 +52,8 @@ module PresentationTests =
     [<InlineData("Songhay Audio Presentation")>]
     let ``Presentation.title test`` (expected: string) =
         let result =
-            audioJsonDocument.RootElement
-            |> tryGetProperty (nameof(Presentation))
-            |> Result.bind (tryGetProperty "Title")
+            presentationElementResult
+            |> Result.bind (tryGetProperty <| nameof(Title))
         result |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
 
         let actual = (result |> Result.valueOr raise).GetString()
@@ -67,8 +63,7 @@ module PresentationTests =
     [<InlineData("This InfoPath Form data is packaged with the audio presentation")>]
     let ``Presentation.parts PresentationDescription test`` (expected: string) =
         let result =
-            audioJsonDocument.RootElement
-            |> tryGetProperty (nameof(Presentation))
+            presentationElementResult
             |> Result.bind (tryGetProperty <| nameof(Description))
             |> Result.bind (tryGetProperty "#text")
         result |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
@@ -84,8 +79,7 @@ module PresentationTests =
     [<Fact>]
     let ``Presentation.parts Credits test`` () =
         let result =
-            audioJsonDocument.RootElement
-            |> tryGetProperty (nameof(Presentation))
+            presentationElementResult
             |> Result.bind (tryGetProperty <| nameof(Credits))
             |> Result.bind (tryGetProperty "#text")
         result |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
