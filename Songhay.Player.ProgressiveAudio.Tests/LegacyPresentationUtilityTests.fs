@@ -3,6 +3,7 @@ namespace Songhay.Player.ProgressiveAudio.Tests
 open System
 open System.Data
 open System.IO
+open System.Linq
 open System.Reflection
 open System.Text.Json
 open System.Text.RegularExpressions
@@ -107,24 +108,54 @@ module LegacyPresentationUtilityTests =
     [<Theory>]
     [<InlineData("©2006 Songhay System")>]
     let ``Presentation.parts CopyRights test`` (expected: string) =
-        let resultName =
+        let nameResult =
             presentationElementResult
             |> Result.bind (tryGetProperty <| nameof(Copyright))
             |> Result.bind (tryGetProperty "@Name")
-        resultName |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
+        nameResult |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
 
-        let resultYear =
+        let yearResult =
             presentationElementResult
             |> Result.bind (tryGetProperty <| nameof(Copyright))
             |> Result.bind (tryGetProperty "@Year")
-        resultName |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
+        nameResult |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
 
         let actual =
             [
-                $"©{(resultYear |> Result.valueOr raise).GetString()} {(resultName |> Result.valueOr raise).GetString()}"
-                |> DisplayText
-                |> Copyright
+                {
+                    year = (yearResult |> Result.valueOr raise).GetString() |> DisplayText
+                    name = (nameResult |> Result.valueOr raise).GetString() |> DisplayText
+                }
             ]
             |> CopyRights
 
-        actual.StringValues[0].Contains(expected) |> should be True
+        actual.StringValues[0].ToString() |> should equal expected
+
+    [<Fact>]
+    let ``Presentation.parts Playlist test`` () =
+        let result =
+            presentationElementResult
+            |> Result.bind (tryGetProperty "ItemGroup")
+            |> Result.bind (tryGetProperty "Item")
+        result |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
+
+        let toPlaylistItem el =
+            let titleResult =
+                el
+                |> tryGetProperty "#text"
+                |> toResultFromStringElement ( fun el -> el.GetString() |> Title)
+            titleResult |> should be (ofCase <@ Result<Title, JsonException>.Ok @>)
+
+            let uriResult =
+                el
+                |> tryGetProperty "@Uri" |>toResultFromStringElement (fun el -> Uri (el.GetString(), UriKind.Relative))
+            uriResult |> should be (ofCase <@ Result<Uri, JsonException>.Ok @>)
+
+            ( titleResult |> Result.valueOr raise, uriResult |> Result.valueOr raise )
+
+        let actual =
+            result
+            |> toResultFromJsonElement (fun kind -> kind = JsonValueKind.Array) (fun el -> el.EnumerateArray().ToArray())
+            |> Result.map (fun a -> a |> Array.map toPlaylistItem |> List.ofArray |> Playlist)
+
+        actual |> should be (ofCase <@ Result<PresentationPart, JsonException>.Ok @>)

@@ -5,17 +5,26 @@ open System
 open Songhay.Modules.Models
 open Songhay.Modules.Publications.Models
 
-type Copyright = | Copyright of DisplayText
+type Copyright =
+    {
+        year: DisplayText
+        name: DisplayText
+    }
 
-type Description = | Description of DisplayText
+    override this.ToString() = $"©{this.year.Value} {this.name.Value}"
 
-type IntroUri = | IntroUri of Uri
+type Description =
+    | Description of DisplayText
+
+    override this.ToString() = match this with Description dt -> dt.Value
 
 type RoleCredit =
     {
         role: DisplayText
         name: DisplayText
     }
+
+    override this.ToString() = $"{nameof(this.role)}{this.role.Value}; {nameof(this.name)}{this.name.Value}"
 
 type StreamSegment =
     {
@@ -33,12 +42,10 @@ type PresentationPart =
 
     member this.StringValue =
         match this with
-        | PresentationDescription (Description dt) -> dt.Value
         | _ -> this.ToString()
 
     member this.StringValues =
         match this with
-        | CopyRights l -> l |> List.map (fun (Copyright dt) -> dt.Value)
+        | CopyRights l -> l |> List.map (fun i -> i.ToString())
         | Pages l -> l
-        | PresentationDescription (Description dt) -> [dt.Value]
         | _ -> [this.ToString()]
