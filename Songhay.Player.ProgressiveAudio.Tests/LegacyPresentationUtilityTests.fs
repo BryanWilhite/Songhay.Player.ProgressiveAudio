@@ -103,3 +103,28 @@ module LegacyPresentationUtilityTests =
 
         let results = matches |> Seq.map processMatches
         results |> should not' (be Empty)
+
+    [<Theory>]
+    [<InlineData("©2006 Songhay System")>]
+    let ``Presentation.parts CopyRights test`` (expected: string) =
+        let resultName =
+            presentationElementResult
+            |> Result.bind (tryGetProperty <| nameof(Copyright))
+            |> Result.bind (tryGetProperty "@Name")
+        resultName |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
+
+        let resultYear =
+            presentationElementResult
+            |> Result.bind (tryGetProperty <| nameof(Copyright))
+            |> Result.bind (tryGetProperty "@Year")
+        resultName |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
+
+        let actual =
+            [
+                $"©{(resultYear |> Result.valueOr raise).GetString()} {(resultName |> Result.valueOr raise).GetString()}"
+                |> DisplayText
+                |> Copyright
+            ]
+            |> CopyRights
+
+        actual.StringValues[0].Contains(expected) |> should be True
