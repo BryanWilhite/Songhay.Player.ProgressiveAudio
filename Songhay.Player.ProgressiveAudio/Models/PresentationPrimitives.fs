@@ -7,7 +7,7 @@ open Songhay.Modules.Publications.Models
 
 type Copyright =
     {
-        year: string
+        year: int
         name: string
     }
 

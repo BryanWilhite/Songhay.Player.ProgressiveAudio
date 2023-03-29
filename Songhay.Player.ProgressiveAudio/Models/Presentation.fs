@@ -7,7 +7,7 @@ type Presentation =
     {
         id: Id
         title: Title
-        cssVariables: CssVariable list
+        cssVariables: CssVariables
         parts: PresentationPart list
     }
 

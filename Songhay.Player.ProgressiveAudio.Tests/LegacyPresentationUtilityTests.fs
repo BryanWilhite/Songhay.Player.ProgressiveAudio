@@ -12,6 +12,7 @@ open FsToolkit.ErrorHandling
 open FsUnit.CustomMatchers
 open FsUnit.Xunit
 open Xunit
+open Xunit.Abstractions
 
 open Songhay.Modules.Models
 open Songhay.Modules.JsonDocumentUtility
@@ -21,7 +22,7 @@ open Songhay.Modules.Publications.Models
 open Songhay.Player.ProgressiveAudio.Models
 open Songhay.Player.ProgressiveAudio.LegacyPresentationUtility
 
-module LegacyPresentationUtilityTests =
+type LegacyPresentationUtilityTests(outputHelper: ITestOutputHelper) =
 
     let projectDirectoryInfo =
         Assembly.GetExecutingAssembly()
@@ -105,9 +106,30 @@ module LegacyPresentationUtilityTests =
         let results = matches |> Seq.map processMatches
         results |> should not' (be Empty)
 
+    [<Fact>]
+    let ``Presentation.cssVariables test``() =
+        let result =
+            presentationElementResult
+            |> Result.bind (tryGetProperty "LayoutMetadata")
+        result |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
+
+        let rec processProperty (p: JsonProperty) =
+            match p.Value.ValueKind with
+            | JsonValueKind.Object ->
+                outputHelper.WriteLine <| p.Name
+                p.Value.EnumerateObject().ToArray() |> Array.map processProperty |> ignore
+                outputHelper.WriteLine <| Environment.NewLine
+                ()
+            | _ ->
+                outputHelper.WriteLine <| p.Name
+                ()
+
+        result
+        |> Result.map(fun el -> el.EnumerateObject().ToArray() |> Array.map processProperty)
+
     [<Theory>]
     [<InlineData("©2006 Songhay System")>]
-    let ``Presentation.parts CopyRights test`` (expected: string) =
+    let ``Presentation.parts Copyrights test`` (expected: string) =
         let nameResult =
             presentationElementResult
             |> Result.bind (tryGetProperty <| nameof(Copyright))
@@ -123,7 +145,7 @@ module LegacyPresentationUtilityTests =
         let actual =
             [
                 {
-                    year = (yearResult |> Result.valueOr raise).GetString()
+                    year = (yearResult |> Result.valueOr raise).GetString() |> Int32.Parse
                     name = (nameResult |> Result.valueOr raise).GetString()
                 }
             ]
