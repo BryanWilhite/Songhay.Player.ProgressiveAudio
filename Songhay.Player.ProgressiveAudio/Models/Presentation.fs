@@ -11,4 +11,4 @@ type Presentation =
         parts: PresentationPart list
     }
 
-    override this.ToString() = $"{nameof(this.id)}{this.id.Value.StringValue}; {nameof(this.title)}{this.title}"
+    override this.ToString() = $"{nameof(this.id)}:{this.id.Value.StringValue}; {nameof(this.title)}:{this.title}"

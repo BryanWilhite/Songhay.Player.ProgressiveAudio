@@ -7,11 +7,11 @@ open Songhay.Modules.Publications.Models
 
 type Copyright =
     {
-        year: DisplayText
-        name: DisplayText
+        year: string
+        name: string
     }
 
-    override this.ToString() = $"©{this.year.Value} {this.name.Value}"
+    override this.ToString() = $"©{this.year} {this.name}"
 
 type Description =
     | Description of DisplayText
@@ -20,11 +20,11 @@ type Description =
 
 type RoleCredit =
     {
-        role: DisplayText
-        name: DisplayText
+        role: string
+        name: string
     }
 
-    override this.ToString() = $"{nameof(this.role)}{this.role.Value}; {nameof(this.name)}{this.name.Value}"
+    override this.ToString() = $"{nameof(this.role)}:{this.role}; {nameof(this.name)}:{this.name}"
 
 type StreamSegment =
     {
@@ -37,7 +37,7 @@ type PresentationPart =
     | Credits of RoleCredit list
     | PresentationDescription of Description
     | Pages of string list
-    | Playlist of (Title * Uri) list
+    | Playlist of (DisplayText * Uri) list
     | Stream of StreamSegment list
 
     member this.StringValue =
@@ -48,4 +48,5 @@ type PresentationPart =
         match this with
         | CopyRights l -> l |> List.map (fun i -> i.ToString())
         | Pages l -> l
+        | Playlist l -> l |> List.map (fun (dt, _) -> dt.Value)
         | _ -> [this.ToString()]

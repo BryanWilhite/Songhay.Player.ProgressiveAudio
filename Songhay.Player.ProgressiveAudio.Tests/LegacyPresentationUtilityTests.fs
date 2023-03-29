@@ -95,11 +95,11 @@ module LegacyPresentationUtilityTests =
 
         let getRole (group: Group) =
             let s = Regex.Replace(group.Value, " by[ , ]. . . . . . . ", String.Empty)
-            DisplayText s
+            s
 
         let processMatches (creditsMatch: Match) =
             match creditsMatch.Groups |> List.ofSeq with
-            | [_; r; n] -> Ok { role = r |> getRole; name = DisplayText <| n.Value }
+            | [_; r; n] -> Ok { role = r |> getRole; name = n.Value }
             | _ -> Error <| DataException $"The expected {nameof(Regex)} group data is not here."
 
         let results = matches |> Seq.map processMatches
@@ -123,8 +123,8 @@ module LegacyPresentationUtilityTests =
         let actual =
             [
                 {
-                    year = (yearResult |> Result.valueOr raise).GetString() |> DisplayText
-                    name = (nameResult |> Result.valueOr raise).GetString() |> DisplayText
+                    year = (yearResult |> Result.valueOr raise).GetString()
+                    name = (nameResult |> Result.valueOr raise).GetString()
                 }
             ]
             |> CopyRights
@@ -143,8 +143,8 @@ module LegacyPresentationUtilityTests =
             let titleResult =
                 el
                 |> tryGetProperty "#text"
-                |> toResultFromStringElement ( fun el -> el.GetString() |> Title)
-            titleResult |> should be (ofCase <@ Result<Title, JsonException>.Ok @>)
+                |> toResultFromStringElement ( fun el -> el.GetString() |> DisplayText)
+            titleResult |> should be (ofCase <@ Result<DisplayText, JsonException>.Ok @>)
 
             let uriResult =
                 el
