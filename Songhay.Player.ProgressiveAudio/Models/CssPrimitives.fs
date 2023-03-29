@@ -24,3 +24,5 @@ type CssVariables =
     | CssVariables of CssVariable list
 
     static member fromInput (input: string list) = input |> List.map CssVariable.fromInput
+
+    member this.add (v: CssVariable) = let (CssVariables l) = this in l |> List.append [v]

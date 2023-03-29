@@ -113,19 +113,32 @@ type LegacyPresentationUtilityTests(outputHelper: ITestOutputHelper) =
             |> Result.bind (tryGetProperty "LayoutMetadata")
         result |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
 
-        let rec processProperty (p: JsonProperty) =
+        let actual = Array.Empty<CssVariable>().ToList()
+
+        let rec processProperty (prefix: string) (p: JsonProperty) =
             match p.Value.ValueKind with
             | JsonValueKind.Object ->
-                outputHelper.WriteLine <| p.Name
-                p.Value.EnumerateObject().ToArray() |> Array.map processProperty |> ignore
-                outputHelper.WriteLine <| Environment.NewLine
+                outputHelper.WriteLine <| String.Empty
+                p.Value.EnumerateObject().ToArray()
+                |> Array.iter (fun el -> ($"{prefix}{p.Name}-", el) ||> processProperty)
                 ()
             | _ ->
-                outputHelper.WriteLine <| p.Name
-                ()
+                match p.Name with
+                | "@uri" | "@version" -> ()
+                | _ ->
+                    let cssVar = $"{prefix}{p.Name.TrimStart('@')}" |> CssVariable.fromInput
+                    outputHelper.WriteLine $"{cssVar}"
+                    actual.Add(cssVar)
+                    ()
 
         result
-        |> Result.map(fun el -> el.EnumerateObject().ToArray() |> Array.map processProperty)
+        |> Result.iter
+            (fun el ->
+                el.EnumerateObject().ToArray()
+                |> Array.iter (fun el -> ("rx-player-", el) ||> processProperty)
+            )
+
+        actual |> should not' (be Empty)
 
     [<Theory>]
     [<InlineData("©2006 Songhay System")>]
