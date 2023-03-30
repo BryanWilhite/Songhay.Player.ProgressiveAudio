@@ -16,8 +16,8 @@ open Xunit.Abstractions
 
 open Songhay.Modules.Models
 open Songhay.Modules.JsonDocumentUtility
-open Songhay.Modules.ProgramFileUtility
 open Songhay.Modules.Publications.Models
+open Songhay.Modules.ProgramFileUtility
 
 open Songhay.Player.ProgressiveAudio.Models
 open Songhay.Player.ProgressiveAudio.LegacyPresentationUtility
@@ -42,136 +42,105 @@ type LegacyPresentationUtilityTests(outputHelper: ITestOutputHelper) =
     [<Theory>]
     [<InlineData("2005-12-10-22-19-14-IDAMAQDBIDANAQDB-1")>]
     let ``Presentation.id test`` (expected: string) =
-        let result =
-            presentationElementResult
-            |> Result.bind (tryGetProperty "@ClientId")
+        let result = presentationElementResult |> tryGetPresentationIdResult
         result |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
 
-        let actual = (result |> Result.valueOr raise).GetString()
-        actual |> should equal expected
+        let actual = result |> toResultFromStringElement (fun el -> el.GetString() |> Identifier.fromString |> Id)
+        actual |> should be (ofCase <@ Result<Id, JsonException>.Ok @>)
+
+        (actual |> Result.valueOr raise).Value.StringValue |> should equal expected
 
     [<Theory>]
     [<InlineData("Songhay Audio Presentation")>]
     let ``Presentation.title test`` (expected: string) =
-        let result =
-            presentationElementResult
-            |> Result.bind (tryGetProperty <| nameof(Title))
+        let result = presentationElementResult |> tryGetPresentationTitleResult
         result |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
 
-        let actual = (result |> Result.valueOr raise).GetString()
-        actual |> should equal expected
+        let actual = result |> toResultFromStringElement (fun el -> el.GetString() |> Title)
+        actual |> should be (ofCase <@ Result<Title, JsonException>.Ok @>)
+
+        match (actual |> Result.valueOr raise) with | Title t -> t |> should equal expected
 
     [<Theory>]
     [<InlineData("This InfoPath Form data is packaged with the audio presentation")>]
     let ``Presentation.parts PresentationDescription test`` (expected: string) =
-        let result =
-            presentationElementResult
-            |> Result.bind (tryGetProperty <| nameof(Description))
-            |> Result.bind (tryGetProperty "#text")
+        let result = presentationElementResult |> tryGetPresentationDescriptionResult
         result |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
 
         let actual =
-            (result |> Result.valueOr raise).GetString()
-            |> DisplayText
-            |> Description
-            |> PresentationDescription
+            result
+            |> toResultFromStringElement (fun el -> el.GetString() |> DisplayText |> Description |> PresentationDescription)
+        actual |> should be (ofCase <@ Result<PresentationPart, JsonException>.Ok @>)
 
-        actual.StringValue.Contains(expected) |> should be True
+        (actual |> Result.valueOr raise).StringValue.Contains(expected) |> should be True
 
     [<Fact>]
     let ``Presentation.parts Credits test`` () =
-        let result =
-            presentationElementResult
-            |> Result.bind (tryGetProperty <| nameof(Credits))
-            |> Result.bind (tryGetProperty "#text")
+        let result = presentationElementResult |> tryGetPresentationCreditsResult
         result |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
 
-        let actual = (result |> Result.valueOr raise).GetString()
-
-        actual |> String.IsNullOrWhiteSpace |> should be False
+        let htmlResult = result |> toResultFromStringElement (fun el -> el.GetString())
+        htmlResult |> should be (ofCase <@ Result<string, JsonException>.Ok @>)
+        (htmlResult |> Result.valueOr raise) |> String.IsNullOrWhiteSpace |> should be False
 
         let rx = Regex("<div>([^<>]+)<strong>([^<>]+)<\/strong><\/div>", RegexOptions.Compiled)
-        let matches = actual |> rx.Matches
+        let matches = (htmlResult |> Result.valueOr raise) |> rx.Matches
         matches |> should not' (be Empty)
 
-        let getRole (group: Group) =
-            let s = Regex.Replace(group.Value, " by[ , ]. . . . . . . ", String.Empty)
-            s
+        let getRole (group: Group) = Regex.Replace(group.Value, " by[ , ]. . . . . . . ", String.Empty)
 
         let processMatches (creditsMatch: Match) =
             match creditsMatch.Groups |> List.ofSeq with
             | [_; r; n] -> Ok { role = r |> getRole; name = n.Value }
             | _ -> Error <| DataException $"The expected {nameof(Regex)} group data is not here."
 
-        let results = matches |> Seq.map processMatches
-        results |> should not' (be Empty)
+        let actual = matches |> Seq.map processMatches |> List.ofSeq
+        actual |> should not' (be Empty)
 
     [<Fact>]
     let ``Presentation.cssVariables test``() =
-        let result =
-            presentationElementResult
-            |> Result.bind (tryGetProperty "LayoutMetadata")
+        let result = presentationElementResult |> tryGetLayoutMetadataResult
         result |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
 
-        let actual = Array.Empty<CssVariable>().ToList()
-
-        let rec processProperty (prefix: string) (p: JsonProperty) =
-            match p.Value.ValueKind with
-            | JsonValueKind.Object ->
-                outputHelper.WriteLine <| String.Empty
-                p.Value.EnumerateObject().ToArray()
-                |> Array.iter (fun el -> ($"{prefix}{p.Name}-", el) ||> processProperty)
-                ()
-            | _ ->
-                match p.Name with
-                | "@uri" | "@version" -> ()
-                | _ ->
-                    let cssVar = $"{prefix}{p.Name.TrimStart('@')}" |> CssVariable.fromInput
-                    outputHelper.WriteLine $"{cssVar}"
-                    actual.Add(cssVar)
-                    ()
-
-        result
-        |> Result.iter
-            (fun el ->
-                el.EnumerateObject().ToArray()
-                |> Array.iter (fun el -> ("rx-player-", el) ||> processProperty)
-            )
-
+        let actual = result |> toPresentationCssVariables
         actual |> should not' (be Empty)
 
     [<Theory>]
     [<InlineData("©2006 Songhay System")>]
     let ``Presentation.parts Copyrights test`` (expected: string) =
-        let nameResult =
-            presentationElementResult
-            |> Result.bind (tryGetProperty <| nameof(Copyright))
-            |> Result.bind (tryGetProperty "@Name")
+        let nameResult = presentationElementResult |> tryGetCopyrightNameResult
         nameResult |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
 
-        let yearResult =
-            presentationElementResult
-            |> Result.bind (tryGetProperty <| nameof(Copyright))
-            |> Result.bind (tryGetProperty "@Year")
-        nameResult |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
+        let yearResult = presentationElementResult |> tryGetCopyrightYearResult
+        yearResult |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
 
         let actual =
             [
-                {
-                    year = (yearResult |> Result.valueOr raise).GetString() |> Int32.Parse
-                    name = (nameResult |> Result.valueOr raise).GetString()
-                }
+                nameResult
+                yearResult
             ]
-            |> CopyRights
+            |> List.sequenceResultM
+            |> Result.map (
+                fun _ ->
+                [
+                    {
+                        name = (nameResult |> Result.valueOr raise).GetString()
+                        year =
+                            match (yearResult |> Result.valueOr raise).GetString() |> Int32.TryParse with
+                            | true, y -> y
+                            | false, _ -> Unchecked.defaultof<int>
+                    }
+                ]
+                |> CopyRights
+            )
 
-        actual.StringValues[0].ToString() |> should equal expected
+        actual |> should be (ofCase <@ Result<PresentationPart, JsonException>.Ok @>)
+
+        (actual |> Result.valueOr raise).StringValues[0] |> should equal expected
 
     [<Fact>]
     let ``Presentation.parts Playlist test`` () =
-        let result =
-            presentationElementResult
-            |> Result.bind (tryGetProperty "ItemGroup")
-            |> Result.bind (tryGetProperty "Item")
+        let result = presentationElementResult |> tryGetPlaylistRootResult
         result |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
 
         let toPlaylistItem el =

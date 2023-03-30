@@ -2,6 +2,13 @@
 
 open Songhay.Modules.StringUtility
 
+type CssValue =
+    | CssValue of string
+
+    member this.Value = let (CssValue v) = this in v
+
+    override this.ToString() = this.Value
+
 type CssVariable =
     | CssVariable of string
 
@@ -9,8 +16,6 @@ type CssVariable =
         match input.TrimStart('-') |> toKabobCase with
         | Some s -> CssVariable $"--{s}"
         | None -> CssVariable "--?"
-
-    member this.toCssDeclaration (cssVariableValue: string) = $"{this.Value}: {cssVariableValue};"
 
     member this.toCssPropertyValue = $"var({this.Value})"
 
@@ -25,4 +30,9 @@ type CssVariables =
 
     static member fromInput (input: string list) = input |> List.map CssVariable.fromInput
 
-    member this.add (v: CssVariable) = let (CssVariables l) = this in l |> List.append [v]
+type CssVariableAndValue =
+    | CssVariableAndValue of CssVariable * CssValue
+
+    member this.toCssDeclaration = match this with | CssVariableAndValue (cssVar, cssVal) -> $"{cssVar}: {cssVal};"
+
+type CssVariableAndValues = CssVariableAndValue list
