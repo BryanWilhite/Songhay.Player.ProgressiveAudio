@@ -118,31 +118,13 @@ type LegacyPresentationUtilityTests(outputHelper: ITestOutputHelper) =
     [<Theory>]
     [<InlineData("©2006 Songhay System")>]
     let ``Presentation.parts Copyrights test`` (expected: string) =
-        let nameResult = presentationElementResult |> tryGetCopyrightNameResult
-        nameResult |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
+        let nameElementResult = presentationElementResult |> tryGetCopyrightNameResult
+        nameElementResult |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
 
-        let yearResult = presentationElementResult |> tryGetCopyrightYearResult
-        yearResult |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
+        let yearElementResult = presentationElementResult |> tryGetCopyrightYearResult
+        yearElementResult |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
 
-        let actual =
-            [
-                nameResult
-                yearResult
-            ]
-            |> List.sequenceResultM
-            |> Result.map (
-                fun _ ->
-                [
-                    {
-                        name = (nameResult |> Result.valueOr raise).GetString()
-                        year =
-                            match (yearResult |> Result.valueOr raise).GetString() |> Int32.TryParse with
-                            | true, y -> y
-                            | false, _ -> Unchecked.defaultof<int>
-                    }
-                ]
-                |> CopyRights
-            )
+        let actual = (nameElementResult, yearElementResult) ||> toPresentationCopyrights
 
         actual |> should be (ofCase <@ Result<PresentationPart, JsonException>.Ok @>)
 

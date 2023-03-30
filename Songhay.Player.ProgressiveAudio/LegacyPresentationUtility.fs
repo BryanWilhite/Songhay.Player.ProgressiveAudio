@@ -16,8 +16,27 @@ module LegacyPresentationUtility =
 
     open Songhay.Player.ProgressiveAudio.Models
 
-    let toPresentationCopyrights (elementResult: Result<JsonElement, JsonException>) =
-        elementResult
+    let toPresentationCopyrights
+        (nameElementResult: Result<JsonElement, JsonException>)
+        (yearElementResult: Result<JsonElement, JsonException>) =
+        [
+            nameElementResult
+            yearElementResult
+        ]
+        |> List.sequenceResultM
+        |> Result.map (
+            fun _ ->
+            [
+                {
+                    name = (nameElementResult |> Result.valueOr raise).GetString()
+                    year =
+                        match (yearElementResult |> Result.valueOr raise).GetString() |> Int32.TryParse with
+                        | true, y -> y
+                        | false, _ -> Unchecked.defaultof<int>
+                }
+            ]
+            |> CopyRights
+        )
 
     let toPresentationCssVariables (elementResult: Result<JsonElement, JsonException>) =
         let declarations = List<CssVariableAndValue>()
