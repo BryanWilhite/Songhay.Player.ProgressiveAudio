@@ -6,6 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="Models\Primitives.fs" />
         <Compile Include="Models\CssPrimitives.fs" />
         <Compile Include="Models\PresentationPrimitives.fs" />
         <Compile Include="Models\Presentation.fs" />

@@ -136,22 +136,40 @@ type LegacyPresentationUtilityTests(outputHelper: ITestOutputHelper) =
         result |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
 
         let toPlaylistItem el =
-            let titleResult =
-                el
-                |> tryGetProperty "#text"
-                |> toResultFromStringElement ( fun el -> el.GetString() |> DisplayText)
-            titleResult |> should be (ofCase <@ Result<DisplayText, JsonException>.Ok @>)
+            let titleResult = el |> tryGetProperty "#text" |> JsonElementValue.tryGetJsonStringValue
+            let uriResult = el |> tryGetProperty "@Uri" |> JsonElementValue.tryGetJsonUriValue UriKind.Relative
 
-            let uriResult =
-                el
-                |> tryGetProperty "@Uri" |>toResultFromStringElement (fun el -> Uri (el.GetString(), UriKind.Relative))
-            uriResult |> should be (ofCase <@ Result<Uri, JsonException>.Ok @>)
-
-            ( titleResult |> Result.valueOr raise, uriResult |> Result.valueOr raise )
+            [
+                titleResult
+                uriResult
+            ]
+            |> List.sequenceResultM
+            |> Result.bind
+                (
+                    fun _ ->
+                        let titleOpt = (titleResult |> Result.valueOr raise).StringValue
+                        let uriOpt = (uriResult |> Result.valueOr raise).UriValue
+                        let options = [|
+                            titleOpt.IsSome
+                            uriOpt.IsSome
+                        |]
+                        match options |> Array.forall id with
+                        | true -> Ok (titleOpt.Value |> DisplayText, uriOpt.Value)
+                        | false -> Error <| JsonException "The expected option values are not here."
+                )
 
         let actual =
             result
-            |> toResultFromJsonElement (fun kind -> kind = JsonValueKind.Array) (fun el -> el.EnumerateArray().ToArray())
-            |> Result.map (fun a -> a |> Array.map toPlaylistItem |> List.ofArray |> Playlist)
+            |> toResultFromJsonElement
+                (fun kind -> kind = JsonValueKind.Array)
+                (fun el -> el.EnumerateArray().ToArray())
+            |> Result.map (
+                    fun a ->
+                        a
+                        |> List.ofSeq
+                        |> List.map toPlaylistItem
+                        |> List.sequenceResultM
+                        |> Result.map (fun l -> l |> Playlist)
+                )
 
         actual |> should be (ofCase <@ Result<PresentationPart, JsonException>.Ok @>)
