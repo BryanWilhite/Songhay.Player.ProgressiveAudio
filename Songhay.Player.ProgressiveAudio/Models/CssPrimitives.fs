@@ -33,6 +33,8 @@ type CssVariables =
 type CssVariableAndValue =
     | CssVariableAndValue of CssVariable * CssValue
 
+    member this.Pair = let (CssVariableAndValue (cssVar, cssVal)) = this in (cssVar, cssVal)
+
     member this.toCssDeclaration = match this with | CssVariableAndValue (cssVar, cssVal) -> $"{cssVar}: {cssVal};"
 
 type CssVariableAndValues = CssVariableAndValue list

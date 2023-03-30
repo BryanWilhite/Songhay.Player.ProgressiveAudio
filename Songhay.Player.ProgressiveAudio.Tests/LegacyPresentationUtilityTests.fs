@@ -97,13 +97,23 @@ type LegacyPresentationUtilityTests(outputHelper: ITestOutputHelper) =
         let actual = matches |> Seq.map processMatches |> List.ofSeq
         actual |> should not' (be Empty)
 
-    [<Fact>]
-    let ``Presentation.cssVariables test``() =
+    [<Theory>]
+    [<InlineData("--rx-player-playlist-background-color", "0xEAEAEA")>]
+    let ``Presentation.cssVariables test``(expectedVarName: string) (expectedValue: string) =
         let result = presentationElementResult |> tryGetLayoutMetadataResult
         result |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
 
         let actual = result |> toPresentationCssVariables
-        actual |> should not' (be Empty)
+        actual |> should be (ofCase <@ Result<CssVariableAndValues, JsonException>.Ok @>)
+        (actual |> Result.valueOr raise)
+        |> List.find
+            (
+                fun i ->
+                    let cssVar, cssVal = i.Pair
+                    cssVar.Value = expectedVarName
+                    && cssVal.Value = expectedValue
+            )
+        |> (fun i -> i.toCssDeclaration |> outputHelper.WriteLine)
 
     [<Theory>]
     [<InlineData("©2006 Songhay System")>]

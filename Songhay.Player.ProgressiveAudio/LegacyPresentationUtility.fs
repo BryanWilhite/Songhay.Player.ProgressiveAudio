@@ -27,7 +27,7 @@ module LegacyPresentationUtility =
                 p.Value.EnumerateObject().ToArray()
                 |> Array.iter (fun el -> ($"{prefix}{p.Name}-", el) ||> processProperty)
                 ()
-            | _ ->
+            | JsonValueKind.String ->
                 match p.Name with
                 | "@title" | "@uri" | "@version" -> ()
                 | _ ->
@@ -41,15 +41,18 @@ module LegacyPresentationUtility =
                     let cssVar = $"{prefix}{p.Name.TrimStart('@')}" |> CssVariable.fromInput
                     declarations.Add((cssVar, cssVal) |> CssVariableAndValue)
                     ()
+            | _ -> ()
 
         elementResult
-        |> Result.iter
-            (fun el ->
-                el.EnumerateObject().ToArray()
-                |> Array.iter (fun el -> ("rx-player-", el) ||> processProperty)
+        |> toResultFromJsonElement
+            (fun kind -> kind = JsonValueKind.Object)
+            (fun el -> el.EnumerateObject().ToArray())
+        |> Result.map
+            (
+                fun jsonProperties ->
+                    jsonProperties |> Array.iter (fun el -> ("rx-player-", el) ||> processProperty)
+                    declarations |> List.ofSeq
             )
-
-        declarations |> List.ofSeq
 
     let tryGetPresentationElementResult (json: string) =
         json
