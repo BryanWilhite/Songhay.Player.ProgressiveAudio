@@ -1,12 +1,8 @@
 namespace Songhay.Player.ProgressiveAudio.Tests
 
-open System
-open System.Data
 open System.IO
-open System.Linq
 open System.Reflection
 open System.Text.Json
-open System.Text.RegularExpressions
 
 open FsToolkit.ErrorHandling
 open FsUnit.CustomMatchers
@@ -79,23 +75,10 @@ type LegacyPresentationUtilityTests(outputHelper: ITestOutputHelper) =
         let result = presentationElementResult |> tryGetPresentationCreditsResult
         result |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
 
-        let htmlResult = result |> toResultFromStringElement (fun el -> el.GetString())
-        htmlResult |> should be (ofCase <@ Result<string, JsonException>.Ok @>)
-        (htmlResult |> Result.valueOr raise) |> String.IsNullOrWhiteSpace |> should be False
+        let actual = result |> toPresentationCreditsResult
+        actual |> should be (ofCase <@ Result<RoleCredit list, JsonException>.Ok @>)
 
-        let rx = Regex("<div>([^<>]+)<strong>([^<>]+)<\/strong><\/div>", RegexOptions.Compiled)
-        let matches = (htmlResult |> Result.valueOr raise) |> rx.Matches
-        matches |> should not' (be Empty)
-
-        let getRole (group: Group) = Regex.Replace(group.Value, " by[ , ]. . . . . . . ", String.Empty)
-
-        let processMatches (creditsMatch: Match) =
-            match creditsMatch.Groups |> List.ofSeq with
-            | [_; r; n] -> Ok { role = r |> getRole; name = n.Value }
-            | _ -> Error <| DataException $"The expected {nameof(Regex)} group data is not here."
-
-        let actual = matches |> Seq.map processMatches |> List.ofSeq
-        actual |> should not' (be Empty)
+        (actual |> Result.valueOr raise) |> should not' (be Empty)
 
     [<Theory>]
     [<InlineData("--rx-player-playlist-background-color", "0xEAEAEA")>]
@@ -103,7 +86,7 @@ type LegacyPresentationUtilityTests(outputHelper: ITestOutputHelper) =
         let result = presentationElementResult |> tryGetLayoutMetadataResult
         result |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
 
-        let actual = result |> toPresentationCssVariables
+        let actual = result |> toPresentationCssVariablesResult
         actual |> should be (ofCase <@ Result<CssVariableAndValues, JsonException>.Ok @>)
         (actual |> Result.valueOr raise)
         |> List.find
@@ -135,41 +118,6 @@ type LegacyPresentationUtilityTests(outputHelper: ITestOutputHelper) =
         let result = presentationElementResult |> tryGetPlaylistRootResult
         result |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
 
-        let toPlaylistItem el =
-            let titleResult = el |> tryGetProperty "#text" |> JsonElementValue.tryGetJsonStringValue
-            let uriResult = el |> tryGetProperty "@Uri" |> JsonElementValue.tryGetJsonUriValue UriKind.Relative
-
-            [
-                titleResult
-                uriResult
-            ]
-            |> List.sequenceResultM
-            |> Result.bind
-                (
-                    fun _ ->
-                        let titleOpt = (titleResult |> Result.valueOr raise).StringValue
-                        let uriOpt = (uriResult |> Result.valueOr raise).UriValue
-                        let options = [|
-                            titleOpt.IsSome
-                            uriOpt.IsSome
-                        |]
-                        match options |> Array.forall id with
-                        | true -> Ok (titleOpt.Value |> DisplayText, uriOpt.Value)
-                        | false -> Error <| JsonException "The expected option values are not here."
-                )
-
-        let actual =
-            result
-            |> toResultFromJsonElement
-                (fun kind -> kind = JsonValueKind.Array)
-                (fun el -> el.EnumerateArray().ToArray())
-            |> Result.bind (
-                    fun a ->
-                        a
-                        |> List.ofSeq
-                        |> List.map toPlaylistItem
-                        |> List.sequenceResultM
-                        |> Result.map (fun l -> l |> Playlist)
-                )
+        let actual = result |> toPresentationPlaylistResult
 
         actual |> should be (ofCase <@ Result<PresentationPart, JsonException>.Ok @>)

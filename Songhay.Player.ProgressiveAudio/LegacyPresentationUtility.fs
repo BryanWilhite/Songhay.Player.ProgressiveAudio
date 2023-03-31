@@ -1,10 +1,9 @@
 namespace Songhay.Player.ProgressiveAudio
 
-open Songhay.Modules.Models
-
 module LegacyPresentationUtility =
 
     open System
+    open System.Data
     open System.Linq
     open System.Collections.Generic
     open System.Text.Json
@@ -13,8 +12,8 @@ module LegacyPresentationUtility =
     open FsToolkit.ErrorHandling
 
     open Songhay.Modules.Models
-    open Songhay.Modules.JsonDocumentUtility
     open Songhay.Modules.Publications.Models
+    open Songhay.Modules.JsonDocumentUtility
 
     open Songhay.Player.ProgressiveAudio.Models
 
@@ -50,7 +49,34 @@ module LegacyPresentationUtility =
             | false -> Error <| JsonException "The expected option values are not here."
         )
 
-    let toPresentationCssVariables (elementResult: Result<JsonElement, JsonException>) =
+    let toPresentationCreditsResult (elementResult: Result<JsonElement, JsonException>) =
+
+        let rx = Regex("<div>([^<>]+)<strong>([^<>]+)<\/strong><\/div>", RegexOptions.Compiled)
+        let matchesResult =
+            elementResult
+            |> toResultFromStringElement (fun el -> el.GetString())
+            |> Result.map (fun html -> html |> rx.Matches)
+            |> Result.bind (fun matches ->
+                if matches.Count > 0 then Ok matches
+                else Error <| JsonException "The expected HTML format is not here.")
+
+        let processMatches (creditsMatch: Match) =
+            let getRole (group: Group) = Regex.Replace(group.Value, " by[ , ]. . . . . . . ", String.Empty)
+
+            match creditsMatch.Groups |> List.ofSeq with
+            | [_; r; n] -> Ok { role = r |> getRole; name = n.Value }
+            | _ -> Error <| JsonException ("See inner exception.", DataException $"The expected {nameof(Regex)} group data is not here.")
+
+        matchesResult
+        |> Result.bind (
+            fun matches ->
+                matches
+                |> Seq.map processMatches
+                |> List.ofSeq
+                |> List.sequenceResultM
+            )
+
+    let toPresentationCssVariablesResult (elementResult: Result<JsonElement, JsonException>) =
         let declarations = List<CssVariableAndValue>()
         let rec processProperty (prefix: string) (p: JsonProperty) =
             match p.Value.ValueKind with
@@ -84,6 +110,44 @@ module LegacyPresentationUtility =
                     jsonProperties |> Array.iter (fun el -> ("rx-player-", el) ||> processProperty)
                     declarations |> List.ofSeq
             )
+
+    let toPresentationPlaylistResult (elementResult: Result<JsonElement, JsonException>) =
+
+        let toPlaylistItem el =
+            let titleResult = el |> tryGetProperty "#text" |> JsonElementValue.tryGetJsonStringValue
+            let uriResult = el |> tryGetProperty "@Uri" |> JsonElementValue.tryGetJsonUriValue UriKind.Relative
+
+            [
+                titleResult
+                uriResult
+            ]
+            |> List.sequenceResultM
+            |> Result.bind
+                (
+                    fun _ ->
+                        let titleOpt = (titleResult |> Result.valueOr raise).StringValue
+                        let uriOpt = (uriResult |> Result.valueOr raise).UriValue
+                        let options = [|
+                            titleOpt.IsSome
+                            uriOpt.IsSome
+                        |]
+                        match options |> Array.forall id with
+                        | true -> Ok (titleOpt.Value |> DisplayText, uriOpt.Value)
+                        | false -> Error <| JsonException "The expected option values are not here."
+                )
+
+        elementResult
+            |> toResultFromJsonElement
+                (fun kind -> kind = JsonValueKind.Array)
+                (fun el -> el.EnumerateArray().ToArray())
+            |> Result.bind (
+                    fun a ->
+                        a
+                        |> List.ofSeq
+                        |> List.map toPlaylistItem
+                        |> List.sequenceResultM
+                        |> Result.map (fun l -> l |> Playlist)
+                )
 
     let tryGetPresentationElementResult (json: string) =
         json
