@@ -1,5 +1,7 @@
 namespace Songhay.Player.ProgressiveAudio
 
+open Songhay.Modules.Models
+
 module LegacyPresentationUtility =
 
     open System
@@ -19,23 +21,33 @@ module LegacyPresentationUtility =
     let toPresentationCopyrights
         (nameElementResult: Result<JsonElement, JsonException>)
         (yearElementResult: Result<JsonElement, JsonException>) =
+
+        let nameResult = nameElementResult |> JsonElementValue.tryGetJsonStringValue
+        let yearResult = yearElementResult |> JsonElementValue.tryGetJsonIntValueFromStringElement
+
         [
-            nameElementResult
-            yearElementResult
+            nameResult
+            yearResult
         ]
         |> List.sequenceResultM
-        |> Result.map (
+        |> Result.bind (
             fun _ ->
-            [
-                {
-                    name = (nameElementResult |> Result.valueOr raise).GetString()
-                    year =
-                        match (yearElementResult |> Result.valueOr raise).GetString() |> Int32.TryParse with
-                        | true, y -> y
-                        | false, _ -> Unchecked.defaultof<int>
-                }
-            ]
-            |> CopyRights
+            let nameOption = (nameResult |> Result.valueOr raise).StringValue
+            let yearOption = (yearResult |> Result.valueOr raise).IntValue
+            let options = [|
+                nameOption.IsSome
+                yearOption.IsSome
+            |]
+            match options |> Array.forall id with
+            | true ->
+                [
+                    {
+                        name = nameOption.Value
+                        year = yearOption.Value
+                    }
+                ]
+                |> CopyRights |> Ok
+            | false -> Error <| JsonException "The expected option values are not here."
         )
 
     let toPresentationCssVariables (elementResult: Result<JsonElement, JsonException>) =

@@ -1,6 +1,5 @@
 namespace Songhay.Player.ProgressiveAudio.Models
 
-open Songhay.Modules.Models
 open Songhay.Modules.Publications.Models
 
 type Presentation =

@@ -163,7 +163,7 @@ type LegacyPresentationUtilityTests(outputHelper: ITestOutputHelper) =
             |> toResultFromJsonElement
                 (fun kind -> kind = JsonValueKind.Array)
                 (fun el -> el.EnumerateArray().ToArray())
-            |> Result.map (
+            |> Result.bind (
                     fun a ->
                         a
                         |> List.ofSeq

@@ -12,28 +12,57 @@ type JsonElementValue =
     | JsonStringValue of string
     | JsonUriValue of Uri
 
+     static member private getEx (typeName: string) = Error <| JsonException $"The expected {typeName} value is not here."
+
     static member tryGetJsonBooleanValue result =
         result |> toResultFromBooleanElement (fun el -> el.GetBoolean() |> JsonBooleanValue)
 
+    static member tryGetJsonBooleanValueFromStringElement result =
+        result
+        |> toResultFromStringElement (fun el -> el.GetString())
+        |> Result.bind (fun s ->
+                match s |> Boolean.TryParse with
+                | true, b -> b |> JsonBooleanValue |> Ok
+                | false, _ -> nameof(Boolean) |> JsonElementValue.getEx
+            )
+
     static member tryGetJsonDateTimeValue result =
         result
-        |> toResultFromBooleanElement (fun el -> el.GetString())
+        |> toResultFromStringElement (fun el -> el.GetString())
         |> Result.bind (fun s ->
             match s |> DateTime.TryParse with
             | true, dt -> Ok <| JsonDateTimeValue dt
-            | false, _ -> Error <| JsonException $"The expected {nameof(DateTime)} value is not here.")
+            | false, _ -> nameof(DateTime) |> JsonElementValue.getEx
+        )
 
     static member tryGetJsonIntValue result =
-        result |> toResultFromBooleanElement (fun el -> el.GetInt32() |> JsonIntValue)
+        result |> toResultFromNumericElement (fun el -> el.GetInt32() |> JsonIntValue)
+
+    static member tryGetJsonIntValueFromStringElement result =
+        result
+        |> toResultFromStringElement (fun el -> el.GetString())
+        |> Result.bind (fun s ->
+                match s |> Int32.TryParse with
+                | true, d -> d |> JsonIntValue |> Ok
+                | false, _ -> nameof(Int32) |> JsonElementValue.getEx
+            )
 
     static member tryGetJsonFloatValue result =
-        result |> toResultFromBooleanElement (fun el -> el.GetDouble() |> JsonFloatValue)
+        result |> toResultFromNumericElement (fun el -> el.GetDouble() |> JsonFloatValue)
 
+    static member tryGetJsonFloatValueFromStringElement result =
+        result
+        |> toResultFromStringElement (fun el -> el.GetString())
+        |> Result.bind (fun s ->
+                match s |> Double.TryParse with
+                | true, d -> d |> JsonFloatValue |> Ok
+                | false, _ -> nameof(Double) |> JsonElementValue.getEx
+            )
     static member tryGetJsonStringValue result =
-        result |> toResultFromBooleanElement (fun el -> el.GetString() |> JsonStringValue)
+        result |> toResultFromStringElement (fun el -> el.GetString() |> JsonStringValue)
 
     static member tryGetJsonUriValue (uriKind: UriKind) result =
-        result |> toResultFromBooleanElement (fun el -> el.GetString())
+        result |> toResultFromStringElement (fun el -> el.GetString())
         |> Result.bind (fun s ->
             match Uri.TryCreate(s, uriKind) with
             | true, uri -> Ok <| JsonUriValue uri
