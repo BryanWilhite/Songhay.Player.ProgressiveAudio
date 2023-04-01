@@ -76,7 +76,7 @@ type LegacyPresentationUtilityTests(outputHelper: ITestOutputHelper) =
         result |> should be (ofCase <@ Result<JsonElement, JsonException>.Ok @>)
 
         let actual = result |> toPresentationCreditsResult
-        actual |> should be (ofCase <@ Result<RoleCredit list, JsonException>.Ok @>)
+        actual |> should be (ofCase <@ Result<PresentationPart, JsonException>.Ok @>)
 
         (actual |> Result.valueOr raise) |> should not' (be Empty)
 
@@ -121,3 +121,9 @@ type LegacyPresentationUtilityTests(outputHelper: ITestOutputHelper) =
         let actual = result |> toPresentationPlaylistResult
 
         actual |> should be (ofCase <@ Result<PresentationPart, JsonException>.Ok @>)
+
+    [<Fact>]
+    let ``tryGetPresentation test`` () =
+        let json = File.ReadAllText(audioJsonDocumentPath)
+        let actual = json |> tryGetPresentation
+        actual |> should be (ofCase <@ Result<Presentation, JsonException>.Ok @>)

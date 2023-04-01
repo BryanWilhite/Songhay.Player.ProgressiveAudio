@@ -4,6 +4,10 @@ open System
 open System.Text.Json
 open Songhay.Modules.JsonDocumentUtility
 
+module Result =
+    let mapToUnit (r: Result<'a, 'b>) =
+        r |> Result.map (fun _ -> ())
+
 type JsonElementValue =
     | JsonBooleanValue of bool
     | JsonDateTimeValue of DateTime
