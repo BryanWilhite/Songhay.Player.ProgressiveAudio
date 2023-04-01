@@ -1,0 +1,31 @@
+{
+  "id": {
+    "Case": "Alphanumeric",
+    "Fields": [
+      "my-id"
+    ]
+  },
+  "title": "this is the title, man",
+  "cssVariables": [
+    {
+      "Case": "CssVariableAndValue",
+      "Fields": [
+        "--my-css-var-one",
+        "var-one-value"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "Case": "CopyRights",
+      "Fields": [
+        [
+          {
+            "year": 2023,
+            "name": "Bryan Wilhite"
+          }
+        ]
+      ]
+    }
+  ]
+}
