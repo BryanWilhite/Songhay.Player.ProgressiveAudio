@@ -35,7 +35,7 @@ type StreamSegment =
 type PresentationPart =
     | CopyRights of Copyright list
     | Credits of RoleCredit list
-    | PresentationDescription of Description
+    | PresentationDescription of string
     | Pages of string list
     | Playlist of (DisplayText * Uri) list
     | Stream of StreamSegment list

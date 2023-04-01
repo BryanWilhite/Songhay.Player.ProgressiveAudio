@@ -1,5 +1,6 @@
 namespace Songhay.Player.ProgressiveAudio.Tests
 
+open System
 open System.IO
 open System.Reflection
 open System.Text.Json
@@ -37,9 +38,44 @@ type PresentationTests (testOutputHelper: ITestOutputHelper) =
             title = "this is the title, man" |> Title
             cssVariables = [
                 CssVariableAndValue (CssVariable "--my-css-var-one", CssValue "var-one-value")
+                CssVariableAndValue (CssVariable "--my-css-var-two", CssValue "var-two-value")
+                CssVariableAndValue (CssVariable "--my-css-var-three", CssValue "var-three-value")
             ]
             parts = [
-                CopyRights [ { year = 2023; name = "Bryan Wilhite" } ]
+                CopyRights [
+                    { year = 2023; name = "Bryan Wilhite" }
+                    { year = 2023; name = "Creflo Dollar" }
+                ]
+                Credits [
+                    { role = "Cinematographer"; name = "Kodak Black" }
+                    { role = "Catering"; name = "Arlendo Calrissian" }
+                    { role = "Location Scout"; name = "Ranger Rick" }
+                ]
+                PresentationDescription "this is a wonderful work of art"
+                Pages [
+                    "page, the one"
+                    "second page"
+                    "the end"
+                ]
+                Playlist [
+                    DisplayText "track one", Uri("track-one.mp3", UriKind.Relative)
+                    DisplayText "track two", Uri("track-two.mp3", UriKind.Relative)
+                    DisplayText "track three", Uri("track-three.mp3", UriKind.Relative)
+                ]
+                Stream [
+                    {
+                        id = "mpeg-dash-001" |> Alphanumeric |> Id
+                        thumbnailUri = Uri("mpeg-dash-001.jpg", UriKind.Relative)
+                    }
+                    {
+                        id = "mpeg-dash-002" |> Alphanumeric |> Id
+                        thumbnailUri = Uri("mpeg-dash-002.jpg", UriKind.Relative)
+                    }
+                    {
+                        id = "mpeg-dash-003" |> Alphanumeric |> Id
+                        thumbnailUri = Uri("mpeg-dash-003.jpg", UriKind.Relative)
+                    }
+                ]
             ]
         }
 

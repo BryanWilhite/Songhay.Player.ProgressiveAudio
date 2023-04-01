@@ -65,7 +65,7 @@ type LegacyPresentationUtilityTests(outputHelper: ITestOutputHelper) =
 
         let actual =
             result
-            |> toResultFromStringElement (fun el -> el.GetString() |> DisplayText |> Description |> PresentationDescription)
+            |> toResultFromStringElement (fun el -> el.GetString() |> PresentationDescription)
         actual |> should be (ofCase <@ Result<PresentationPart, JsonException>.Ok @>)
 
         (actual |> Result.valueOr raise).StringValue.Contains(expected) |> should be True
