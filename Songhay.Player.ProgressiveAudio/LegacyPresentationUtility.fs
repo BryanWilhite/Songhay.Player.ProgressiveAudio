@@ -192,58 +192,55 @@ module LegacyPresentationUtility =
         >>= (tryGetProperty "Item")
 
     let tryGetPresentation (json: string) =
-        let presentationElementResult = json |> tryGetPresentationElementResult
+        result {
+            let presentationElementResult = json |> tryGetPresentationElementResult
 
-        let idResult =
-            presentationElementResult
-            |> tryGetPresentationIdResult
-            |> toResultFromStringElement (fun el -> el.GetString() |> Identifier.fromString |> Id)
-        let titleResult =
-            presentationElementResult
-            |> tryGetPresentationTitleResult
-            |> toResultFromStringElement (fun el -> el.GetString() |> Title)
-        let cssVariablesResult =
-            presentationElementResult
-            |> tryGetLayoutMetadataResult
-            |> toPresentationCssVariablesResult
-        let descriptionResult =
-            presentationElementResult
-            |> tryGetPresentationDescriptionResult
-            |> toResultFromStringElement (fun el -> el.GetString() |> PresentationDescription)
-        let creditsResult =
-            presentationElementResult
-            |> tryGetPresentationCreditsResult
-            |> toPresentationCreditsResult
-        let copyRightNameResult = presentationElementResult |> tryGetCopyrightNameResult
-        let copyRightYearResult = presentationElementResult |> tryGetCopyrightYearResult
-        let copyRightsResult = (copyRightNameResult, copyRightYearResult) ||> toPresentationCopyrights
-        let playlistResult =
-            presentationElementResult
-            |> tryGetPlaylistRootResult
-            |> toPresentationPlaylistResult
+            let! id =
+                presentationElementResult
+                |> tryGetPresentationIdResult
+                |> toResultFromStringElement (fun el -> el.GetString() |> Identifier.fromString |> Id)
 
-        [
-            idResult |> Result.mapToUnit
-            titleResult |> Result.mapToUnit
-            cssVariablesResult |> Result.mapToUnit
-            descriptionResult |> Result.mapToUnit
-            creditsResult |> Result.mapToUnit
-            copyRightsResult |> Result.mapToUnit
-            playlistResult |> Result.mapToUnit
-        ]
-        |> List.sequenceResultM
-        |> Result.map
-            (
-                fun _ ->
-                    {
-                        id = idResult |> Result.valueOr raise
-                        title = titleResult |> Result.valueOr raise
-                        cssVariables = cssVariablesResult |> Result.valueOr raise
-                        parts = [
-                            descriptionResult |> Result.valueOr raise
-                            creditsResult |> Result.valueOr raise
-                            copyRightsResult |> Result.valueOr raise
-                            playlistResult |> Result.valueOr raise
-                        ]
-                    }
-            )
+            let! title =
+                presentationElementResult
+                |> tryGetPresentationTitleResult
+                |> toResultFromStringElement (fun el -> el.GetString() |> Title)
+
+            let! cssVariableAndValues =
+                presentationElementResult
+                |> tryGetLayoutMetadataResult
+                |> toPresentationCssVariablesResult
+
+            let! description =
+                presentationElementResult
+                |> tryGetPresentationDescriptionResult
+                |> toResultFromStringElement (fun el -> el.GetString() |> PresentationDescription)
+
+            let! credits =
+                presentationElementResult
+                |> tryGetPresentationCreditsResult
+                |> toPresentationCreditsResult
+
+            let copyRightNameResult = presentationElementResult |> tryGetCopyrightNameResult
+            let copyRightYearResult = presentationElementResult |> tryGetCopyrightYearResult
+
+            let! copyrights = (copyRightNameResult, copyRightYearResult) ||> toPresentationCopyrights
+
+            let! playlist =
+                presentationElementResult
+                |> tryGetPlaylistRootResult
+                |> toPresentationPlaylistResult
+
+            return
+
+                {
+                    id = id
+                    title = title
+                    cssVariables = cssVariableAndValues
+                    parts = [
+                        description
+                        credits
+                        copyrights
+                        playlist
+                    ]
+                }
+        }
