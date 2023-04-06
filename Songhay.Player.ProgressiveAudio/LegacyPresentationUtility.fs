@@ -192,8 +192,9 @@ module LegacyPresentationUtility =
         >>= (tryGetProperty "Item")
 
     let tryGetPresentation (json: string) =
+        let presentationElementResult = json |> tryGetPresentationElementResult
+
         result {
-            let presentationElementResult = json |> tryGetPresentationElementResult
 
             let! id =
                 presentationElementResult
