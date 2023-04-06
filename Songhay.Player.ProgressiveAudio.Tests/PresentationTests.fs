@@ -6,7 +6,6 @@ open System.Reflection
 open System.Text.Json
 open System.Text.Json.Serialization
 
-open Songhay.Modules.Publications.Models
 open Xunit
 open Xunit.Abstractions
 
@@ -16,8 +15,8 @@ open FsToolkit.ErrorHandling
 open Songhay.Modules
 open Songhay.Modules.Models
 open Songhay.Modules.ProgramFileUtility
-
-open Songhay.Player.ProgressiveAudio.Models
+open Songhay.Modules.Publications.Models
+open Songhay.Modules.Bolero.Models
 
 type PresentationTests (testOutputHelper: ITestOutputHelper) =
 

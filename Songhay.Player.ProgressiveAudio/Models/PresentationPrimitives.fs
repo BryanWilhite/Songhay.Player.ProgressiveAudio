@@ -1,4 +1,4 @@
-namespace Songhay.Player.ProgressiveAudio.Models
+namespace Songhay.Modules.Bolero.Models
 
 open System
 

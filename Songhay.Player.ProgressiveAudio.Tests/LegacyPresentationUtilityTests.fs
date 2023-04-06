@@ -15,8 +15,8 @@ open Songhay.Modules.JsonDocumentUtility
 open Songhay.Modules.Publications.Models
 open Songhay.Modules.ProgramFileUtility
 
-open Songhay.Player.ProgressiveAudio.Models
-open Songhay.Player.ProgressiveAudio.LegacyPresentationUtility
+open Songhay.Modules.Bolero.Models
+open Songhay.Modules.Bolero.LegacyPresentationUtility
 
 type LegacyPresentationUtilityTests(outputHelper: ITestOutputHelper) =
 

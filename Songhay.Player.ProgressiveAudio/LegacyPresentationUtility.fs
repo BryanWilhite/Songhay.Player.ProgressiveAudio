@@ -1,4 +1,4 @@
-namespace Songhay.Player.ProgressiveAudio
+namespace Songhay.Modules.Bolero
 
 module LegacyPresentationUtility =
 
@@ -10,12 +10,12 @@ module LegacyPresentationUtility =
     open System.Text.RegularExpressions
 
     open FsToolkit.ErrorHandling
+    open FsToolkit.ErrorHandling.Operator.Result
 
     open Songhay.Modules.Models
-    open Songhay.Modules.Publications.Models
     open Songhay.Modules.JsonDocumentUtility
-
-    open Songhay.Player.ProgressiveAudio.Models
+    open Songhay.Modules.Publications.Models
+    open Songhay.Modules.Bolero.Models
 
     let toPresentationCopyrights
         (nameElementResult: Result<JsonElement, JsonException>)
@@ -29,7 +29,7 @@ module LegacyPresentationUtility =
             yearResult
         ]
         |> List.sequenceResultM
-        |> Result.bind (
+        >>= (
             fun _ ->
             let nameOption = (nameResult |> Result.valueOr raise).StringValue
             let yearOption = (yearResult |> Result.valueOr raise).IntValue
@@ -56,7 +56,7 @@ module LegacyPresentationUtility =
             elementResult
             |> toResultFromStringElement (fun el -> el.GetString())
             |> Result.map (fun html -> html |> rx.Matches)
-            |> Result.bind (fun matches ->
+            >>= (fun matches ->
                 if matches.Count > 0 then Ok matches
                 else Error <| JsonException "The expected HTML format is not here.")
 
@@ -68,7 +68,7 @@ module LegacyPresentationUtility =
             | _ -> Error <| JsonException ("See inner exception.", DataException $"The expected {nameof(Regex)} group data is not here.")
 
         matchesResult
-        |> Result.bind (
+        >>= (
             fun matches ->
                 matches
                 |> Seq.map processMatches
@@ -123,7 +123,7 @@ module LegacyPresentationUtility =
                 uriResult
             ]
             |> List.sequenceResultM
-            |> Result.bind
+            >>=
                 (
                     fun _ ->
                         let titleOpt = (titleResult |> Result.valueOr raise).StringValue
@@ -141,7 +141,7 @@ module LegacyPresentationUtility =
             |> toResultFromJsonElement
                 (fun kind -> kind = JsonValueKind.Array)
                 (fun el -> el.EnumerateArray().ToArray())
-            |> Result.bind (
+            >>= (
                     fun a ->
                         a
                         |> List.ofSeq
@@ -153,43 +153,43 @@ module LegacyPresentationUtility =
     let tryGetPresentationElementResult (json: string) =
         json
         |> tryGetRootElement
-        |> Result.bind (tryGetProperty <| nameof(Presentation))
+        >>= (tryGetProperty <| nameof(Presentation))
 
     let tryGetPresentationIdResult presentationElementResult =
         presentationElementResult
-        |> Result.bind (tryGetProperty "@ClientId")
+        >>= (tryGetProperty "@ClientId")
 
     let tryGetPresentationTitleResult presentationElementResult =
         presentationElementResult
-        |> Result.bind (tryGetProperty <| nameof(Title))
+        >>= (tryGetProperty <| nameof(Title))
 
     let tryGetPresentationDescriptionResult presentationElementResult =
         presentationElementResult
-        |> Result.bind (tryGetProperty <| nameof(Description))
-        |> Result.bind (tryGetProperty "#text")
+        >>= (tryGetProperty <| nameof(Description))
+        >>= (tryGetProperty "#text")
 
     let tryGetPresentationCreditsResult presentationElementResult =
         presentationElementResult
-        |> Result.bind (tryGetProperty <| nameof(Credits))
-        |> Result.bind (tryGetProperty "#text")
+        >>= (tryGetProperty <| nameof(Credits))
+        >>= (tryGetProperty "#text")
 
     let tryGetLayoutMetadataResult presentationElementResult =
         presentationElementResult
-        |> Result.bind (tryGetProperty "LayoutMetadata")
+        >>= (tryGetProperty "LayoutMetadata")
 
     let tryGetCopyrightNameResult presentationElementResult =
             presentationElementResult
-            |> Result.bind (tryGetProperty <| nameof(Copyright))
-            |> Result.bind (tryGetProperty "@Name")
+            >>= (tryGetProperty <| nameof(Copyright))
+            >>= (tryGetProperty "@Name")
     let tryGetCopyrightYearResult presentationElementResult =
             presentationElementResult
-            |> Result.bind (tryGetProperty <| nameof(Copyright))
-            |> Result.bind (tryGetProperty "@Year")
+            >>= (tryGetProperty <| nameof(Copyright))
+            >>= (tryGetProperty "@Year")
 
     let tryGetPlaylistRootResult presentationElementResult =
         presentationElementResult
-        |> Result.bind (tryGetProperty "ItemGroup")
-        |> Result.bind (tryGetProperty "Item")
+        >>= (tryGetProperty "ItemGroup")
+        >>= (tryGetProperty "Item")
 
     let tryGetPresentation (json: string) =
         let presentationElementResult = json |> tryGetPresentationElementResult
