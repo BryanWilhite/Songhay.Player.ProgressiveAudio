@@ -14,6 +14,7 @@ module LegacyPresentationUtility =
 
     open Songhay.Modules.Models
     open Songhay.Modules.JsonDocumentUtility
+    open Songhay.Modules.JsonElementValueUtility
     open Songhay.Modules.Publications.Models
     open Songhay.Modules.Bolero.Models
 
@@ -21,33 +22,30 @@ module LegacyPresentationUtility =
         (nameElementResult: Result<JsonElement, JsonException>)
         (yearElementResult: Result<JsonElement, JsonException>) =
 
-        let nameResult = nameElementResult |> JsonElementValue.tryGetJsonStringValue
-        let yearResult = yearElementResult |> JsonElementValue.tryGetJsonIntValueFromStringElement
+        result {
+            let! name =
+                nameElementResult
+                |> toResultFromStringElement (fun el -> el.GetString())
 
-        [
-            nameResult
-            yearResult
-        ]
-        |> List.sequenceResultM
-        >>= (
-            fun _ ->
-            let nameOption = (nameResult |> Result.valueOr raise).StringValue
-            let yearOption = (yearResult |> Result.valueOr raise).IntValue
-            let options = [|
-                nameOption.IsSome
-                yearOption.IsSome
-            |]
-            match options |> Array.forall id with
-            | true ->
+            and! year =
+                yearElementResult
+                |> toResultFromStringElement (fun el -> el.GetString())
+                >>= (
+                        fun s ->
+                            match Int32.TryParse(s) with
+                            | false, _ -> Error <| JsonException $"The expected {nameof(Int32)} value is not here."
+                            | true, i -> Ok i
+                    )
+
+            return
                 [
                     {
-                        name = nameOption.Value
-                        year = yearOption.Value
+                        name = name
+                        year = year
                     }
                 ]
-                |> CopyRights |> Ok
-            | false -> Error <| JsonException "The expected option values are not here."
-        )
+                |> CopyRights
+        }
 
     let toPresentationCreditsResult (elementResult: Result<JsonElement, JsonException>) =
 
@@ -115,27 +113,12 @@ module LegacyPresentationUtility =
     let toPresentationPlaylistResult (elementResult: Result<JsonElement, JsonException>) =
 
         let toPlaylistItem el =
-            let titleResult = el |> tryGetProperty "#text" |> JsonElementValue.tryGetJsonStringValue
-            let uriResult = el |> tryGetProperty "@Uri" |> JsonElementValue.tryGetJsonUriValue UriKind.Relative
+            result {
+                let! title = el |> tryGetProperty "#text" |> tryGetJsonStringValue
+                let! uri = el |> tryGetProperty "@Uri" |> tryGetJsonUriValue UriKind.Relative
 
-            [
-                titleResult
-                uriResult
-            ]
-            |> List.sequenceResultM
-            >>=
-                (
-                    fun _ ->
-                        let titleOpt = (titleResult |> Result.valueOr raise).StringValue
-                        let uriOpt = (uriResult |> Result.valueOr raise).UriValue
-                        let options = [|
-                            titleOpt.IsSome
-                            uriOpt.IsSome
-                        |]
-                        match options |> Array.forall id with
-                        | true -> Ok (titleOpt.Value |> DisplayText, uriOpt.Value)
-                        | false -> Error <| JsonException "The expected option values are not here."
-                )
+                return (DisplayText title, uri)
+            }
 
         elementResult
             |> toResultFromJsonElement
