@@ -23,19 +23,8 @@ module LegacyPresentationUtility =
         (yearElementResult: Result<JsonElement, JsonException>) =
 
         result {
-            let! name =
-                nameElementResult
-                |> toResultFromStringElement (fun el -> el.GetString())
-
-            and! year =
-                yearElementResult
-                |> toResultFromStringElement (fun el -> el.GetString())
-                >>= (
-                        fun s ->
-                            match Int32.TryParse(s) with
-                            | false, _ -> Error <| JsonException $"The expected {nameof(Int32)} value is not here."
-                            | true, i -> Ok i
-                    )
+            let! name = nameElementResult |> tryGetJsonStringValue
+            and! year = yearElementResult |> tryGetJsonIntValueFromStringElement
 
             return
                 [
