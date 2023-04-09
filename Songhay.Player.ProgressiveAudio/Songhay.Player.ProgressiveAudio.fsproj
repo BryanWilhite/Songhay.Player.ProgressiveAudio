@@ -6,17 +6,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Result.fs" />
-        <Compile Include="JsonElementValueUtility.fs" />
-        <Compile Include="Models\CssPrimitives.fs" />
-        <Compile Include="Models\PresentationPrimitives.fs" />
-        <Compile Include="Models\Presentation.fs" />
-        <Compile Include="LegacyPresentationUtility.fs" />
+      <PackageReference Include="Songhay.Modules.Bolero" Version="6.2.0" />
+      <PackageReference Include="Songhay.Modules.Publications" Version="6.2.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Songhay.Modules.Bolero" Version="6.1.2" />
-      <PackageReference Include="Songhay.Modules.Publications" Version="6.1.0" />
+      <Compile Include="Models\ProgressiveAudioMessage.fs" />
+      <Compile Include="Models\ProgressiveAudioModel.fs" />
+      <Compile Include="Components\PlayerElmishComponent.fs" />
     </ItemGroup>
 
 </Project>
