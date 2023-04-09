@@ -11,6 +11,11 @@ open Songhay.Player.ProgressiveAudio.Models
 type PlayerElmishComponent() =
     inherit ElmishComponent<ProgressiveAudioModel, ProgressiveAudioMessage>()
 
+    let sectionNode (_: IJSRuntime) model dispatch =
+        section {
+            empty()
+        }
+
     static member EComp model dispatch =
         ecomp<PlayerElmishComponent, _, _> model dispatch { attr.empty() }
 
@@ -18,6 +23,4 @@ type PlayerElmishComponent() =
     member val JSRuntime = Unchecked.defaultof<IJSRuntime> with get, set
 
     override this.View model dispatch =
-        section {
-            empty()
-        }
+        (model, dispatch) ||> sectionNode this.JSRuntime
