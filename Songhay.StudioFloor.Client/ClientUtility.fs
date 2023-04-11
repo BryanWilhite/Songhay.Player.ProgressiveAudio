@@ -1,18 +1,17 @@
-module Songhay.StudioFloor.Client.ClientUtility
+namespace Songhay.StudioFloor.Client
 
 open System
-open System.Net
 open System.Net.Http
 open Elmish
 open Bolero.Remoting.Client
 open Microsoft.JSInterop
 
 open Songhay.Modules.Bolero
-open Songhay.Modules.Models
 open Songhay.Modules.HttpClientUtility
 open Songhay.Modules.HttpRequestMessageUtility
 open Songhay.Modules.Bolero.RemoteHandlerUtility
-open Songhay.StudioFloor.Client.ElmishTypes
+
+module ClientUtility =
 
     module Remote =
         let tryDownloadToStringAsync (client: HttpClient, uri: Uri) =
@@ -25,14 +24,14 @@ open Songhay.StudioFloor.Client.ElmishTypes
                 return output
             }
 
-let passFailureToConsole (jsRuntime: IJSRuntime option) ex =
-    if jsRuntime.IsSome then
-        jsRuntime.Value |> JsRuntimeUtility.consoleErrorAsync [|
-            "failure:", ex
-        |] |> ignore
-    ex
+    let passFailureToConsole (jsRuntime: IJSRuntime option) ex =
+        if jsRuntime.IsSome then
+            jsRuntime.Value |> JsRuntimeUtility.consoleErrorAsync [|
+                "failure:", ex
+            |] |> ignore
+        ex
 
-let update (jsRuntime: IJSRuntime) (client: HttpClient) paMsg model =
+    let update (_: IJSRuntime) (_: HttpClient) paMsg model =
 
-    match paMsg with
-    | _ -> model, Cmd.none
+        match paMsg with
+        | _ -> model, Cmd.none

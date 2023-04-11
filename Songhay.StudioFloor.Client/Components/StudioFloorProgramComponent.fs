@@ -1,11 +1,12 @@
-module Songhay.StudioFloor.Client.ElmishProgram
+namespace Songhay.StudioFloor.Client.Components
 
 open System
 open System.Net
 open System.Net.Http
-open FsToolkit.ErrorHandling
 open Microsoft.AspNetCore.Components
 open Microsoft.JSInterop
+
+open FsToolkit.ErrorHandling
 open Elmish
 open Bolero
 open Bolero.Html
@@ -13,10 +14,12 @@ open Bolero.Html
 open Songhay.Modules.Bolero.Models
 open Songhay.Modules.Bolero.Visuals.Bulma.Element
 open Songhay.Modules.Bolero.Visuals.Bulma.Layout
-open Songhay.StudioFloor.Client.ElmishTypes
+
+open Songhay.StudioFloor.Client
+open Songhay.StudioFloor.Client.Models
 
 type StudioFloorProgramComponent() =
-    inherit ProgramComponent<Model, Message>()
+    inherit ProgramComponent<StudioFloorModel, StudioFloorMessage>()
 
     let update (jsRuntime: IJSRuntime) (client: HttpClient) message model =
         match message with
@@ -24,15 +27,15 @@ type StudioFloorProgramComponent() =
         | GetReadMe ->
             let success (result: Result<string, HttpStatusCode>) =
                 let data = result |> Result.valueOr (fun code -> $"The expected README data is not here. [error code: {code}]")
-                Message.GotReadMe data
-            let failure ex = ((jsRuntime |> Some), ex) ||> ClientUtility.passFailureToConsole |> Message.Error
+                StudioFloorMessage.GotReadMe data
+            let failure ex = ((jsRuntime |> Some), ex) ||> ClientUtility.passFailureToConsole |> StudioFloorMessage.Error
             let uri = ("./README.html", UriKind.Relative) |> Uri
             let cmd = Cmd.OfAsync.either ClientUtility.Remote.tryDownloadToStringAsync (client, uri)  success failure
             model, cmd
         | GotReadMe data ->
             let m = { model with readMeData = (data |> Some) }
             m, Cmd.none
-        | Message.SetTab tab ->
+        | StudioFloorMessage.SetTab tab ->
             let m = { model with tab = tab }
             match tab with
             | _ -> m, Cmd.none
@@ -89,6 +92,6 @@ type StudioFloorProgramComponent() =
             tab = ReadMeTab
             readMeData = None
         }
-        let init = (fun _ -> initModel, Cmd.ofMsg Message.GetReadMe)
+        let init = (fun _ -> initModel, Cmd.ofMsg StudioFloorMessage.GetReadMe)
         let update = update this.JSRuntime this.HttpClient
         Program.mkProgram init update view

@@ -1,0 +1,211 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "dotnet build [Solution]",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "build",
+                "${workspaceFolder}/Songhay.Player.ProgressiveAudio.sln"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "dotnet build [Solution, Release]",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "build",
+                "${workspaceFolder}/Songhay.Player.ProgressiveAudio.sln",
+                "--configuration",
+                "Release"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "dotnet build [Songhay.Player.ProgressiveAudio]",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "build",
+                "${workspaceFolder}/Songhay.Player.ProgressiveAudio/Songhay.Player.ProgressiveAudio.fsproj"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "dotnet build [Songhay.Player.ProgressiveAudio, Release]",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "build",
+                "${workspaceFolder}/Songhay.Player.ProgressiveAudio/Songhay.Player.ProgressiveAudio.fsproj",
+                "--configuration",
+                "Release"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "dotnet pack [Songhay.Player.ProgressiveAudio, Debug]",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "pack",
+                "${workspaceFolder}/Songhay.Player.ProgressiveAudio/Songhay.Player.ProgressiveAudio.fsproj",
+                "--configuration",
+                "Debug",
+                "-p:NuspecFile=${workspaceFolder}/Songhay.Player.ProgressiveAudio/Songhay.Player.ProgressiveAudio.nuspec",
+                "-p:NuspecBasePath=${workspaceFolder}/Songhay.Player.ProgressiveAudio",
+                "--output",
+                "${workspaceFolder}/Songhay.Player.ProgressiveAudio",
+                "--verbosity",
+                "normal"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "dotnet build [Songhay.Player.ProgressiveAudio.Tests]",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "build",
+                "${workspaceFolder}/Songhay.Player.ProgressiveAudio.Tests/Songhay.Player.ProgressiveAudio.Tests.fsproj"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "dotnet test [Songhay.Player.ProgressiveAudio.Tests]",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "test",
+                "${workspaceFolder}/Songhay.Player.ProgressiveAudio.Tests/Songhay.Player.ProgressiveAudio.Tests.fsproj",
+                "--logger:trx",
+                "--results-directory:${workspaceFolder}/TestResults",
+                "--verbosity:normal",
+                "/p:CollectCoverage=true"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "dotnet build [Songhay.Player.ProgressiveAudio.Tests, Release]",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "build",
+                "${workspaceFolder}/Songhay.Player.ProgressiveAudio.Tests/Songhay.Player.ProgressiveAudio.Tests.fsproj",
+                "--configuration",
+                "Release"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "dotnet test [Songhay.Player.ProgressiveAudio.Tests, filtered by selected text]",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "test",
+                "${workspaceFolder}/Songhay.Player.ProgressiveAudio.Tests/Songhay.Player.ProgressiveAudio.Tests.fsproj",
+                "--filter:${selectedText}",
+                "--logger:trx",
+                "--results-directory:${workspaceFolder}/TestResults",
+                "--verbosity:normal"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "dotnet build [Statiq.Docs.Shell, Release]",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "build",
+                "${workspaceFolder}/Statiq.Docs.Shell/Statiq.Docs.Shell.fsproj",
+                "--configuration",
+                "Release"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "dotnet publish [Songhay.StudioFloor.Client, Release]",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "publish",
+                "${workspaceFolder}/Songhay.StudioFloor.Client/Songhay.StudioFloor.Client.fsproj",
+                "--configuration",
+                "Release"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "dotnet Statiq [Release]",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "${workspaceFolder}/Statiq.Docs.Shell/bin/Release/net6.0/Statiq.Docs.Shell.dll",
+                "--configuration",
+                "Release",
+                "--",
+                "--root",
+                "${workspaceFolder}/Statiq.Docs.Shell/bin/Release/net6.0/",
+                "--log-level",
+                "Information",
+                "--log-file",
+                "${workspaceFolder}/Statiq.Docs.Shell/statiq-"
+            ],
+            "options": {
+                "cwd": "${workspaceRoot}/Statiq.Docs.Shell/bin/Release/net6.0/"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "git [Statiq Theme Docable]",
+            "command": "git",
+            "type": "shell",
+            "args": [
+                "submodule",
+                "add",
+                "--force",
+                "git@github.com:statiqdev/Docable.git",
+                "${workspaceFolder}/Statiq.Docs.Shell/bin/Release/net6.0/theme/"
+            ],
+            "options": {
+                "cwd": "${workspaceRoot}/Statiq.Docs.Shell/bin/Release/net6.0/"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "pandoc [publish README to Studio Floor]",
+            "command": "pandoc",
+            "type": "shell",
+            "args": [
+                "${workspaceRoot}/README.md",
+                "-o",
+                "${workspaceRoot}/Songhay.StudioFloor.Client/wwwroot/README.html"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Statiq: add .nojekyll file for GitHub",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/docs"
+            },
+            "linux": {
+                "command": "touch",
+                "args": [
+                    ".nojekyll"
+                ]
+            },
+            "windows": {
+                "command": "New-Item",
+                "args": [
+                    "-ItemType",
+                    "file",
+                    ".nojekyll"
+                ]
+            },
+            "problemMatcher": []
+        }
+    ]
+}
