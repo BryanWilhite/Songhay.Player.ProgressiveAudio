@@ -6,7 +6,7 @@
   <ItemGroup>
     <Compile Include="ElmishTypes.fs" />
     <Compile Include="ClientUtility.fs" />
-    <Compile Include="ElmishProgram.fs" />
+    <Compile Include="StudioFloorProgramComponent.fs" />
     <Compile Include="Startup.fs" />
   </ItemGroup>
   <ItemGroup>
