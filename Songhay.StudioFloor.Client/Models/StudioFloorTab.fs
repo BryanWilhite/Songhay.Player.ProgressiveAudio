@@ -1,4 +1,4 @@
 namespace Songhay.StudioFloor.Client.Models
 
-type Tab =
+type StudioFloorTab =
     | ReadMeTab

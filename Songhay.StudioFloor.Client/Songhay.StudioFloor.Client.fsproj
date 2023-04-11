@@ -5,7 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ClientUtility.fs" />
-    <Compile Include="Models\Tab.fs" />
+    <Compile Include="Models\StudioFloorTab.fs" />
     <Compile Include="Models\StudioFloorMessage.fs" />
     <Compile Include="Models\StudioFloorModel.fs" />
     <Compile Include="Components\StudioFloorProgramComponent.fs" />
