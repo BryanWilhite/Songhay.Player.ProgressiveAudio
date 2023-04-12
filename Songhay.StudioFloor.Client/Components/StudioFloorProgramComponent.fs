@@ -15,6 +15,8 @@ open Songhay.Modules.Bolero.Models
 open Songhay.Modules.Bolero.Visuals.Bulma.Element
 open Songhay.Modules.Bolero.Visuals.Bulma.Layout
 
+open Songhay.Player.ProgressiveAudio.Components
+open Songhay.Player.ProgressiveAudio.Models
 open Songhay.StudioFloor.Client
 open Songhay.StudioFloor.Client.Models
 
@@ -39,10 +41,12 @@ type StudioFloorProgramComponent() =
             let m = { model with tab = tab }
             match tab with
             | _ -> m, Cmd.none
+        | StudioFloorMessage.ProgressiveAudioMessage playerMessage -> ClientUtility.updatePlayer jsRuntime client playerMessage model
 
     let view model dispatch =
         let tabs = [
             ("README", ReadMeTab)
+            ("Progressive Audio Player", PlayerTab)
         ]
 
         concat {
@@ -79,6 +83,11 @@ type StudioFloorProgramComponent() =
                         (bulmaNotification
                             (HasClasses <| CssClasses [ "is-info" ])
                             (rawHtml model.readMeData.Value))
+            | PlayerTab ->
+                bulmaContainer
+                    ContainerWidthFluid
+                    NoCssClasses
+                    (PlayerElmishComponent.EComp model.playerModel (ProgressiveAudioMessage >> dispatch))
         }
 
     [<Inject>]
@@ -89,6 +98,7 @@ type StudioFloorProgramComponent() =
 
     override this.Program =
         let initModel = {
+            playerModel = ProgressiveAudioModel.initialize
             tab = ReadMeTab
             readMeData = None
         }
