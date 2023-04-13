@@ -42,6 +42,9 @@ module ClientUtility =
         let paModel = { model with playerModel = ProgressiveAudioModel.updateModel message model.playerModel }
 
         let failure ex = ((jsRuntime |> Some), ex) ||> message.failureMessage |> StudioFloorMessage.ProgressiveAudioMessage
+        let httpFailure statusCode =
+            let ex = JsonException($"{nameof HttpStatusCode}: {statusCode}")
+            Result.Error ex
 
         match message with
         | GetPlayerManifest ->
@@ -49,11 +52,7 @@ module ClientUtility =
             let success (result: Result<string, HttpStatusCode>) =
                 let presentationOption =
                     result
-                    |> Result.either
-                        LegacyPresentationUtility.tryGetPresentation
-                        (fun statusCode ->
-                            let ex = JsonException($"{nameof HttpStatusCode}: {statusCode}")
-                            Result.Error ex)
+                    |> Result.either LegacyPresentationUtility.tryGetPresentation httpFailure
                     |> Result.toOption
                 StudioFloorMessage.ProgressiveAudioMessage <| ProgressiveAudioMessage.GotPlayerManifest presentationOption
 

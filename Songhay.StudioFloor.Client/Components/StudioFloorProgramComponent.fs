@@ -41,7 +41,8 @@ type StudioFloorProgramComponent() =
             let m = { model with tab = tab }
             match tab with
             | _ -> m, Cmd.none
-        | StudioFloorMessage.ProgressiveAudioMessage playerMessage -> ClientUtility.updatePlayer jsRuntime client playerMessage model
+        | StudioFloorMessage.ProgressiveAudioMessage playerMessage ->
+            ClientUtility.updatePlayer jsRuntime client playerMessage model
 
     let view model dispatch =
         let tabs = [

@@ -14,6 +14,7 @@
       <Compile Include="Models\ProgressiveAudioMessage.fs" />
       <Compile Include="Models\ProgressiveAudioModel.fs" />
       <Compile Include="Components\PlayerElmishComponent.fs" />
+      <Compile Include="ProgressiveAudioScalars.fs" />
     </ItemGroup>
 
 </Project>
