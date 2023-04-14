@@ -11,6 +11,7 @@ open Elmish
 open Bolero
 open Bolero.Html
 
+open Songhay.Modules.Bolero.JsRuntimeUtility
 open Songhay.Modules.Bolero.Models
 open Songhay.Modules.Bolero.Visuals.Bulma.Element
 open Songhay.Modules.Bolero.Visuals.Bulma.Layout
@@ -23,7 +24,10 @@ open Songhay.StudioFloor.Client.Models
 type StudioFloorProgramComponent() =
     inherit ProgramComponent<StudioFloorModel, StudioFloorMessage>()
 
-    let update (jsRuntime: IJSRuntime) (client: HttpClient) message model =
+    let update (jsRuntime: IJSRuntime) (client: HttpClient) (navMan: NavigationManager) message model =
+
+        jsRuntime |> consoleDebugAsync [| navMan.Uri |] |> ignore
+
         match message with
         | Error _ -> model, Cmd.none
         | GetReadMe ->
@@ -42,7 +46,7 @@ type StudioFloorProgramComponent() =
             match tab with
             | _ -> m, Cmd.none
         | StudioFloorMessage.ProgressiveAudioMessage playerMessage ->
-            ClientUtility.updatePlayer jsRuntime client playerMessage model
+            ClientUtility.updatePlayer jsRuntime client navMan playerMessage model
 
     let view model dispatch =
         let tabs = [
@@ -97,6 +101,9 @@ type StudioFloorProgramComponent() =
     [<Inject>]
     member val JSRuntime = Unchecked.defaultof<IJSRuntime> with get, set
 
+    [<Inject>]
+    member val NavigationManager = Unchecked.defaultof<NavigationManager> with get, set
+
     override this.Program =
         let initModel = {
             playerModel = ProgressiveAudioModel.initialize
@@ -104,5 +111,5 @@ type StudioFloorProgramComponent() =
             readMeData = None
         }
         let init = (fun _ -> initModel, Cmd.ofMsg StudioFloorMessage.GetReadMe)
-        let update = update this.JSRuntime this.HttpClient
+        let update = update this.JSRuntime this.HttpClient this.NavigationManager
         Program.mkProgram init update view
