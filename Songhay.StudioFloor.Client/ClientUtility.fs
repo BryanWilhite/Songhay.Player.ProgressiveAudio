@@ -17,6 +17,7 @@ open Songhay.Modules.HttpClientUtility
 open Songhay.Modules.HttpRequestMessageUtility
 open Songhay.Modules.Bolero.RemoteHandlerUtility
 
+open Songhay.Modules.Publications.Models
 open Songhay.Player.ProgressiveAudio.ProgressiveAudioScalars
 open Songhay.Player.ProgressiveAudio.Models
 
@@ -29,7 +30,7 @@ module ClientUtility =
             ($"{rxProgressiveAudioApiRootUri}/api/Player/v1/audio/{presentationKey}", UriKind.Absolute) |> Uri
 
         let getPresentationPlaylistItemUri (presentationKey: string ) (relativePath: string) =
-            let segment = relativePath.TrimStart('.').TrimStart('/')
+            let segment = relativePath.TrimStart('.', '/')
             ($"{rxProgressiveAudioApiRootUri}/api/Player/v1/audio/{presentationKey}/{segment}", UriKind.Absolute) |> Uri
 
         let tryDownloadToStringAsync (client: HttpClient, uri: Uri) =
@@ -41,6 +42,25 @@ module ClientUtility =
 
                 return output
             }
+
+    let getPresentationKey (jsRuntime: IJSRuntime) (navMan: NavigationManager) =
+
+        let uriFragmentOption =
+            match (navMan.Uri, UriKind.Absolute) |> Uri |> fun uri -> uri.Fragment with
+            | s when s.Length > 0 -> Some s
+            | _ -> None
+
+        jsRuntime |> JsRuntimeUtility.consoleWarnAsync [| nameof uriFragmentOption ; uriFragmentOption |] |> ignore
+
+        let getTypeAndKey (s: string) =
+            match s.Split('/') with
+            | [| _ ; t ; k |] ->
+                if t = "audio" then Some k
+                else None
+            | _ -> None
+
+        uriFragmentOption
+        |> Option.bind (fun s -> s |> getTypeAndKey)
 
     let passFailureToConsole (jsRuntime: IJSRuntime option) ex =
         if jsRuntime.IsSome then
@@ -63,18 +83,21 @@ module ClientUtility =
             let ex = JsonException($"{nameof HttpStatusCode}: {statusCode}")
             Result.Error ex
 
-        let hashOption = (navMan.Uri, UriKind.Absolute) |> Uri |> fun uri -> uri
-
         match message with
         | GetPlayerManifest ->
-            let uri = Uri ""
-            let success (result: Result<string, HttpStatusCode>) =
-                let presentationOption =
-                    result
-                    |> Result.either LegacyPresentationUtility.tryGetPresentation httpFailure
-                    |> Result.toOption
-                StudioFloorMessage.ProgressiveAudioMessage <| ProgressiveAudioMessage.GotPlayerManifest presentationOption
+            let keyOption = (jsRuntime, navMan) ||> getPresentationKey
+            if keyOption.IsNone then
+                let msg = StudioFloorMessage.Error <| FormatException $"The expected {nameof Presentation} key was not found."
+                model, Cmd.ofMsg msg
+            else
+                let uri = keyOption.Value |> Remote.getPresentationManifestUri
+                let success (result: Result<string, HttpStatusCode>) =
+                    let presentationOption =
+                        result
+                        |> Result.either LegacyPresentationUtility.tryGetPresentation httpFailure
+                        |> Result.toOption
+                    StudioFloorMessage.ProgressiveAudioMessage <| ProgressiveAudioMessage.GotPlayerManifest presentationOption
 
-            model, Cmd.OfAsync.either Remote.tryDownloadToStringAsync (client, uri) success failure
+                model, Cmd.OfAsync.either Remote.tryDownloadToStringAsync (client, uri) success failure
         | _ ->
             model, Cmd.none

@@ -26,8 +26,6 @@ type StudioFloorProgramComponent() =
 
     let update (jsRuntime: IJSRuntime) (client: HttpClient) (navMan: NavigationManager) message model =
 
-        jsRuntime |> consoleDebugAsync [| navMan.Uri |] |> ignore
-
         match message with
         | Error _ -> model, Cmd.none
         | GetReadMe ->
@@ -44,6 +42,9 @@ type StudioFloorProgramComponent() =
         | StudioFloorMessage.SetTab tab ->
             let m = { model with tab = tab }
             match tab with
+            | PlayerTab ->
+                let msg = ProgressiveAudioMessage.GetPlayerManifest |> StudioFloorMessage.ProgressiveAudioMessage
+                m, Cmd.ofMsg msg
             | _ -> m, Cmd.none
         | StudioFloorMessage.ProgressiveAudioMessage playerMessage ->
             ClientUtility.updatePlayer jsRuntime client navMan playerMessage model
