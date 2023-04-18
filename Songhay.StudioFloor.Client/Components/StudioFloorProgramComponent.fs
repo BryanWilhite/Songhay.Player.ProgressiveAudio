@@ -9,14 +9,7 @@ open Microsoft.JSInterop
 open FsToolkit.ErrorHandling
 open Elmish
 open Bolero
-open Bolero.Html
 
-open Songhay.Modules.Bolero.JsRuntimeUtility
-open Songhay.Modules.Bolero.Models
-open Songhay.Modules.Bolero.Visuals.Bulma.Element
-open Songhay.Modules.Bolero.Visuals.Bulma.Layout
-
-open Songhay.Player.ProgressiveAudio.Components
 open Songhay.Player.ProgressiveAudio.Models
 open Songhay.StudioFloor.Client
 open Songhay.StudioFloor.Client.Models
@@ -50,51 +43,7 @@ type StudioFloorProgramComponent() =
             ClientUtility.updatePlayer jsRuntime client navMan playerMessage model
 
     let view model dispatch =
-        let tabs = [
-            ("README", ReadMeTab)
-            ("Progressive Audio Player", PlayerTab)
-        ]
-
-        concat {
-            div {
-                [
-                    "tabs";
-                    "has-background-grey-light";
-                    "is-toggle";
-                    "is-fullwidth";
-                    "is-large"
-                ] |> CssClasses.toHtmlClassFromList
-
-                ul {
-                    forEach tabs <| fun (label, pg) ->
-                    li {
-                        a {
-                            attr.href "#"
-                            DomElementEvent.Click.PreventDefault
-                            on.click (fun _ -> SetTab pg |> dispatch)
-                            text label
-                        }
-                    }
-                }
-            }
-
-            cond model.tab <| function
-            | ReadMeTab ->
-                if model.readMeData.IsNone then
-                    text "loading…"
-                else
-                    bulmaContainer
-                        ContainerWidthFluid
-                        NoCssClasses
-                        (bulmaNotification
-                            (HasClasses <| CssClasses [ "is-info" ])
-                            (rawHtml model.readMeData.Value))
-            | PlayerTab ->
-                bulmaContainer
-                    ContainerWidthFluid
-                    NoCssClasses
-                    (PlayerElmishComponent.EComp model.playerModel (ProgressiveAudioMessage >> dispatch))
-        }
+        TabsElmishComponent.EComp model dispatch
 
     [<Inject>]
     member val HttpClient = Unchecked.defaultof<HttpClient> with get, set
