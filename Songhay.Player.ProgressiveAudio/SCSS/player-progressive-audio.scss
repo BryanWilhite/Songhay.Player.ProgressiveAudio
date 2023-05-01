@@ -1,0 +1,108 @@
+section.player {
+
+    --rx-player-background-color: #CCFF00;
+    --rx-player-border-color: #006633;
+    --rx-player-background-opacity: 90%;
+    --rx-player-credits-x: 350px;
+    --rx-player-credits-y: 350px;
+    --rx-player-credits-width: 360px;
+    --rx-player-credits-height: 240px;
+    --rx-player-credits-button-x: 761px;
+    --rx-player-credits-button-y: 540px;
+    --rx-player-player-x: 500px;
+    --rx-player-player-y: 320px;
+    --rx-player-playlist-background-color: 0xEAEAEA;
+    --rx-player-playlist-color: 0x000000;
+    --rx-player-playlist-x: 500px;
+    --rx-player-playlist-y: 100px;
+    --rx-player-playlist-width: 180px;
+    --rx-player-playlist-height: 160px;
+    --rx-player-playlist-opacity: 60%;
+    --rx-player-prose-background-color: 0xEAEAEA;
+    --rx-player-prose-color: 0x000000;
+    --rx-player-prose-x: 10px;
+    --rx-player-prose-y: 100px;
+    --rx-player-prose-width: 450px;
+    --rx-player-prose-height: 320px;
+    --rx-player-prose-opacity: 60%;
+    --rx-player-title-background-color: 0x6C6C6C;
+    --rx-player-title-color: 0xFFFFFF;
+    --rx-player-title-x: 0px;
+    --rx-player-title-y: 0px;
+    --rx-player-title-width: 640px;
+    --rx-player-title-height: 36px;
+    --rx-player-title-opacity: 60%;
+    --rx-player-title-margin-bottom: 0px;
+    --rx-player-title-margin-top: 16px;
+
+    &.progressive-audio {
+
+        & > .loading {
+            text-align: center;
+        }
+
+        & a:link,
+        & a:visited {
+            color: inherit !important;
+            text-decoration: underline;
+        }
+
+        & a:hover {
+            background-color: #fff !important;
+            color: #000 !important;
+        }
+
+        & .btn-link,
+        & .btn-link:hover {
+            color: inherit !important;
+        }
+
+        & .track-list {
+            & .b-roll.playing {
+                border: solid 2px #fff;
+            }
+
+            list-style-type: none;
+
+            & > li {
+                margin: 0;
+            }
+        }
+
+        & .credits {
+            & > button {
+                &:hover {
+                    opacity: 1.0;
+                }
+
+                width: 100%;
+                height: 100%;
+                opacity: 0.77;
+
+                & > span {
+                    background: url(https://songhay.blob.core.windows.net/shared-styles-svg/akyinkyin.svg) no-repeat top left;
+                    background-size: contain;
+                    cursor: pointer;
+                    display: inline-block;
+                    height: 52px;
+                    width: 40px;
+                }
+            }
+        }
+
+        & #ImageCreditsModal .credits-flow {
+            text-align: center;
+        }
+
+        & > .audio-player-container {
+
+            background-color: #f8f8f8;
+            border: 1px solid #000;
+            font-size: x-small;
+            height: 48px;
+            padding: 1px 2px;
+            width: 224px;
+
+        }
+    }
+}
