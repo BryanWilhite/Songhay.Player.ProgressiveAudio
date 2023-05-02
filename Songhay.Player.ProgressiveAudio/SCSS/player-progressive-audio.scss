@@ -1,6 +1,9 @@
 section.player {
 
-    --rx-player-background-color: #CCFF00;
+    --rx-player-width: 800px;
+    --rx-player-height: 600px;
+
+    --rx-player-background-color: #ccff00;
     --rx-player-border-color: #006633;
     --rx-player-background-opacity: 90%;
     --rx-player-credits-x: 350px;
@@ -11,22 +14,22 @@ section.player {
     --rx-player-credits-button-y: 540px;
     --rx-player-player-x: 500px;
     --rx-player-player-y: 320px;
-    --rx-player-playlist-background-color: 0xEAEAEA;
-    --rx-player-playlist-color: 0x000000;
+    --rx-player-playlist-background-color: #eaeaea;
+    --rx-player-playlist-color: #000;
     --rx-player-playlist-x: 500px;
     --rx-player-playlist-y: 100px;
     --rx-player-playlist-width: 180px;
     --rx-player-playlist-height: 160px;
     --rx-player-playlist-opacity: 60%;
-    --rx-player-prose-background-color: 0xEAEAEA;
-    --rx-player-prose-color: 0x000000;
+    --rx-player-prose-background-color: #eaeaea;
+    --rx-player-prose-color: #000;
     --rx-player-prose-x: 10px;
     --rx-player-prose-y: 100px;
     --rx-player-prose-width: 450px;
     --rx-player-prose-height: 320px;
     --rx-player-prose-opacity: 60%;
-    --rx-player-title-background-color: 0x6C6C6C;
-    --rx-player-title-color: 0xFFFFFF;
+    --rx-player-title-background-color: #6c6c6c;
+    --rx-player-title-color: #fff;
     --rx-player-title-x: 0px;
     --rx-player-title-y: 0px;
     --rx-player-title-width: 640px;
@@ -36,6 +39,16 @@ section.player {
     --rx-player-title-margin-top: 16px;
 
     &.progressive-audio {
+        position: relative;
+
+        width: var(--rx-player-width);
+        height: var(--rx-player-height);
+
+        background-color: var(--rx-player-background-color);
+        opacity: var(-rx-player-background-opacity);
+
+        border-color: var(--rx-player-border-color);
+        border-width: 2px;
 
         & > .loading {
             text-align: center;
@@ -57,7 +70,47 @@ section.player {
             color: inherit !important;
         }
 
+        & .title {
+            position: absolute;
+
+            top: var(--rx-player-title-y);
+            left: var(--rx-player-title-x);
+            width: var(--rx-player-title-width);
+            height: var(--rx-player-title-height);
+
+            margin-top: var(--rx-player-title-margin-top);
+            margin-bottom: var(--rx-player-title-margin-bottom);
+
+            background-color: var(--rx-player-title-background-color);
+            color: var(--rx-player-title-color);
+            opacity: var(--rx-player-title-opacity);
+        }
+
+        & .prose {
+            position: absolute;
+
+            top: var(--rx-player-prose-y);
+            left: var(--rx-player-prose-x);
+            width: var(--rx-player-prose-width);
+            height: var(--rx-player-prose-height);
+
+            background-color: var(--rx-player-prose-background-color);
+            color: var(--rx-player-prose-color);
+            opacity: var(--rx-player-prose-opacity);
+        }
+
         & .track-list {
+            position: absolute;
+
+            top: var(--rx-player-playlist-x);
+            left: var(--rx-player-playlist-y);
+            width: var(--rx-player-playlist-width);
+            height: var(--rx-player-playlist-height);
+
+            background-color: var(--rx-player-playlist-background-color);
+            color: var(--rx-player-playlist-color);
+            opacity: var(--rx-player-playlist-opacity);
+
             & .b-roll.playing {
                 border: solid 2px #fff;
             }
@@ -68,9 +121,28 @@ section.player {
                 margin: 0;
             }
         }
+        
+        & .controls {
+            position: absolute;
+
+            left: var(--rx-player-player-x);
+            top: var(--rx-player-player-y);
+        }
 
         & .credits {
+            position: absolute;
+
+            left: var(--rx-player-credits-x);
+            top: var(--rx-player-credits-y);
+            width: var(--rx-player-credits-width);
+            height: var(--rx-player-credits-height);
+
             & > button {
+                position: absolute;
+
+                left: var(-rx-player-credits-button-x);
+                top: var(--rx-player-credits-button-y);
+
                 &:hover {
                     opacity: 1.0;
                 }
@@ -88,21 +160,6 @@ section.player {
                     width: 40px;
                 }
             }
-        }
-
-        & #ImageCreditsModal .credits-flow {
-            text-align: center;
-        }
-
-        & > .audio-player-container {
-
-            background-color: #f8f8f8;
-            border: 1px solid #000;
-            font-size: x-small;
-            height: 48px;
-            padding: 1px 2px;
-            width: 224px;
-
         }
     }
 }

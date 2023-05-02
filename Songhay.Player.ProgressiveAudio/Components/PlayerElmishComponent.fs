@@ -6,6 +6,7 @@ open Microsoft.JSInterop
 open Bolero
 open Bolero.Html
 
+open Songhay.Modules.Bolero.Models
 open Songhay.Player.ProgressiveAudio.Models
 
 type PlayerElmishComponent() =
@@ -13,6 +14,7 @@ type PlayerElmishComponent() =
 
     let sectionNode (_: IJSRuntime) model dispatch =
         section {
+            [ "player"; "progressive-audio" ] |> CssClasses.toHtmlClassFromList
             empty()
         }
 
