@@ -19,12 +19,14 @@
     <PackageReference Include="System.Net.Http.Json" Version="6.0.*" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="src\scss\index.scss" />
+  </ItemGroup>
+  <ItemGroup>
     <_ContentIncludedByDefault Remove="wwwroot\css\index.min.css" />
     <_ContentIncludedByDefault Remove="wwwroot\favicon.ico" />
     <_ContentIncludedByDefault Remove="wwwroot\index.html" />
   </ItemGroup>
   <ItemGroup>
-    <Content Remove="package.json" />
     <Content Remove="package-lock.json" />
   </ItemGroup>
   <ItemGroup>
