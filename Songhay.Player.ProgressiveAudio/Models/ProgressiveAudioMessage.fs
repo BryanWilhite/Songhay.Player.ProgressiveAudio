@@ -6,6 +6,7 @@ open Songhay.Modules.Publications.Models
 
 type ProgressiveAudioMessage =
     | GetPlayerManifest | GotPlayerManifest of Presentation option
+    | PlayerCreditsClick
     | PlayerError of exn
 
     member this.failureMessage (jsRuntime: IJSRuntime option) ex =

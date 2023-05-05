@@ -88,7 +88,7 @@ module ClientUtility =
             let keyOption = (jsRuntime, navMan) ||> getPresentationKey
             if keyOption.IsNone then
                 let msg = StudioFloorMessage.Error <| FormatException $"The expected {nameof Presentation} key was not found."
-                model, Cmd.ofMsg msg
+                paModel, Cmd.ofMsg msg
             else
                 let uri = keyOption.Value |> Remote.getPresentationManifestUri
                 let success (result: Result<string, HttpStatusCode>) =
@@ -98,6 +98,6 @@ module ClientUtility =
                         |> Result.toOption
                     StudioFloorMessage.ProgressiveAudioMessage <| ProgressiveAudioMessage.GotPlayerManifest presentationOption
 
-                model, Cmd.OfAsync.either Remote.tryDownloadToStringAsync (client, uri) success failure
+                paModel, Cmd.OfAsync.either Remote.tryDownloadToStringAsync (client, uri) success failure
         | _ ->
-            model, Cmd.none
+            paModel, Cmd.none

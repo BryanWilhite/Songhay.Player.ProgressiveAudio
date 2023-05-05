@@ -44,6 +44,7 @@ section.player {
 
         width: var(--rx-player-width);
         height: var(--rx-player-height);
+        margin: 0 auto;
 
         background-color: var(--rx-player-background-color);
         background-image: var(--rx-player-background-image);
@@ -153,6 +154,11 @@ section.player {
                 width: 40px;
                 margin-left: 4px;
                 margin-top: 4px;
+            }
+        }
+        & > .modal {
+            & > button.modal-close {
+                margin-top: 71px;
             }
         }
     }

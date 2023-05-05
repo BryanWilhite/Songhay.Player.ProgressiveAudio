@@ -19,8 +19,7 @@ type TabsElmishComponent() =
     override this.ShouldRender(oldModel, newModel) =
         oldModel.tab <> newModel.tab
         || oldModel.readMeData <> newModel.readMeData
-        || oldModel.playerModel.error <> newModel.playerModel.error
-        || oldModel.playerModel.presentation <> newModel.playerModel.presentation
+        || oldModel.playerModel <> newModel.playerModel
 
     override this.View model dispatch =
         let tabs = [
