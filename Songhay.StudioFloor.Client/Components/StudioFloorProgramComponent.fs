@@ -24,15 +24,16 @@ type StudioFloorProgramComponent() =
         | GetReadMe ->
             let success (result: Result<string, HttpStatusCode>) =
                 let data = result |> Result.valueOr (fun code -> $"The expected README data is not here. [error code: {code}]")
-                StudioFloorMessage.GotReadMe data
-            let failure ex = ((jsRuntime |> Some), ex) ||> ClientUtility.passFailureToConsole |> StudioFloorMessage.Error
+                GotReadMe data
+            let failure ex =
+                ((jsRuntime |> Some), ex) ||> ClientUtility.passFailureToConsole |> Error
             let uri = ("./README.html", UriKind.Relative) |> Uri
-            let cmd = Cmd.OfAsync.either ClientUtility.Remote.tryDownloadToStringAsync (client, uri)  success failure
+            let cmd = Cmd.OfAsync.either ClientUtility.Remote.tryDownloadToStringAsync (client, uri) success failure
             model, cmd
         | GotReadMe data ->
             let m = { model with readMeData = (data |> Some) }
             m, Cmd.none
-        | StudioFloorMessage.SetTab tab ->
+        | SetTab tab ->
             let m = { model with tab = tab }
             match tab with
             | PlayerTab ->

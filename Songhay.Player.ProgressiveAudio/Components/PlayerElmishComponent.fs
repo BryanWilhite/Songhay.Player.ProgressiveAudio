@@ -1,5 +1,6 @@
 namespace Songhay.Player.ProgressiveAudio.Components
 
+open Elmish
 open Microsoft.AspNetCore.Components
 open Microsoft.JSInterop
 
@@ -19,11 +20,15 @@ type PlayerElmishComponent() =
             (model, dispatch) ||> PlayerCreditsElmishComponent.EComp
         }
 
+    [<Inject>]
+    member val JSRuntime = Unchecked.defaultof<IJSRuntime> with get, set
+
     static member EComp model dispatch =
         ecomp<PlayerElmishComponent, _, _> model dispatch { attr.empty() }
 
-    [<Inject>]
-    member val JSRuntime = Unchecked.defaultof<IJSRuntime> with get, set
+    static member Update model dispatch =
+        match model with
+        | _ -> model, Cmd.none
 
     override this.View model dispatch =
         (model, dispatch) ||> sectionNode this.JSRuntime

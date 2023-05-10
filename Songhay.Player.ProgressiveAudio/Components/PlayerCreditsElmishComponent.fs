@@ -6,14 +6,36 @@ open Microsoft.JSInterop
 open Bolero
 open Bolero.Html
 
+open Songhay.Modules.StringUtility
 open Songhay.Modules.Bolero.Models
 
+open Songhay.Modules.Publications.Models
 open Songhay.Player.ProgressiveAudio.Models
 
 type PlayerCreditsElmishComponent() =
     inherit ElmishComponent<ProgressiveAudioModel, ProgressiveAudioMessage>()
 
     let modalNode (_: IJSRuntime) (model: ProgressiveAudioModel) dispatch =
+        let creditItemsNode =
+            if model.presentation.IsSome then
+                let credits =
+                    model.presentation.Value.parts
+                    |> List.choose (function | PresentationPart.Credits l -> Some l | _ -> None)
+                forEach credits <| fun l -> forEach l <| fun c ->
+                    li {
+                        (nameof RoleCredit |> toKabobCase).Value |> CssClasses.toHtmlClass
+                        span {
+                            nameof c.name |> CssClasses.toHtmlClass
+                            text c.name
+                        }
+                        span {
+                            nameof c.role |> CssClasses.toHtmlClass
+                            text c.role
+                        }
+                    }
+            else
+                text "[missing!]"
+
         div {
             [
                 "modal"
@@ -44,7 +66,9 @@ type PlayerCreditsElmishComponent() =
                     }
                     div {
                         [ "message-body" ] |> CssClasses.toHtmlClassFromList
-                        text "Hello world!"
+                        ul {
+                            creditItemsNode
+                        }
                     }
                 }
             }
