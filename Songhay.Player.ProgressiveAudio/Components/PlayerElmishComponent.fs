@@ -20,15 +20,15 @@ type PlayerElmishComponent() =
             (model, dispatch) ||> PlayerCreditsElmishComponent.EComp
         }
 
-    [<Inject>]
-    member val JSRuntime = Unchecked.defaultof<IJSRuntime> with get, set
-
     static member EComp model dispatch =
         ecomp<PlayerElmishComponent, _, _> model dispatch { attr.empty() }
 
     static member Update model dispatch =
         match model with
         | _ -> model, Cmd.none
+
+    [<Inject>]
+    member val JSRuntime = Unchecked.defaultof<IJSRuntime> with get, set
 
     override this.View model dispatch =
         (model, dispatch) ||> sectionNode this.JSRuntime

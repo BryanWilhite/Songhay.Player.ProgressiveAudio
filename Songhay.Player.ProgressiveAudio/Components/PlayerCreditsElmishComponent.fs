@@ -8,7 +8,7 @@ open Bolero.Html
 
 open Songhay.Modules.StringUtility
 open Songhay.Modules.Bolero.Models
-
+open Songhay.Modules.Bolero.Visuals.Bulma.Component
 open Songhay.Modules.Publications.Models
 open Songhay.Player.ProgressiveAudio.Models
 
@@ -36,43 +36,35 @@ type PlayerCreditsElmishComponent() =
             else
                 text "[missing!]"
 
-        div {
-            [
-                "modal"
-                if model.isCreditsModalVisible then "is-active"
-            ] |> CssClasses.toHtmlClassFromList
+        let modalNode =
+            article {
+                [ "message"; "is-success" ] |> CssClasses.toHtmlClassFromList
 
-            div {
-                [ "modal-background" ] |> CssClasses.toHtmlClassFromList
+                div {
+                    [ "message-header" ] |> CssClasses.toHtmlClassFromList
+                    p { text "Credits" }
 
-                on.click <| fun _ -> ProgressiveAudioMessage.PlayerCreditsClick |> dispatch
+                    button {
+                        [ "delete" ] |> CssClasses.toHtmlClassFromList
+                        attr.aria "label" "delete"
 
-            }
-            div {
-                [ "modal-content" ] |> CssClasses.toHtmlClassFromList
-                article {
-                    [ "message"; "is-success" ] |> CssClasses.toHtmlClassFromList
-
-                    div {
-                        [ "message-header" ] |> CssClasses.toHtmlClassFromList
-                        p { text "Credits" }
-
-                        button {
-                            [ "delete" ] |> CssClasses.toHtmlClassFromList
-                            attr.aria "label" "delete"
-
-                            on.click <| fun _ -> ProgressiveAudioMessage.PlayerCreditsClick |> dispatch
-                        }
+                        on.click <| fun _ -> ProgressiveAudioMessage.PlayerCreditsClick |> dispatch
                     }
-                    div {
-                        [ "message-body" ] |> CssClasses.toHtmlClassFromList
-                        ul {
-                            creditItemsNode
-                        }
+                }
+                div {
+                    [ "message-body" ] |> CssClasses.toHtmlClassFromList
+                    ul {
+                        creditItemsNode
                     }
                 }
             }
-        }
+
+        bulmaModalContainer
+            NoCssClasses
+            (HasAttr (on.click <| fun _ -> ProgressiveAudioMessage.PlayerCreditsClick |> dispatch))
+            false
+            model.isCreditsModalVisible
+            modalNode
 
     let buttonNode (jsRuntime: IJSRuntime) (model: ProgressiveAudioModel) dispatch =
         concat {
