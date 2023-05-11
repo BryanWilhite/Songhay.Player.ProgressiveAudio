@@ -6,13 +6,15 @@ type ProgressiveAudioModel =
     {
         error: string option
         isCreditsModalVisible: bool
+        isLoadingModalVisible: bool
         presentation: Presentation option
     }
 
     static member initialize =
         {
             error = None
-            isCreditsModalVisible = false 
+            isCreditsModalVisible = false
+            isLoadingModalVisible = true 
             presentation = None 
         }
 
