@@ -23,7 +23,7 @@ open Songhay.Player.ProgressiveAudio.Models
 
 open Songhay.StudioFloor.Client.Models
 
-module ClientUtility =
+module ProgramComponentUtility =
 
     module Remote =
         let getPresentationManifestUri (presentationKey: string ) =
@@ -69,14 +69,23 @@ module ClientUtility =
             |] |> ignore
         ex
 
-    let updatePlayer
-        (jsRuntime: IJSRuntime)
-        (client: HttpClient)
-        (navMan: NavigationManager)
-        (message: ProgressiveAudioMessage)
-        (model: StudioFloorModel) =
+    let getCommandForGetReadMe (jsRuntime: IJSRuntime) (client: HttpClient) =
+        let success (result: Result<string, HttpStatusCode>) =
+            let data = result |> Result.valueOr (fun code -> $"The expected README data is not here. [error code: {code}]")
+            GotReadMe data
+        let failure ex = ((jsRuntime |> Some), ex) ||> passFailureToConsole |> Error
+        let uri = ("./README.html", UriKind.Relative) |> Uri
 
-        let paModel = { model with playerModel = ProgressiveAudioModel.updateModel message model.playerModel }
+        Cmd.OfAsync.either Remote.tryDownloadToStringAsync (client, uri) success failure
+
+    let getCommandForSetTab tab =
+        match tab with
+        | PlayerTab ->
+            let msg = StudioFloorMessage.ProgressiveAudioMessage ProgressiveAudioMessage.GetPlayerManifest
+            Cmd.ofMsg msg
+        | _ -> Cmd.none
+
+    let getCommandForProgressiveAudio (jsRuntime: IJSRuntime) (client: HttpClient) (navMan: NavigationManager) (message: ProgressiveAudioMessage) =
 
         let failure ex = ((jsRuntime |> Some), ex) ||> message.failureMessage |> StudioFloorMessage.ProgressiveAudioMessage
         let httpFailure statusCode =
@@ -88,7 +97,7 @@ module ClientUtility =
             let keyOption = (jsRuntime, navMan) ||> getPresentationKey
             if keyOption.IsNone then
                 let msg = StudioFloorMessage.Error <| FormatException $"The expected {nameof Presentation} key was not found."
-                paModel, Cmd.ofMsg msg
+                Cmd.ofMsg msg
             else
                 let uri = keyOption.Value |> Remote.getPresentationManifestUri
                 let success (result: Result<string, HttpStatusCode>) =
@@ -98,6 +107,5 @@ module ClientUtility =
                         |> Result.toOption
                     StudioFloorMessage.ProgressiveAudioMessage <| ProgressiveAudioMessage.GotPlayerManifest presentationOption
 
-                paModel, Cmd.OfAsync.either Remote.tryDownloadToStringAsync (client, uri) success failure
-        | _ ->
-            paModel, Cmd.none
+                Cmd.OfAsync.either Remote.tryDownloadToStringAsync (client, uri) success failure
+        | _ -> Cmd.none

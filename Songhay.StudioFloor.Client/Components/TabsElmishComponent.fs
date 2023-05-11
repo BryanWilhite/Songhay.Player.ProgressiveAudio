@@ -19,7 +19,7 @@ type TabsElmishComponent() =
     override this.ShouldRender(oldModel, newModel) =
         oldModel.tab <> newModel.tab
         || oldModel.readMeData <> newModel.readMeData
-        || oldModel.playerModel <> newModel.playerModel
+        || oldModel.paModel <> newModel.paModel
 
     override this.View model dispatch =
         let tabs = [
@@ -65,5 +65,5 @@ type TabsElmishComponent() =
                 bulmaContainer
                     ContainerWidthFluid
                     NoCssClasses
-                    (PlayerElmishComponent.EComp model.playerModel (ProgressiveAudioMessage >> dispatch))
+                    (PlayerElmishComponent.EComp model.paModel (ProgressiveAudioMessage >> dispatch))
         }
