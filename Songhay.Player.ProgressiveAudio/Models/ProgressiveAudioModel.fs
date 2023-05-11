@@ -6,7 +6,6 @@ type ProgressiveAudioModel =
     {
         error: string option
         isCreditsModalVisible: bool
-        isLoadingModalVisible: bool
         presentation: Presentation option
     }
 
@@ -14,7 +13,6 @@ type ProgressiveAudioModel =
         {
             error = None
             isCreditsModalVisible = false
-            isLoadingModalVisible = true 
             presentation = None 
         }
 
