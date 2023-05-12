@@ -6,8 +6,10 @@ open Microsoft.JSInterop
 open Bolero
 open Bolero.Html
 
+open Songhay.Modules.Models
 open Songhay.Modules.StringUtility
 open Songhay.Modules.Bolero.Models
+open Songhay.Modules.Bolero.Visuals.Bulma
 open Songhay.Modules.Bolero.Visuals.Bulma.Component
 open Songhay.Modules.Publications.Models
 open Songhay.Player.ProgressiveAudio.Models
@@ -23,13 +25,19 @@ type PlayerCreditsElmishComponent() =
                     |> List.choose (function | PresentationPart.Credits l -> Some l | _ -> None)
                 forEach credits <| fun l -> forEach l <| fun c ->
                     li {
-                        (nameof RoleCredit |> toKabobCase).Value |> CssClasses.toHtmlClass
+                        [
+                            (nameof RoleCredit |> toKabobCase).Value
+                            "is-flex"
+                            CssClass.elementFlexDirection Row
+                            CssClass.elementFlexItemsAlignment Start
+                            CssClass.elementFlexJustifyContent SpaceBetween
+                        ] |> CssClasses.toHtmlClassFromList
                         span {
-                            nameof c.name |> CssClasses.toHtmlClass
+                            [ nameof c.name; CssClass.fontSize Size3 ] |> CssClasses.toHtmlClassFromList
                             text c.name
                         }
                         span {
-                            nameof c.role |> CssClasses.toHtmlClass
+                            [ nameof c.role ] |> CssClasses.toHtmlClassFromList
                             text c.role
                         }
                     }
