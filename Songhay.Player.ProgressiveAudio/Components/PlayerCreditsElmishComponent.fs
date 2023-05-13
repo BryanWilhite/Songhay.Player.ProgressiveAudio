@@ -17,7 +17,7 @@ open Songhay.Player.ProgressiveAudio.Models
 type PlayerCreditsElmishComponent() =
     inherit ElmishComponent<ProgressiveAudioModel, ProgressiveAudioMessage>()
 
-    let modalNode (_: IJSRuntime) (model: ProgressiveAudioModel) dispatch =
+    let modalNode model dispatch =
         let creditItemsNode =
             if model.presentation.IsSome then
                 let credits =
@@ -74,7 +74,7 @@ type PlayerCreditsElmishComponent() =
             model.isCreditsModalVisible
             modalNode
 
-    let buttonNode (jsRuntime: IJSRuntime) (model: ProgressiveAudioModel) dispatch =
+    let buttonNode model dispatch =
         concat {
             button {
                 [ "credits" ] |> CssClasses.toHtmlClassFromList
@@ -86,7 +86,7 @@ type PlayerCreditsElmishComponent() =
                 }
             }
 
-            (model, dispatch) ||> modalNode jsRuntime
+            (model, dispatch) ||> modalNode
         }
 
     static member EComp model dispatch =
@@ -96,4 +96,4 @@ type PlayerCreditsElmishComponent() =
     member val JSRuntime = Unchecked.defaultof<IJSRuntime> with get, set
 
     override this.View model dispatch =
-        (model, dispatch) ||> buttonNode this.JSRuntime
+        (model, dispatch) ||> buttonNode

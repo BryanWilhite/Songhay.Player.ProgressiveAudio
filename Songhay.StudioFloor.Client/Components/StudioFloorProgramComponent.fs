@@ -16,13 +16,13 @@ module pcu = ProgramComponentUtility
 type StudioFloorProgramComponent() =
     inherit ProgramComponent<StudioFloorModel, StudioFloorMessage>()
 
-    let update (jsRuntime: IJSRuntime) (client: HttpClient) (navMan: NavigationManager) message model =
+    let update message model =
 
         match message with
         | Error _ ->
             model, Cmd.none
         | GetReadMe ->
-            let cmd = (jsRuntime, client) ||> pcu.getCommandForGetReadMe
+            let cmd = ( model.blazorServices.jsRuntime, model.blazorServices.httpClient ) ||> pcu.getCommandForGetReadMe
             model, cmd
         | GotReadMe data ->
             let m = { model with readMeData = data |> Some }
@@ -33,7 +33,12 @@ type StudioFloorProgramComponent() =
             m, cmd
         | StudioFloorMessage.ProgressiveAudioMessage msg ->
             let m = { model with paModel = ProgressiveAudioModel.updateModel msg model.paModel }
-            let cmd = pcu.getCommandForProgressiveAudio jsRuntime client navMan msg
+            let cmd =
+                pcu.getCommandForProgressiveAudio
+                    model.blazorServices.jsRuntime
+                    model.blazorServices.httpClient
+                    model.blazorServices.navigationManager
+                    msg
             m, cmd
 
     let view model dispatch =
@@ -49,9 +54,7 @@ type StudioFloorProgramComponent() =
     member val NavigationManager = Unchecked.defaultof<NavigationManager> with get, set
 
     override this.Program =
-        let m = StudioFloorModel.initialize
+        let m = StudioFloorModel.initialize this.HttpClient this.JSRuntime this.NavigationManager
         let cmd = Cmd.ofMsg StudioFloorMessage.GetReadMe
-
-        let update = update this.JSRuntime this.HttpClient this.NavigationManager
 
         Program.mkProgram (fun _ -> m, cmd) update view

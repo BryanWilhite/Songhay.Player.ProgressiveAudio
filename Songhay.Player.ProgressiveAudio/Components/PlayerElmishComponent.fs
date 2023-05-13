@@ -23,7 +23,7 @@ type PlayerElmishComponent() =
             (HasClasses (CssClasses [p (All, L6); elementTextAlign AlignCentered]))
                 (bulmaLoader (HasClasses <| CssClasses (imageContainer (Square Square128) @ [p (All, L3)])))
 
-    let sectionNode (_: IJSRuntime) model dispatch =
+    let sectionNode model dispatch =
         section {
             [ "player"; "progressive-audio" ] |> CssClasses.toHtmlClassFromList
 
@@ -40,8 +40,5 @@ type PlayerElmishComponent() =
     static member EComp model dispatch =
         ecomp<PlayerElmishComponent, _, _> model dispatch { attr.empty() }
 
-    [<Inject>]
-    member val JSRuntime = Unchecked.defaultof<IJSRuntime> with get, set
-
     override this.View model dispatch =
-        (model, dispatch) ||> sectionNode this.JSRuntime
+        (model, dispatch) ||> sectionNode
