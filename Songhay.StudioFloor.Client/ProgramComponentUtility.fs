@@ -69,14 +69,14 @@ module ProgramComponentUtility =
             |] |> ignore
         ex
 
-    let getCommandForGetReadMe (jsRuntime: IJSRuntime) (client: HttpClient) =
+    let getCommandForGetReadMe model =
         let success (result: Result<string, HttpStatusCode>) =
             let data = result |> Result.valueOr (fun code -> $"The expected README data is not here. [error code: {code}]")
             GotReadMe data
-        let failure ex = ((jsRuntime |> Some), ex) ||> passFailureToConsole |> Error
+        let failure ex = ((model.blazorServices.jsRuntime |> Some), ex) ||> passFailureToConsole |> Error
         let uri = ("./README.html", UriKind.Relative) |> Uri
 
-        Cmd.OfAsync.either Remote.tryDownloadToStringAsync (client, uri) success failure
+        Cmd.OfAsync.either Remote.tryDownloadToStringAsync (model.blazorServices.httpClient, uri) success failure
 
     let getCommandForSetTab tab =
         match tab with
@@ -85,16 +85,22 @@ module ProgramComponentUtility =
             Cmd.ofMsg msg
         | _ -> Cmd.none
 
-    let getCommandForProgressiveAudio (jsRuntime: IJSRuntime) (client: HttpClient) (navMan: NavigationManager) (message: ProgressiveAudioMessage) =
+    let getCommandForProgressiveAudio model (message: ProgressiveAudioMessage) =
 
-        let failure ex = ((jsRuntime |> Some), ex) ||> message.failureMessage |> StudioFloorMessage.ProgressiveAudioMessage
+        let failure ex =
+            (Some model.blazorServices.jsRuntime, ex) ||> message.failureMessage
+            |> StudioFloorMessage.ProgressiveAudioMessage
         let httpFailure statusCode =
             let ex = JsonException($"{nameof HttpStatusCode}: {statusCode}")
             Result.Error ex
 
         match message with
         | GetPlayerManifest ->
-            let keyOption = (jsRuntime, navMan) ||> getPresentationKey
+            let keyOption =
+                (
+                    model.blazorServices.jsRuntime,
+                    model.blazorServices.navigationManager
+                ) ||> getPresentationKey
             if keyOption.IsNone then
                 let msg = StudioFloorMessage.Error <| FormatException $"The expected {nameof Presentation} key was not found."
                 Cmd.ofMsg msg
@@ -107,5 +113,5 @@ module ProgramComponentUtility =
                         |> Result.toOption
                     StudioFloorMessage.ProgressiveAudioMessage <| ProgressiveAudioMessage.GotPlayerManifest presentationOption
 
-                Cmd.OfAsync.either Remote.tryDownloadToStringAsync (client, uri) success failure
+                Cmd.OfAsync.either Remote.tryDownloadToStringAsync (model.blazorServices.httpClient, uri) success failure
         | _ -> Cmd.none

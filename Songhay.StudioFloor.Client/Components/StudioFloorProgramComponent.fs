@@ -22,7 +22,7 @@ type StudioFloorProgramComponent() =
         | Error _ ->
             model, Cmd.none
         | GetReadMe ->
-            let cmd = ( model.blazorServices.jsRuntime, model.blazorServices.httpClient ) ||> pcu.getCommandForGetReadMe
+            let cmd = pcu.getCommandForGetReadMe model
             model, cmd
         | GotReadMe data ->
             let m = { model with readMeData = data |> Some }
@@ -31,14 +31,9 @@ type StudioFloorProgramComponent() =
             let m = { model with tab = tab }
             let cmd = pcu.getCommandForSetTab tab
             m, cmd
-        | StudioFloorMessage.ProgressiveAudioMessage msg ->
-            let m = { model with paModel = ProgressiveAudioModel.updateModel msg model.paModel }
-            let cmd =
-                pcu.getCommandForProgressiveAudio
-                    model.blazorServices.jsRuntime
-                    model.blazorServices.httpClient
-                    model.blazorServices.navigationManager
-                    msg
+        | StudioFloorMessage.ProgressiveAudioMessage paMessage ->
+            let m = { model with paModel = ProgressiveAudioModel.updateModel paMessage model.paModel }
+            let cmd = pcu.getCommandForProgressiveAudio model paMessage
             m, cmd
 
     let view model dispatch =
