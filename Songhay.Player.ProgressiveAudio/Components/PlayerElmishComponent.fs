@@ -33,6 +33,16 @@ type PlayerElmishComponent() =
                         t
                     | _ -> "[ Loading… ]"
 
+            PlayerProseComponent.BComp <|
+                match model.presentation.IsSome with
+                    | true ->
+                        let desc =
+                            model.presentation.Value.parts
+                            |> List.choose (function | PresentationPart.PresentationDescription s -> Some s | _ -> None)
+                            |> List.head
+                        desc
+                    | _ -> "[ Loading… ]"
+
             (model, dispatch) ||> PlayerCreditsElmishComponent.EComp
 
             bulmaModalContainer

@@ -90,7 +90,7 @@ section.player {
             opacity: var(--rx-player-title-opacity);
         }
 
-        & .prose {
+        & > .prose {
             position: absolute;
 
             top: var(--rx-player-prose-y);
@@ -101,6 +101,7 @@ section.player {
             background-color: var(--rx-player-prose-background-color);
             color: var(--rx-player-prose-color);
             opacity: var(--rx-player-prose-opacity);
+            padding: 1em;
         }
 
         & .track-list {

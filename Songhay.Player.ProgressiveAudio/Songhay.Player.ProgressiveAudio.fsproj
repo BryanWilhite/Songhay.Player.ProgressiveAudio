@@ -15,8 +15,9 @@
       <Compile Include="ProgressiveAudioScalars.fs" />
       <Compile Include="Models\ProgressiveAudioMessage.fs" />
       <Compile Include="Models\ProgressiveAudioModel.fs" />
-      <Compile Include="Components\PlayerCreditsElmishComponent.fs" />
       <Compile Include="Components\PlayerTitleComponent.fs" />
+      <Compile Include="Components\PlayerProseComponent.fs" />
+      <Compile Include="Components\PlayerCreditsElmishComponent.fs" />
       <Compile Include="Components\PlayerElmishComponent.fs" />
       <Content Include="src\scss\player-progressive-audio.scss" />
     </ItemGroup>
