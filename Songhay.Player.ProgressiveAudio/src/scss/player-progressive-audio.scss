@@ -74,7 +74,7 @@ section.player {
             color: inherit !important;
         }
 
-        & .title {
+        & > .title {
             position: absolute;
 
             top: var(--rx-player-title-y);

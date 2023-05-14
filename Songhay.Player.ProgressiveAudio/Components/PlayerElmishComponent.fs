@@ -1,17 +1,16 @@
 namespace Songhay.Player.ProgressiveAudio.Components
 
-open Microsoft.AspNetCore.Components
-open Microsoft.JSInterop
-
 open Bolero
 open Bolero.Html
 
-open Songhay.Modules.Bolero.Visuals.Bulma
 open Songhay.Modules.Models
+open Songhay.Modules.Publications.Models
+
 open Songhay.Modules.Bolero.Models
 open Songhay.Modules.Bolero.Visuals.Bulma.CssClass
 open Songhay.Modules.Bolero.Visuals.Bulma.Component
 open Songhay.Modules.Bolero.Visuals.Bulma.Layout
+
 open Songhay.Player.ProgressiveAudio.Models
 
 type PlayerElmishComponent() =
@@ -26,6 +25,13 @@ type PlayerElmishComponent() =
     let sectionNode model dispatch =
         section {
             [ "player"; "progressive-audio" ] |> CssClasses.toHtmlClassFromList
+
+            PlayerTitleComponent.BComp <|
+                match model.presentation.IsSome with
+                    | true ->
+                        let (Title t) = model.presentation.Value.title
+                        t
+                    | _ -> "[ Loading… ]"
 
             (model, dispatch) ||> PlayerCreditsElmishComponent.EComp
 
