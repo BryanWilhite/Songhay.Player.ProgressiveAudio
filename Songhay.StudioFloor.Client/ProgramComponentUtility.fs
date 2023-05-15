@@ -5,6 +5,7 @@ open System.Net
 open System.Net.Http
 open System.Text.Json
 open Microsoft.AspNetCore.Components
+open Microsoft.FSharp.Core
 open Microsoft.JSInterop
 open Elmish
 
@@ -12,12 +13,13 @@ open FsToolkit.ErrorHandling
 open FsToolkit.ErrorHandling.Operator.Result
 open Bolero.Remoting.Client
 
-open Songhay.Modules.Bolero
 open Songhay.Modules.HttpClientUtility
 open Songhay.Modules.HttpRequestMessageUtility
+open Songhay.Modules.Publications.Models
+open Songhay.Modules.Bolero
+open Songhay.Modules.Bolero.JsRuntimeUtility
 open Songhay.Modules.Bolero.RemoteHandlerUtility
 
-open Songhay.Modules.Publications.Models
 open Songhay.Player.ProgressiveAudio.ProgressiveAudioScalars
 open Songhay.Player.ProgressiveAudio.Models
 
@@ -62,18 +64,22 @@ module ProgramComponentUtility =
         uriFragmentOption
         |> Option.bind (fun s -> s |> getTypeAndKey)
 
-    let passFailureToConsole (jsRuntime: IJSRuntime option) ex =
-        if jsRuntime.IsSome then
-            jsRuntime.Value |> JsRuntimeUtility.consoleErrorAsync [|
-                "failure:", ex
-            |] |> ignore
+    let passFailureToConsole (label: string option) (ex: exn) model =
+        model.blazorServices.jsRuntime
+        |> consoleErrorAsync
+               [|
+                   if label.IsSome then label.Value
+                   ex
+               |]
+        |> ignore
         ex
 
     let getCommandForGetReadMe model =
         let success (result: Result<string, HttpStatusCode>) =
             let data = result |> Result.valueOr (fun code -> $"The expected README data is not here. [error code: {code}]")
             GotReadMe data
-        let failure ex = ((model.blazorServices.jsRuntime |> Some), ex) ||> passFailureToConsole |> Error
+        let label = $"{nameof Remote.tryDownloadToStringAsync}:" |> Some
+        let failure ex = model |> passFailureToConsole label ex |> Error
         let uri = ("./README.html", UriKind.Relative) |> Uri
 
         Cmd.OfAsync.either Remote.tryDownloadToStringAsync (model.blazorServices.httpClient, uri) success failure
@@ -90,9 +96,6 @@ module ProgramComponentUtility =
         let failure ex =
             (Some model.blazorServices.jsRuntime, ex) ||> message.failureMessage
             |> StudioFloorMessage.ProgressiveAudioMessage
-        let httpFailure statusCode =
-            let ex = JsonException($"{nameof HttpStatusCode}: {statusCode}")
-            Result.Error ex
 
         match message with
         | GetPlayerManifest ->
@@ -102,16 +105,31 @@ module ProgramComponentUtility =
                     model.blazorServices.navigationManager
                 ) ||> getPresentationKey
             if keyOption.IsNone then
-                let msg = StudioFloorMessage.Error <| FormatException $"The expected {nameof Presentation} key was not found."
+                let ex = FormatException $"The expected {nameof Presentation} key was not found."
+                let msg = model |> passFailureToConsole None ex |> StudioFloorMessage.Error
                 Cmd.ofMsg msg
             else
                 let uri = keyOption.Value |> Remote.getPresentationManifestUri
                 let success (result: Result<string, HttpStatusCode>) =
-                    let presentationOption =
-                        result
-                        |> Result.either LegacyPresentationUtility.tryGetPresentation httpFailure
-                        |> Result.toOption
-                    StudioFloorMessage.ProgressiveAudioMessage <| ProgressiveAudioMessage.GotPlayerManifest presentationOption
+                    result
+                    |> Result.either
+                        LegacyPresentationUtility.tryGetPresentation
+                        (
+                            fun statusCode ->
+                                let ex = JsonException($"{nameof HttpStatusCode}: {statusCode}")
+                                Result.Error ex
+                        )
+                    |> Result.either
+                        (
+                            fun x ->
+                                let paMessage = ProgressiveAudioMessage.GotPlayerManifest <| Some x
+                                StudioFloorMessage.ProgressiveAudioMessage paMessage
+                        )
+                        (
+                            fun ex ->
+                                let label = $"{nameof LegacyPresentationUtility.tryGetPresentation}:" |> Some
+                                model |> passFailureToConsole label ex |> StudioFloorMessage.Error
+                        )
 
                 Cmd.OfAsync.either Remote.tryDownloadToStringAsync (model.blazorServices.httpClient, uri) success failure
         | _ -> Cmd.none
