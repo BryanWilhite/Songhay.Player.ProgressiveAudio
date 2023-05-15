@@ -10,7 +10,7 @@ open Microsoft.JSInterop
 open Elmish
 
 open FsToolkit.ErrorHandling
-open FsToolkit.ErrorHandling.Operator.Result
+open FsToolkit.ErrorHandling.Operator.Option
 open Bolero.Remoting.Client
 
 open Songhay.Modules.HttpClientUtility
@@ -52,7 +52,7 @@ module ProgramComponentUtility =
             | s when s.Length > 0 -> Some s
             | _ -> None
 
-        jsRuntime |> JsRuntimeUtility.consoleWarnAsync [| nameof uriFragmentOption ; uriFragmentOption |] |> ignore
+        jsRuntime |> consoleWarnAsync [| nameof uriFragmentOption ; uriFragmentOption |] |> ignore
 
         let getTypeAndKey (s: string) =
             match s.Split('/') with
@@ -61,11 +61,10 @@ module ProgramComponentUtility =
                 else None
             | _ -> None
 
-        uriFragmentOption
-        |> Option.bind (fun s -> s |> getTypeAndKey)
+        uriFragmentOption >>= (fun s -> s |> getTypeAndKey)
 
-    let passFailureToConsole (label: string option) (ex: exn) model =
-        model.blazorServices.jsRuntime
+    let passErrorToConsole (label: string option) (ex: exn) jsRuntime =
+        jsRuntime
         |> consoleErrorAsync
                [|
                    if label.IsSome then label.Value
@@ -79,7 +78,7 @@ module ProgramComponentUtility =
             let data = result |> Result.valueOr (fun code -> $"The expected README data is not here. [error code: {code}]")
             GotReadMe data
         let label = $"{nameof Remote.tryDownloadToStringAsync}:" |> Some
-        let failure ex = model |> passFailureToConsole label ex |> Error
+        let failure ex = model.blazorServices.jsRuntime |> passErrorToConsole label ex |> Error
         let uri = ("./README.html", UriKind.Relative) |> Uri
 
         Cmd.OfAsync.either Remote.tryDownloadToStringAsync (model.blazorServices.httpClient, uri) success failure
@@ -106,7 +105,7 @@ module ProgramComponentUtility =
                 ) ||> getPresentationKey
             if keyOption.IsNone then
                 let ex = FormatException $"The expected {nameof Presentation} key was not found."
-                let msg = model |> passFailureToConsole None ex |> StudioFloorMessage.Error
+                let msg = model.blazorServices.jsRuntime |> passErrorToConsole None ex |> StudioFloorMessage.Error
                 Cmd.ofMsg msg
             else
                 let uri = keyOption.Value |> Remote.getPresentationManifestUri
@@ -128,7 +127,7 @@ module ProgramComponentUtility =
                         (
                             fun ex ->
                                 let label = $"{nameof LegacyPresentationUtility.tryGetPresentation}:" |> Some
-                                model |> passFailureToConsole label ex |> StudioFloorMessage.Error
+                                model.blazorServices.jsRuntime |> passErrorToConsole label ex |> StudioFloorMessage.Error
                         )
 
                 Cmd.OfAsync.either Remote.tryDownloadToStringAsync (model.blazorServices.httpClient, uri) success failure
