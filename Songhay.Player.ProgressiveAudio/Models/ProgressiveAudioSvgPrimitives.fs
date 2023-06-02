@@ -2,6 +2,8 @@ namespace Songhay.Player.ProgressiveAudio.Models
 
 open Bolero.Html
 
+open Songhay.Modules.Bolero.SvgUtility
+
 open Songhay.Modules.Models
 
 type ProgressiveAudioSvgKeys =
@@ -13,11 +15,6 @@ type ProgressiveAudioSvgKeys =
     member this.ToAlphanumeric = Alphanumeric this.Value
 
 type ProgressiveAudioSvgData() =
-
-    static let polygonNode (points: string) =
-        elt "polygon" {
-            "points" => points
-        }
 
     static let Collection =
         [
@@ -37,16 +34,3 @@ type ProgressiveAudioSvgData() =
     static member Get (id: Identifier) = Collection[id]
 
     static member HasKey (id: Identifier) = Collection.ContainsKey(id)
-
-    static member ToSvgBlock =
-        svg {
-            "xmlns" => "http://www.w3.org/2000/svg"
-            attr.style "display: none;"
-            forEach Collection <| fun pair -> pair.Value
-        }
-
-    static member ToSvgUse (id: Identifier) =
-        elt "use" {
-            attr.id id.StringValue
-            "xlink:href" => $"#{id.StringValue}"
-        }
