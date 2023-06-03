@@ -1,13 +1,16 @@
 namespace Songhay.Player.ProgressiveAudio.Models
 
+open System
 open Microsoft.AspNetCore.Components
 open Microsoft.JSInterop
 
+open Songhay.Modules.Models
 open Songhay.Modules.Publications.Models
 
 type ProgressiveAudioModel =
     {
         blazorServices: {| jsRuntime: IJSRuntime; navigationManager: NavigationManager |}
+        currentPlaylistItem: (DisplayText * Uri) option
         error: string option
         isCreditsModalVisible: bool
         presentation: Presentation option
@@ -16,6 +19,7 @@ type ProgressiveAudioModel =
     static member initialize (jsRuntime: IJSRuntime) (navigationManager: NavigationManager) =
         {
             blazorServices = {| jsRuntime = jsRuntime; navigationManager = navigationManager |}
+            currentPlaylistItem = None 
             error = None
             isCreditsModalVisible = false
             presentation = None 

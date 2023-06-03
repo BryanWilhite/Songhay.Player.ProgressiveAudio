@@ -34,3 +34,5 @@ type ProgressiveAudioSvgData() =
     static member Get (id: Identifier) = Collection[id]
 
     static member HasKey (id: Identifier) = Collection.ContainsKey(id)
+
+    static member SvgBlock = Collection |> toSvgBlock
