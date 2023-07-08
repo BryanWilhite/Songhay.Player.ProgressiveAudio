@@ -6,14 +6,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Songhay.Modules.Bolero" Version="6.2.0" />
+      <PackageReference Include="Songhay.Modules.Bolero" Version="6.3.0" />
       <PackageReference Include="Songhay.Modules.Publications" Version="6.2.0" />
       <PackageReference Remove="FSharp.Core" />
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Include="SvgUtility.fs" />
-      <Compile Include="Visuals\Bulma\Component.fs" />
       <Compile Include="ProgressiveAudioScalars.fs" />
       <Compile Include="Models\ProgressiveAudioMessage.fs" />
       <Compile Include="Models\ProgressiveAudioModel.fs" />

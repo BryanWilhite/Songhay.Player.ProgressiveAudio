@@ -69,10 +69,12 @@ type PlayerCreditsElmishComponent() =
 
         bulmaModalContainer
             NoCssClasses
-            (HasAttr (on.click <| fun _ -> ProgressiveAudioMessage.PlayerCreditsClick |> dispatch))
-            false
             model.isCreditsModalVisible
-            modalNode
+            (concat {
+                bulmaModalBackground
+                    (HasAttr (on.click <| fun _ -> ProgressiveAudioMessage.PlayerCreditsClick |> dispatch))
+                bulmaModalContent NoCssClasses modalNode
+            })
 
     let buttonNode model dispatch =
         concat {

@@ -47,10 +47,12 @@ type PlayerElmishComponent() =
 
             bulmaModalContainer
                 NoCssClasses
-                NoAttr
-                false
                 model.presentation.IsNone
-                spinnerContainer
+                (concat {
+                    bulmaModalBackground NoAttr
+                    bulmaModalContent NoCssClasses spinnerContainer
+                })
+
         }
 
     static member EComp model dispatch =
