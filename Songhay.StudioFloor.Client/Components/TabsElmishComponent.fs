@@ -4,6 +4,7 @@ open Bolero
 open Bolero.Html
 
 open Songhay.Modules.Bolero.Models
+open Songhay.Modules.Bolero.Visuals.Bulma.Component
 open Songhay.Modules.Bolero.Visuals.Bulma.Element
 open Songhay.Modules.Bolero.Visuals.Bulma.Layout
 
@@ -22,33 +23,17 @@ type TabsElmishComponent() =
         || oldModel.paModel <> newModel.paModel
 
     override this.View model dispatch =
-        let tabs = [
-            ("README", ReadMeTab)
-            ("Progressive Audio Player", PlayerTab)
-        ]
-
         concat {
-            div {
-                [
-                    "tabs";
-                    "has-background-grey-light";
-                    "is-toggle";
-                    "is-fullwidth";
-                    "is-large"
-                ] |> CssClasses.toHtmlClassFromList
+            let tabs = [
+                (text "README", ReadMeTab)
+                (text "Progressive Audio Player", PlayerTab)
+            ]
 
-                ul {
-                    forEach tabs <| fun (label, pg) ->
-                    li {
-                        a {
-                            attr.href "#"
-                            DomElementEvent.Click.PreventDefault
-                            on.click (fun _ -> SetTab pg |> dispatch)
-                            text label
-                        }
-                    }
-                }
-            }
+            bulmaTabs
+                (HasClasses <| CssClasses [ ColorEmpty.BackgroundCssClassLight; "is-toggle"; "is-fullwidth"; SizeLarge.CssClass ])
+                (fun pg -> model.tab = pg)
+                (fun pg _ -> SetTab pg |> dispatch)
+                tabs
 
             cond model.tab <| function
             | ReadMeTab ->

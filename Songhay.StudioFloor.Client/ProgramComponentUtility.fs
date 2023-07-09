@@ -63,16 +63,6 @@ module ProgramComponentUtility =
 
         uriFragmentOption >>= (fun s -> s |> getTypeAndKey)
 
-    let passErrorToConsole (label: string option) (ex: exn) jsRuntime =
-        jsRuntime
-        |> consoleErrorAsync
-               [|
-                   if label.IsSome then label.Value
-                   ex
-               |]
-        |> ignore
-        ex
-
     let getCommandForGetReadMe model =
         let success (result: Result<string, HttpStatusCode>) =
             let data = result |> Result.valueOr (fun code -> $"The expected README data is not here. [error code: {code}]")

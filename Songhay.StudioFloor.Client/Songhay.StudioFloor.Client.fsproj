@@ -21,6 +21,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="src\scss\index.scss" />
+    <Folder Include="src\scss\colors\" />
+    <Content Include="src\scss\player-progressive-audio.scss" />
+    <Folder Include="src\js\" />
   </ItemGroup>
   <ItemGroup>
     <_ContentIncludedByDefault Remove="wwwroot\css\index.min.css" />

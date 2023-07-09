@@ -21,7 +21,6 @@
       <Compile Include="Components\PlayerControlsElmishComponent.fs" />
       <Compile Include="Components\PlayerCreditsElmishComponent.fs" />
       <Compile Include="Components\PlayerElmishComponent.fs" />
-      <Content Include="src\scss\player-progressive-audio.scss" />
     </ItemGroup>
 
 </Project>
