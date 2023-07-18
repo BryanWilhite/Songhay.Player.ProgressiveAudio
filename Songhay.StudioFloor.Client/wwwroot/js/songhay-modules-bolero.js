@@ -41,7 +41,7 @@ __webpack_require__.r(__webpack_exports__);
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
   BoleroUtility: () => (/* reexport */ BoleroUtility),
-  StudioFloorUtility: () => (/* reexport */ StudioFloorUtility)
+  ProgressiveAudioUtility: () => (/* reexport */ ProgressiveAudioUtility)
 });
 
 ;// CONCATENATED MODULE: ./node_modules/songhay/core/models/window-animation.js
@@ -1125,20 +1125,17 @@ function __disposeResources(env) {
   __disposeResources,
 });
 
-;// CONCATENATED MODULE: ./src/studio-floor-utility.ts
+;// CONCATENATED MODULE: ./src/progressive-audio-utility.ts
 
 
-class StudioFloorUtility {
-    static runMyAnimation(instance) {
+class ProgressiveAudioUtility {
+    static startPlayAnimation(instance) {
         console.warn({ instance });
-        WindowAnimation.registerAndGenerate(1, (animation) => __awaiter(this, void 0, void 0, function* () {
+        ProgressiveAudioUtility.playAnimation = WindowAnimation.registerAndGenerate(1, (_) => __awaiter(this, void 0, void 0, function* () {
+            var _a;
             try {
-                const x = yield instance.invokeMethodAsync('invokeAsync', null);
-                console.warn({ x });
-                console.info(animation.getDiagnosticStatus());
-                if (!x || x > 99) {
-                    WindowAnimation.cancelAnimation();
-                }
+                yield instance.invokeMethodAsync('startAsync', null);
+                console.info((_a = ProgressiveAudioUtility.playAnimation) === null || _a === void 0 ? void 0 : _a.getDiagnosticStatus());
             }
             catch (error) {
                 console.error({ error });
@@ -1147,11 +1144,12 @@ class StudioFloorUtility {
         }));
         WindowAnimation.animate();
     }
+    static stopPlayAnimation() {
+        var _a, _b;
+        WindowAnimation.cancelAnimation((_b = (_a = ProgressiveAudioUtility.playAnimation) === null || _a === void 0 ? void 0 : _a.id) !== null && _b !== void 0 ? _b : undefined);
+    }
 }
-DomUtility.runWhenWindowContentLoaded(() => {
-    console.info('the `DotNet` “namespace” should not be undefined:', { DotNet });
-    console.warn({ StudioFloorUtility }, { window });
-});
+ProgressiveAudioUtility.playAnimation = null;
 
 ;// CONCATENATED MODULE: ./src/_index.ts
 /* utilities */

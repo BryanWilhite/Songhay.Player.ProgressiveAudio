@@ -21,9 +21,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="src\scss\index.scss" />
-    <Folder Include="src\scss\colors\" />
+    <Content Include="src\scss\colors\bulma.scss" />
     <Content Include="src\scss\player-progressive-audio.scss" />
     <Folder Include="src\js\" />
+    <TypeScriptCompile Include="src\_index.ts" />
+    <TypeScriptCompile Include="src\bolero-utility.ts" />
+    <TypeScriptCompile Include="src\progressive-audio-utility.ts" />
+    <Content Include="webpack.config.js" />
   </ItemGroup>
   <ItemGroup>
     <_ContentIncludedByDefault Remove="wwwroot\css\index.min.css" />
