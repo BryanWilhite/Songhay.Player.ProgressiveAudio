@@ -43,6 +43,8 @@ type PlayerElmishComponent() =
                         desc
                     | _ -> "[ Loading… ]"
 
+            (model, dispatch) ||> PlayerControlsElmishComponent.EComp
+
             (model, dispatch) ||> PlayerCreditsElmishComponent.EComp
 
             bulmaModalContainer

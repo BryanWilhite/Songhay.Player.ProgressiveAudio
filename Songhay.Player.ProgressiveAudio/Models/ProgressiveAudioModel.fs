@@ -13,6 +13,7 @@ type ProgressiveAudioModel =
         currentPlaylistItem: (DisplayText * Uri) option
         error: string option
         isCreditsModalVisible: bool
+        isPlaying: bool
         presentation: Presentation option
     }
 
@@ -22,6 +23,7 @@ type ProgressiveAudioModel =
             currentPlaylistItem = None 
             error = None
             isCreditsModalVisible = false
+            isPlaying = false 
             presentation = None 
         }
 
