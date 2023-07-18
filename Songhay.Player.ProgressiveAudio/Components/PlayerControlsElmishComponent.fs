@@ -8,7 +8,6 @@ open Bolero.Html
 
 open Songhay.Modules.Models
 open Songhay.Modules.Bolero.Models
-open Songhay.Modules.Bolero.Visuals.SvgElement
 open Songhay.Modules.Bolero.Visuals.Bulma
 open Songhay.Modules.Bolero.Visuals.Bulma.CssClass
 
@@ -23,9 +22,11 @@ type PlayerControlsElmishComponent() =
             attr.id "play-pause-block"
             button {
                 svg {
+                    attr.width 96
+                    attr.height 96
                     cond model.isPlaying <| function
-                        | true -> toSvgUse NoAttr PLAY.ToAlphanumeric
-                        | false -> toSvgUse NoAttr PAUSE.ToAlphanumeric
+                        | true -> ProgressiveAudioSvgData.Get PLAY.ToAlphanumeric
+                        | false -> ProgressiveAudioSvgData.Get PAUSE.ToAlphanumeric
                 }
             }
             input {
@@ -40,7 +41,6 @@ type PlayerControlsElmishComponent() =
         let uriOption = model.currentPlaylistItem |> Option.map (fun pair -> pair |> snd)
 
         concat {
-            ProgressiveAudioSvgData.SvgBlock
             div {
                 attr.id "audio-player-container"
                 cond uriOption.IsSome <| function
