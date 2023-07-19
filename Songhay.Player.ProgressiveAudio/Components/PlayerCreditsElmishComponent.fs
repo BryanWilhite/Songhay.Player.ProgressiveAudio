@@ -3,13 +3,15 @@ namespace Songhay.Player.ProgressiveAudio.Components
 open Microsoft.AspNetCore.Components
 open Microsoft.JSInterop
 
+open FsToolkit.ErrorHandling
+
 open Bolero
 open Bolero.Html
 
 open Songhay.Modules.Models
 open Songhay.Modules.StringUtility
 open Songhay.Modules.Bolero.Models
-open Songhay.Modules.Bolero.Visuals.Bulma
+open Songhay.Modules.Bolero.Visuals.Bulma.CssClass
 open Songhay.Modules.Bolero.Visuals.Bulma.Component
 open Songhay.Modules.Publications.Models
 open Songhay.Player.ProgressiveAudio.Models
@@ -19,30 +21,31 @@ type PlayerCreditsElmishComponent() =
 
     let modalNode model dispatch =
         let creditItemsNode =
-            if model.presentation.IsSome then
-                let credits =
-                    model.presentation.Value.parts
-                    |> List.choose (function | PresentationPart.Credits l -> Some l | _ -> None)
-                forEach credits <| fun l -> forEach l <| fun c ->
-                    li {
-                        [
-                            (nameof RoleCredit |> toKabobCase).Value
-                            "is-flex"
-                            CssClass.elementFlexDirection Row
-                            CssClass.elementFlexItemsAlignment Start
-                            CssClass.elementFlexJustifyContent SpaceBetween
-                        ] |> CssClasses.toHtmlClassFromList
-                        span {
-                            [ nameof c.name; CssClass.fontSize Size3 ] |> CssClasses.toHtmlClassFromList
-                            text c.name
+            model.presentation
+            |> Option.either
+                (fun p ->
+                    let lists =
+                        p.parts |> List.choose (function | PresentationPart.Credits l -> Some l | _ -> None)
+                    forEach lists <| fun l -> forEach l <| fun c ->
+                        li {
+                            [
+                                (nameof RoleCredit |> toKabobCase).Value
+                                elementIsFlex
+                                elementFlexDirection Row
+                                elementFlexItemsAlignment Start
+                                elementFlexJustifyContent SpaceBetween
+                            ] |> CssClasses.toHtmlClassFromList
+                            span {
+                                [ nameof c.name; fontSize Size3 ] |> CssClasses.toHtmlClassFromList
+                                text c.name
+                            }
+                            span {
+                                [ nameof c.role ] |> CssClasses.toHtmlClassFromList
+                                text c.role
+                            }
                         }
-                        span {
-                            [ nameof c.role ] |> CssClasses.toHtmlClassFromList
-                            text c.role
-                        }
-                    }
-            else
-                text "[missing!]"
+                )
+                (fun () -> text "[missing!]")
 
         let modalNode =
             article {
@@ -50,7 +53,7 @@ type PlayerCreditsElmishComponent() =
 
                 div {
                     [ "message-header" ] |> CssClasses.toHtmlClassFromList
-                    p { text "Credits" }
+                    Html.p { text "Credits" }
 
                     button {
                         [ "delete" ] |> CssClasses.toHtmlClassFromList

@@ -22,8 +22,8 @@ type PlayerControlsElmishComponent() =
             attr.id "play-pause-block"
             button {
                 svg {
-                    attr.width 96
-                    attr.height 96
+                    attr.width 16
+                    attr.height 16
                     cond model.isPlaying <| function
                         | true -> ProgressiveAudioSvgData.Get PLAY.ToAlphanumeric
                         | false -> ProgressiveAudioSvgData.Get PAUSE.ToAlphanumeric
