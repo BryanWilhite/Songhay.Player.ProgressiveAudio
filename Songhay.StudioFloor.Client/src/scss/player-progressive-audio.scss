@@ -3,6 +3,7 @@ section.player {
     --rx-player-width: 800px;
     --rx-player-height: 600px;
     --rx-player-background-image: url(https://songhay.blob.core.windows.net/player-audio/default/jpg/background.jpg);
+    --rx-player-credits-button-background-image: url(https://songhay.blob.core.windows.net/shared-styles-svg/akyinkyin.svg);
 
     --rx-player-background-color: #ccff00;
     --rx-player-border-color: #006633;
@@ -132,6 +133,22 @@ section.player {
 
             left: var(--rx-player-player-x);
             top: var(--rx-player-player-y);
+            width: 224px; /* width of legacy player */
+
+            & > button {
+                background: black;
+                border-radius: 48px;
+                border: 0 none;
+                color: antiquewhite;
+                cursor: pointer;
+                width:48px;
+                height: 48px; /* height of legacy player */
+                padding: 0;
+            }
+
+            & > input {
+                width: 90px;
+            }
         }
 
         & > button.credits {
@@ -147,7 +164,7 @@ section.player {
             opacity: 0.77;
 
             & > span {
-                background: url(https://songhay.blob.core.windows.net/shared-styles-svg/akyinkyin.svg) no-repeat top left;
+                background: var(--rx-player-credits-button-background-image) no-repeat top left;
                 background-size: contain;
                 cursor: pointer;
                 display: inline-block;

@@ -6,9 +6,8 @@ open Microsoft.JSInterop
 open Bolero
 open Bolero.Html
 
-open Songhay.Modules.Models
 open Songhay.Modules.Bolero.Models
-open Songhay.Modules.Bolero.Visuals.Bulma
+open Songhay.Modules.Bolero.SvgUtility
 open Songhay.Modules.Bolero.Visuals.Bulma.CssClass
 
 open Songhay.Player.ProgressiveAudio.Models
@@ -18,15 +17,17 @@ type PlayerControlsElmishComponent() =
 
     let playPauseBlock model dispatch =
         div {
-            [ elementIsFlex; AlignCentered.CssClass; CssClass.p (L, L2) ] |> CssClasses.toHtmlClassFromList
+            [ "controls"; elementIsFlex; AlignCentered.CssClass ] |> CssClasses.toHtmlClassFromList
             attr.id "play-pause-block"
             button {
                 svg {
-                    attr.width 16
-                    attr.height 16
+                    "xmlns" => SvgUri
+                    "fill" => "currentColor"
+                    "preserveAspectRatio" => "xMidYMid meet"
+                    "viewBox" => "-45 -47 180 190"
                     cond model.isPlaying <| function
-                        | true -> ProgressiveAudioSvgData.Get PLAY.ToAlphanumeric
-                        | false -> ProgressiveAudioSvgData.Get PAUSE.ToAlphanumeric
+                        | true -> ProgressiveAudioSvgData.Get PAUSE.ToAlphanumeric
+                        | false -> ProgressiveAudioSvgData.Get PLAY.ToAlphanumeric
                 }
             }
             input {
@@ -43,6 +44,7 @@ type PlayerControlsElmishComponent() =
         concat {
             div {
                 attr.id "audio-player-container"
+
                 cond uriOption.IsSome <| function
                     | true -> audio { attr.src uriOption.Value; attr.preload "metadata" }
                     | false -> empty()
