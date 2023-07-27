@@ -14,6 +14,8 @@ type ProgressiveAudioModel =
         error: string option
         isCreditsModalVisible: bool
         isPlaying: bool
+        playingDuration: string
+        playingProgress: string
         presentation: Presentation option
     }
 
@@ -23,8 +25,10 @@ type ProgressiveAudioModel =
             currentPlaylistItem = None 
             error = None
             isCreditsModalVisible = false
-            isPlaying = false 
-            presentation = None 
+            isPlaying = false
+            playingDuration = "00:00" 
+            playingProgress = "00:00" 
+            presentation = None
         }
 
     static member updateModel (message: ProgressiveAudioMessage) (model: ProgressiveAudioModel) =

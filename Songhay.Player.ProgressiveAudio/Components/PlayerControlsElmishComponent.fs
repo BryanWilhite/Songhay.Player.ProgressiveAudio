@@ -10,6 +10,7 @@ open Songhay.Modules.Bolero.Models
 open Songhay.Modules.Bolero.SvgUtility
 open Songhay.Modules.Bolero.Visuals.Bulma.CssClass
 
+open Songhay.Modules.Models
 open Songhay.Player.ProgressiveAudio.Models
 
 type PlayerControlsElmishComponent() =
@@ -31,23 +32,43 @@ type PlayerControlsElmishComponent() =
                 }
             }
             input {
+                m (L, L1) |> CssClasses.toHtmlClass
                 attr.id "play-pause-range"
                 attr.``type`` "range"
                 attr.value 0
+            }
+            span {
+                [ elementIsFlex; elementFlexWrap NoWrap; elementFlexContentAlignment Center; m (L, L1) ] |> CssClasses.toHtmlClassFromList
+                output {
+                    [ fontSize Size6; elementFlexSelfAlignment Center ] |> CssClasses.toHtmlClassFromList
+                    attr.id "play-pause-progress-output"
+                    attr.``for`` "play-pause-range"
+                    text model.playingProgress
+                }
+                span {
+                    [ fontSize Size7; elementFlexSelfAlignment Center ] |> CssClasses.toHtmlClassFromList
+                    text "/"
+                }
+                output {
+                    [ fontSize Size7; elementFlexSelfAlignment Center ] |> CssClasses.toHtmlClassFromList
+                    attr.id "play-pause-duration-output"
+                    attr.``for`` "play-pause-range"
+                    text model.playingDuration
+                }
             }
         }
 
     let container model dispatch =
 
-        let uriOption = model.currentPlaylistItem |> Option.map (fun pair -> pair |> snd)
+        let uriOption = model.currentPlaylistItem |> Option.map snd
 
         concat {
             div {
                 attr.id "audio-player-container"
-
-                cond uriOption.IsSome <| function
-                    | true -> audio { attr.src uriOption.Value; attr.preload "metadata" }
-                    | false -> empty()
+                audio {
+                    attr.src (if uriOption.IsSome then uriOption.Value else null)
+                    attr.preload "metadata"
+                }
                 (model, dispatch) ||> playPauseBlock
             }
         }
