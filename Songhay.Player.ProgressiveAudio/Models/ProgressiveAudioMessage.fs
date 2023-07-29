@@ -6,6 +6,7 @@ open Songhay.Modules.Publications.Models
 
 type ProgressiveAudioMessage =
     | GetPlayerManifest | GotPlayerManifest of Presentation option
+    | PlayPauseControl
     | PlayerCreditsClick
     | PlayerError of exn
 

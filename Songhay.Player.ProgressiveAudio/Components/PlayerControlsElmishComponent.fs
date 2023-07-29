@@ -1,13 +1,17 @@
 namespace Songhay.Player.ProgressiveAudio.Components
 
+open System.Threading.Tasks
 open Microsoft.AspNetCore.Components
 open Microsoft.JSInterop
 
 open Bolero
 open Bolero.Html
+open Elmish
 
+open Songhay.Modules.Bolero.JsRuntimeUtility
 open Songhay.Modules.Bolero.Models
 open Songhay.Modules.Bolero.SvgUtility
+open Songhay.Modules.Bolero.Visuals.BodyElement
 open Songhay.Modules.Bolero.Visuals.Bulma.CssClass
 
 open Songhay.Modules.Models
@@ -16,12 +20,28 @@ open Songhay.Player.ProgressiveAudio.Models
 type PlayerControlsElmishComponent() =
     inherit ElmishComponent<ProgressiveAudioModel, ProgressiveAudioMessage>()
 
-    let playPauseBlock model dispatch =
+    let playPauseBlock (comp: PlayerControlsElmishComponent) model dispatch =
         div {
             [ "controls"; elementIsFlex; AlignCentered.CssClass ] |> CssClasses.toHtmlClassFromList
             attr.id "play-pause-block"
-            button {
-                svg {
+            buttonElementAsync
+                NoCssClasses
+                (fun _ ->
+                    let dotNetObjectReference = DotNetObjectReference.Create(comp)
+                    let qualifiedName =
+                        if model.isPlaying then
+                            $"{rx}.ProgressiveAudioUtility.stopPlayAnimation"
+                        else
+                            $"{rx}.ProgressiveAudioUtility.startPlayAnimation"
+
+                    dispatch PlayPauseControl
+
+                    model.blazorServices
+                        .jsRuntime.InvokeVoidAsync(qualifiedName, dotNetObjectReference)
+                        .AsTask()
+                    |> Async.AwaitTask
+                )
+                (svg {
                     "xmlns" => SvgUri
                     "fill" => "currentColor"
                     "preserveAspectRatio" => "xMidYMid meet"
@@ -29,8 +49,8 @@ type PlayerControlsElmishComponent() =
                     cond model.isPlaying <| function
                         | true -> ProgressiveAudioSvgData.Get PAUSE.ToAlphanumeric
                         | false -> ProgressiveAudioSvgData.Get PLAY.ToAlphanumeric
-                }
-            }
+                })
+
             input {
                 m (L, L1) |> CssClasses.toHtmlClass
                 attr.id "play-pause-range"
@@ -58,7 +78,7 @@ type PlayerControlsElmishComponent() =
             }
         }
 
-    let container model dispatch =
+    let container (comp: PlayerControlsElmishComponent) model dispatch =
 
         let uriOption = model.currentPlaylistItem |> Option.map snd
 
@@ -69,15 +89,20 @@ type PlayerControlsElmishComponent() =
                     attr.src (if uriOption.IsSome then uriOption.Value else null)
                     attr.preload "metadata"
                 }
-                (model, dispatch) ||> playPauseBlock
+                (comp, model, dispatch) |||> playPauseBlock
             }
         }
 
     static member EComp model dispatch =
         ecomp<PlayerControlsElmishComponent, _, _> model dispatch { attr.empty() }
 
+    [<JSInvokable>]
+    member this.animateAsync(uiData: {| animationStatus: string; audioDuration: double; isAudioPaused: bool |}) =
+        this.JSRuntime |> consoleInfoAsync [| uiData |] |> ignore
+        Task.FromResult()
+
     [<Inject>]
     member val JSRuntime = Unchecked.defaultof<IJSRuntime> with get, set
 
     override this.View model dispatch =
-        (model, dispatch) ||> container
+        (this, model, dispatch) |||> container

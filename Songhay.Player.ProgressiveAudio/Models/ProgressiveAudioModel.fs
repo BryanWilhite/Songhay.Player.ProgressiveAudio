@@ -35,5 +35,6 @@ type ProgressiveAudioModel =
         match message with
         | GetPlayerManifest -> { model with presentation = None }
         | GotPlayerManifest presentationOption -> { model with presentation = presentationOption }
+        | PlayPauseControl -> { model with isPlaying = not model.isPlaying }
         | PlayerCreditsClick -> { model with isCreditsModalVisible = not model.isCreditsModalVisible }
         | PlayerError exn -> { model with error = Some exn.Message }
