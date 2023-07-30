@@ -3,6 +3,7 @@ import { WindowAnimation } from 'songhay';
 export declare class ProgressiveAudioUtility {
     static getHTMLAudioElement(): HTMLAudioElement | null;
     static playAnimation: WindowAnimation | null;
+    static invokeDotNetMethodAsync(instance: DotNet.DotNetObject, audio: HTMLAudioElement | null): Promise<void>;
     static startPlayAnimation(instance: DotNet.DotNetObject): void;
-    static stopPlayAnimation(): void;
+    static stopPlayAnimationAsync(instance: DotNet.DotNetObject): Promise<void>;
 }

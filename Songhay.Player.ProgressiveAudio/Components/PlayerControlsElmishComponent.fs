@@ -30,7 +30,7 @@ type PlayerControlsElmishComponent() =
                     let dotNetObjectReference = DotNetObjectReference.Create(comp)
                     let qualifiedName =
                         if model.isPlaying then
-                            $"{rx}.ProgressiveAudioUtility.stopPlayAnimation"
+                            $"{rx}.ProgressiveAudioUtility.stopPlayAnimationAsync"
                         else
                             $"{rx}.ProgressiveAudioUtility.startPlayAnimation"
 
@@ -97,7 +97,7 @@ type PlayerControlsElmishComponent() =
         ecomp<PlayerControlsElmishComponent, _, _> model dispatch { attr.empty() }
 
     [<JSInvokable>]
-    member this.animateAsync(uiData: {| animationStatus: string; audioDuration: double; isAudioPaused: bool |}) =
+    member this.animateAsync(uiData: {| animationStatus: string option; audioDuration: double option; audioReadyState: int option; isAudioPaused: bool option |}) =
         this.JSRuntime |> consoleInfoAsync [| uiData |] |> ignore
         Task.FromResult()
 

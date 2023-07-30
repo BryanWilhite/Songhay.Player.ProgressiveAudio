@@ -7,37 +7,44 @@ export class ProgressiveAudioUtility {
 
     static playAnimation: WindowAnimation | null = null;
 
+    static async invokeDotNetMethodAsync(instance: DotNet.DotNetObject, audio: HTMLAudioElement | null) : Promise<void> {
+        try {
+            await instance.invokeMethodAsync(
+                'animateAsync',
+                {
+                    animationStatus: ProgressiveAudioUtility.playAnimation?.getDiagnosticStatus(),
+                    audioDuration: audio?.duration,
+                    audioReadyState: audio?.readyState,
+                    isAudioPaused: audio?.paused
+                }
+            );
+        } catch (error) {
+            console.error({error});
+            WindowAnimation.cancelAnimation();
+        }
+    }
+
     static startPlayAnimation(instance: DotNet.DotNetObject) : void {
 
         ProgressiveAudioUtility.playAnimation = WindowAnimation.registerAndGenerate(1, async _ => {
 
             const audio: HTMLAudioElement | null = ProgressiveAudioUtility.getHTMLAudioElement();
 
-            if(audio?.paused) { await audio?.play(); }
+            if(audio?.paused && audio?.readyState > 0) { await audio?.play(); }
 
-            try {
-                await instance.invokeMethodAsync(
-                    'animateAsync',
-                    {
-                        animationStatus: ProgressiveAudioUtility.playAnimation?.getDiagnosticStatus(),
-                        audioDuration: audio?.duration,
-                        isAudioPaused: audio?.paused
-                    }
-                );
-            } catch (error) {
-                console.error({error});
-                WindowAnimation.cancelAnimation();
-            }
+            await ProgressiveAudioUtility.invokeDotNetMethodAsync(instance, audio);
         });
 
         WindowAnimation.animate();
     }
 
-    static stopPlayAnimation(): void
+    static async stopPlayAnimationAsync(instance: DotNet.DotNetObject): Promise<void>
     {
         const audio: HTMLAudioElement | null = ProgressiveAudioUtility.getHTMLAudioElement();
 
-        audio?.pause();
+        if(audio && !audio.paused && audio.readyState > 0) { audio.pause(); }
+
+        await ProgressiveAudioUtility.invokeDotNetMethodAsync(instance, audio);
 
         WindowAnimation.cancelAnimation(ProgressiveAudioUtility.playAnimation?.id ?? undefined);
     }
