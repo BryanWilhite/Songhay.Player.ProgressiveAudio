@@ -41,7 +41,7 @@ const outputLibraryConfig = {
 const defaultConfig = {
     name: 'default-config',
     output: {
-        filename: 'songhay-modules-bolero.js',
+        filename: 'songhay-player-audio.js',
         path: path.resolve(__dirname, 'wwwroot', 'js'),
         ...outputLibraryConfig
     },
@@ -53,7 +53,7 @@ const defaultConfig = {
 const optimizationConfig = {
     name: 'optimization-config',
     output: {
-        filename: 'songhay-modules-bolero.min.js',
+        filename: 'songhay-player-audio.min.js',
         path: path.resolve(__dirname, 'wwwroot', 'js'),
         ...outputLibraryConfig
     },
