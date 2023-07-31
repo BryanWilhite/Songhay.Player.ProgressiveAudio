@@ -20,6 +20,7 @@
       <Compile Include="Components\PlayerProseComponent.fs" />
       <Compile Include="Components\PlayerControlsElmishComponent.fs" />
       <Compile Include="Components\PlayerCreditsElmishComponent.fs" />
+      <Compile Include="Components\PlaylistElmishComponent.fs" />
       <Compile Include="Components\PlayerElmishComponent.fs" />
     </ItemGroup>
 

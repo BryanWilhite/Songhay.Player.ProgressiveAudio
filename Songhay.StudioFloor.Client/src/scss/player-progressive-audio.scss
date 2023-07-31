@@ -108,8 +108,8 @@ section.player {
         & .track-list {
             position: absolute;
 
-            top: var(--rx-player-playlist-x);
-            left: var(--rx-player-playlist-y);
+            top: var(--rx-player-playlist-y);
+            left: var(--rx-player-playlist-x);
             width: var(--rx-player-playlist-width);
             height: var(--rx-player-playlist-height);
 
