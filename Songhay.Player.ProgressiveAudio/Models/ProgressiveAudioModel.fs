@@ -5,6 +5,7 @@ open Microsoft.AspNetCore.Components
 open Microsoft.JSInterop
 
 open Songhay.Modules.Models
+open Songhay.Player.ProgressiveAudio.ProgressiveAudioScalars
 open Songhay.Modules.Publications.Models
 
 type ProgressiveAudioModel =
@@ -18,6 +19,13 @@ type ProgressiveAudioModel =
         playingProgress: string
         presentation: Presentation option
     }
+
+    static member buildAudioRootUri (relativeUri: Uri) =
+        if relativeUri.IsAbsoluteUri then relativeUri
+        else
+            let builder = UriBuilder(rxProgressiveAudioRoot)
+            builder.Path <- relativeUri.OriginalString
+            builder.Uri
 
     static member initialize (jsRuntime: IJSRuntime) (navigationManager: NavigationManager) =
         {

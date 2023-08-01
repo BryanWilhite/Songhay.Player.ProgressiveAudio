@@ -12,6 +12,7 @@ open Songhay.Player.ProgressiveAudio.Models
 
 type PlaylistElmishComponent() =
     inherit ElmishComponent<ProgressiveAudioModel, ProgressiveAudioMessage>()
+
     let container model dispatch =
         let itemsOption =
             model.presentation |> Option.map (
@@ -33,7 +34,9 @@ type PlaylistElmishComponent() =
                                 text "⬤"
                             }
                             a {
-                                "data-src" => if uri.IsAbsoluteUri then uri.AbsoluteUri else uri.OriginalString
+                                "data-src" =>
+                                    if uri.IsAbsoluteUri then uri.AbsoluteUri
+                                    else (uri |> ProgressiveAudioModel.buildAudioRootUri).AbsoluteUri
                                 text txt.Value
                             }
                         }

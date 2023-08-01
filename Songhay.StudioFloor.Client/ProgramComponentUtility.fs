@@ -29,11 +29,11 @@ module ProgramComponentUtility =
 
     module Remote =
         let getPresentationManifestUri (presentationKey: string ) =
-            ($"{rxProgressiveAudioApiRootUri}/api/Player/v1/audio/{presentationKey}", UriKind.Absolute) |> Uri
+            ($"{rxProgressiveAudioApiRoot}/api/Player/v1/audio/{presentationKey}", UriKind.Absolute) |> Uri
 
         let getPresentationPlaylistItemUri (presentationKey: string ) (relativePath: string) =
             let segment = relativePath.TrimStart('.', '/')
-            ($"{rxProgressiveAudioApiRootUri}/api/Player/v1/audio/{presentationKey}/{segment}", UriKind.Absolute) |> Uri
+            ($"{rxProgressiveAudioApiRoot}/api/Player/v1/audio/{presentationKey}/{segment}", UriKind.Absolute) |> Uri
 
         let tryDownloadToStringAsync (client: HttpClient, uri: Uri) =
             async {
