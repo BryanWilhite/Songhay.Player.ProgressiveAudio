@@ -7,26 +7,18 @@ open Microsoft.AspNetCore.Components
 open Microsoft.JSInterop
 
 open Songhay.Modules.Bolero.Models
-open Songhay.Modules.Publications.Models
 open Songhay.Player.ProgressiveAudio.Models
 
 type PlaylistElmishComponent() =
     inherit ElmishComponent<ProgressiveAudioModel, ProgressiveAudioMessage>()
 
-    let container model dispatch =
-        let itemsOption =
-            model.presentation |> Option.map (
-                    fun p ->
-                        p.parts
-                        |> List.choose (function | PresentationPart.Playlist pl -> pl |> Some | _ -> None)
-                        |> List.head
-                )
+    let container (model: ProgressiveAudioModel) dispatch =
         ol {
             [ "panel"; "track-list" ] |> CssClasses.toHtmlClassFromList
             attr.id "playlist"
-            cond itemsOption.IsSome <| function
+            cond model.presentationPlayList.IsSome <| function
                 | true ->
-                    forEach itemsOption.Value <| fun (txt, uri) ->
+                    forEach model.presentationPlayList.Value <| fun (txt, uri) ->
                         li {
                             "panel-block" |> CssClasses.toHtmlClass
                             span {
@@ -34,9 +26,7 @@ type PlaylistElmishComponent() =
                                 text "⬤"
                             }
                             a {
-                                "data-src" =>
-                                    if uri.IsAbsoluteUri then uri.AbsoluteUri
-                                    else (uri |> ProgressiveAudioModel.buildAudioRootUri).AbsoluteUri
+                                "data-src" => uri.AbsoluteUri
                                 text txt.Value
                             }
                         }

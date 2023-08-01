@@ -19,13 +19,11 @@ open Songhay.Player.ProgressiveAudio.Models
 type PlayerCreditsElmishComponent() =
     inherit ElmishComponent<ProgressiveAudioModel, ProgressiveAudioMessage>()
 
-    let modalNode model dispatch =
+    let modalNode (model: ProgressiveAudioModel) dispatch =
         let creditItemsNode =
-            model.presentation
+            model.presentationCredits
             |> Option.either
-                (fun p ->
-                    let lists =
-                        p.parts |> List.choose (function | PresentationPart.Credits l -> Some l | _ -> None)
+                (fun lists ->
                     forEach lists <| fun l -> forEach l <| fun c ->
                         li {
                             [

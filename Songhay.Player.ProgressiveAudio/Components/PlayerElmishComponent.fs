@@ -34,13 +34,8 @@ type PlayerElmishComponent() =
                     | _ -> "[ Loading… ]"
 
             PlayerProseComponent.BComp <|
-                match model.presentation.IsSome with
-                    | true ->
-                        let desc =
-                            model.presentation.Value.parts
-                            |> List.choose (function | PresentationPart.PresentationDescription s -> Some s | _ -> None)
-                            |> List.head
-                        desc
+                match model.presentationDescription.IsSome with
+                    | true -> model.presentationDescription.Value
                     | _ -> "[ Loading… ]"
 
             (model, dispatch) ||> PlaylistElmishComponent.EComp
