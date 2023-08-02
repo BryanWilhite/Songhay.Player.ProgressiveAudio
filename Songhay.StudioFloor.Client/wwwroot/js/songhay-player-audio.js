@@ -1149,11 +1149,18 @@ class ProgressiveAudioUtility {
             }
         });
     }
+    static loadAudioTrackAsync(instance) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const audio = ProgressiveAudioUtility.getHTMLAudioElement();
+            audio === null || audio === void 0 ? void 0 : audio.load();
+            yield ProgressiveAudioUtility.invokeDotNetMethodAsync(instance, audio);
+        });
+    }
     static startPlayAnimation(instance) {
         ProgressiveAudioUtility.playAnimation = WindowAnimation.registerAndGenerate(1, (_) => __awaiter(this, void 0, void 0, function* () {
             const audio = ProgressiveAudioUtility.getHTMLAudioElement();
             if ((audio === null || audio === void 0 ? void 0 : audio.paused) && (audio === null || audio === void 0 ? void 0 : audio.readyState) > 0) {
-                yield (audio === null || audio === void 0 ? void 0 : audio.play());
+                yield audio.play();
             }
             yield ProgressiveAudioUtility.invokeDotNetMethodAsync(instance, audio);
         }));

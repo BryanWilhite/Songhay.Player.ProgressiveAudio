@@ -24,13 +24,21 @@ export class ProgressiveAudioUtility {
         }
     }
 
+    static async loadAudioTrackAsync(instance: DotNet.DotNetObject) : Promise<void> {
+        const audio: HTMLAudioElement | null = ProgressiveAudioUtility.getHTMLAudioElement();
+
+        audio?.load();
+
+        await ProgressiveAudioUtility.invokeDotNetMethodAsync(instance, audio);
+    }
+
     static startPlayAnimation(instance: DotNet.DotNetObject) : void {
 
         ProgressiveAudioUtility.playAnimation = WindowAnimation.registerAndGenerate(1, async _ => {
 
             const audio: HTMLAudioElement | null = ProgressiveAudioUtility.getHTMLAudioElement();
 
-            if(audio?.paused && audio?.readyState > 0) { await audio?.play(); }
+            if(audio?.paused && audio?.readyState > 0) { await audio.play(); }
 
             await ProgressiveAudioUtility.invokeDotNetMethodAsync(instance, audio);
         });
