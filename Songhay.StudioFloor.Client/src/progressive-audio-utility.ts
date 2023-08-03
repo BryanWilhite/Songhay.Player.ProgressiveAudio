@@ -24,12 +24,11 @@ export class ProgressiveAudioUtility {
         }
     }
 
-    static async loadAudioTrackAsync(instance: DotNet.DotNetObject) : Promise<void> {
+    static loadAudioTrack(src: string) : void {
         const audio: HTMLAudioElement | null = ProgressiveAudioUtility.getHTMLAudioElement();
 
+        audio?.setAttribute('src', src);
         audio?.load();
-
-        await ProgressiveAudioUtility.invokeDotNetMethodAsync(instance, audio);
     }
 
     static startPlayAnimation(instance: DotNet.DotNetObject) : void {

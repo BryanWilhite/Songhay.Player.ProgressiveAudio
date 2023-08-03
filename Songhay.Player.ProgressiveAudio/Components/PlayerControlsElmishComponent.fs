@@ -34,7 +34,7 @@ type PlayerControlsElmishComponent() =
                         else
                             $"{rx}.ProgressiveAudioUtility.startPlayAnimation"
 
-                    dispatch PlayPauseControl
+                    dispatch PlayPauseControlClick
 
                     model.blazorServices
                         .jsRuntime.InvokeVoidAsync(qualifiedName, dotNetObjectReference)

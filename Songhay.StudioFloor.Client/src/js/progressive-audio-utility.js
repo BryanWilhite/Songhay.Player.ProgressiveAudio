@@ -21,12 +21,10 @@ export class ProgressiveAudioUtility {
             }
         });
     }
-    static loadAudioTrackAsync(instance) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const audio = ProgressiveAudioUtility.getHTMLAudioElement();
-            audio === null || audio === void 0 ? void 0 : audio.load();
-            yield ProgressiveAudioUtility.invokeDotNetMethodAsync(instance, audio);
-        });
+    static loadAudioTrack(src) {
+        const audio = ProgressiveAudioUtility.getHTMLAudioElement();
+        audio === null || audio === void 0 ? void 0 : audio.setAttribute('src', src);
+        audio === null || audio === void 0 ? void 0 : audio.load();
     }
     static startPlayAnimation(instance) {
         ProgressiveAudioUtility.playAnimation = WindowAnimation.registerAndGenerate(1, (_) => __awaiter(this, void 0, void 0, function* () {

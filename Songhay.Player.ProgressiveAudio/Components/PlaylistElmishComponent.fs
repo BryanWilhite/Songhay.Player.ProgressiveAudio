@@ -7,6 +7,8 @@ open Microsoft.AspNetCore.Components
 open Microsoft.JSInterop
 
 open Songhay.Modules.Bolero.Models
+open Songhay.Modules.Bolero.JsRuntimeUtility
+open Songhay.Modules.Bolero.Visuals.Bulma.CssClass
 open Songhay.Player.ProgressiveAudio.Models
 
 type PlaylistElmishComponent() =
@@ -22,11 +24,21 @@ type PlaylistElmishComponent() =
                         li {
                             "panel-block" |> CssClasses.toHtmlClass
                             span {
-                                [ "panel-icon"; "is-size-3" ] |> CssClasses.toHtmlClassFromList
+                                [ "panel-icon"; fontSize Size3 ] |> CssClasses.toHtmlClassFromList
                                 text "⬤"
                             }
                             a {
-                                "data-src" => uri.AbsoluteUri
+                                attr.href "#"
+                                on.async.click (
+                                    fun _ ->
+                                        let qualifiedName = $"{rx}.ProgressiveAudioUtility.loadAudioTrack"
+                                        model.blazorServices
+                                            .jsRuntime.InvokeVoidAsync(qualifiedName, (uri |> ProgressiveAudioModel.buildAudioRootUri).AbsoluteUri)
+                                            .AsTask()
+                                        |> Async.AwaitTask
+
+                                )
+                                DomElementEvent.Click.PreventDefault
                                 text txt.Value
                             }
                         }

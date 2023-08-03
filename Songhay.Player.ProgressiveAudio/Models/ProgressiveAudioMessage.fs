@@ -1,13 +1,17 @@
 namespace Songhay.Player.ProgressiveAudio.Models
 
+open System
 open Microsoft.JSInterop
-open Songhay.Modules.Bolero
+
+open Songhay.Modules.Models
 open Songhay.Modules.Publications.Models
+open Songhay.Modules.Bolero
 
 type ProgressiveAudioMessage =
     | GetPlayerManifest | GotPlayerManifest of Presentation option
-    | PlayPauseControl
+    | PlayPauseControlClick
     | PlayerCreditsClick
+    | PlaylistClick of (DisplayText * Uri)
     | PlayerError of exn
 
     member this.failureMessage (jsRuntime: IJSRuntime option) ex =

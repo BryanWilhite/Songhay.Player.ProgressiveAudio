@@ -40,7 +40,7 @@ type ProgressiveAudioModel =
         if relativeUri.IsAbsoluteUri then relativeUri
         else
             let builder = UriBuilder(rxProgressiveAudioRoot)
-            builder.Path <- relativeUri.OriginalString
+            builder.Path <- $"{builder.Path}{relativeUri.OriginalString.TrimStart([|'.';'/'|])}"
             builder.Uri
 
     static member initialize (jsRuntime: IJSRuntime) (navigationManager: NavigationManager) =
@@ -62,16 +62,17 @@ type ProgressiveAudioModel =
             let item =
                 option {
                     let! presentation = presentationOption
-                    let list =
-                        presentation
-                        |> ProgressiveAudioModel.getPlayList
-                        |> List.map (fun (txt, uri) -> (txt, uri |> ProgressiveAudioModel.buildAudioRootUri))
+                    let list = presentation |> ProgressiveAudioModel.getPlayList
 
-                    return list |> List.head
+                    return
+                        list
+                        |> List.head
+                        |> (fun (txt, uri) -> (txt, uri |> ProgressiveAudioModel.buildAudioRootUri))
                 }
             { model with presentation = presentationOption; currentPlaylistItem = item }
-        | PlayPauseControl -> { model with isPlaying = not model.isPlaying }
+        | PlayPauseControlClick -> { model with isPlaying = not model.isPlaying }
         | PlayerCreditsClick -> { model with isCreditsModalVisible = not model.isCreditsModalVisible }
+        | PlaylistClick item -> { model with currentPlaylistItem = item |> Some }
         | PlayerError exn -> { model with error = Some exn.Message }
 
     member this.presentationCredits = this.presentation |> Option.map ProgressiveAudioModel.getCredits
