@@ -33,7 +33,7 @@ type PlaylistElmishComponent() =
                                     fun _ ->
                                         let qualifiedName = $"{rx}.ProgressiveAudioUtility.loadAudioTrack"
                                         model.blazorServices
-                                            .jsRuntime.InvokeVoidAsync(qualifiedName, (uri |> ProgressiveAudioModel.buildAudioRootUri).AbsoluteUri)
+                                            .jsRuntime.InvokeVoidAsync(qualifiedName, uri.AbsoluteUri)
                                             .AsTask()
                                         |> Async.AwaitTask
 

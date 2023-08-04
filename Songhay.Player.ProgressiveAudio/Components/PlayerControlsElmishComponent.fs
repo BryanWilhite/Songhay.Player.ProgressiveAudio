@@ -1,15 +1,13 @@
 namespace Songhay.Player.ProgressiveAudio.Components
 
-open System.Threading.Tasks
 open Microsoft.AspNetCore.Components
 open Microsoft.JSInterop
 
 open Bolero
 open Bolero.Html
-open Elmish
 
-open Songhay.Modules.Bolero.JsRuntimeUtility
 open Songhay.Modules.Bolero.Models
+open Songhay.Modules.Bolero.JsRuntimeUtility
 open Songhay.Modules.Bolero.SvgUtility
 open Songhay.Modules.Bolero.Visuals.BodyElement
 open Songhay.Modules.Bolero.Visuals.Bulma.CssClass
@@ -20,14 +18,14 @@ open Songhay.Player.ProgressiveAudio.Models
 type PlayerControlsElmishComponent() =
     inherit ElmishComponent<ProgressiveAudioModel, ProgressiveAudioMessage>()
 
-    let playPauseBlock (comp: PlayerControlsElmishComponent) model dispatch =
+    let playPauseBlock model dispatch =
         div {
             [ "controls"; elementIsFlex; AlignCentered.CssClass ] |> CssClasses.toHtmlClassFromList
             attr.id "play-pause-block"
             buttonElementAsync
                 NoCssClasses
                 (fun _ ->
-                    let dotNetObjectReference = DotNetObjectReference.Create(comp)
+                    let dotNetObjectReference = DotNetObjectReference.Create(model)
                     let qualifiedName =
                         if model.isPlaying then
                             $"{rx}.ProgressiveAudioUtility.stopPlayAnimationAsync"
@@ -78,7 +76,7 @@ type PlayerControlsElmishComponent() =
             }
         }
 
-    let container (comp: PlayerControlsElmishComponent) model dispatch =
+    let container model dispatch =
 
         let uriOption = model.currentPlaylistItem |> Option.map snd
 
@@ -89,20 +87,15 @@ type PlayerControlsElmishComponent() =
                     attr.src (if uriOption.IsSome then uriOption.Value else null)
                     attr.preload "metadata"
                 }
-                (comp, model, dispatch) |||> playPauseBlock
+                (model, dispatch) ||> playPauseBlock
             }
         }
 
     static member EComp model dispatch =
         ecomp<PlayerControlsElmishComponent, _, _> model dispatch { attr.empty() }
 
-    [<JSInvokable>]
-    member this.animateAsync(uiData: {| animationStatus: string option; audioDuration: double option; audioReadyState: int option; isAudioPaused: bool option |}) =
-        this.JSRuntime |> consoleInfoAsync [| uiData |] |> ignore
-        Task.FromResult()
-
     [<Inject>]
     member val JSRuntime = Unchecked.defaultof<IJSRuntime> with get, set
 
     override this.View model dispatch =
-        (this, model, dispatch) |||> container
+        (model, dispatch) ||> container

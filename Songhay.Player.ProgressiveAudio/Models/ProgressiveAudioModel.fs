@@ -7,8 +7,9 @@ open Microsoft.JSInterop
 open FsToolkit.ErrorHandling
 
 open Songhay.Modules.Models
-open Songhay.Player.ProgressiveAudio.ProgressiveAudioScalars
 open Songhay.Modules.Publications.Models
+open Songhay.Modules.Bolero.JsRuntimeUtility
+open Songhay.Player.ProgressiveAudio.ProgressiveAudioScalars
 
 type ProgressiveAudioModel =
     {
@@ -58,18 +59,33 @@ type ProgressiveAudioModel =
     static member updateModel (message: ProgressiveAudioMessage) (model: ProgressiveAudioModel) =
         match message with
         | GetPlayerManifest -> { model with presentation = None }
-        | GotPlayerManifest presentationOption ->
+        | GotPlayerManifest data ->
+
+            let presentationOption =
+                option {
+                    let! presentation = data
+
+                    let map list =
+                        list
+                        |> List.map(fun (txt, uri) -> (txt, uri |> ProgressiveAudioModel.buildAudioRootUri))
+                        |> Playlist
+
+                    let parts =
+                        presentation.parts
+                        |> List.map(fun part -> match part with | Playlist list -> list |> map | _ -> part)
+
+                    return { presentation with parts = parts }
+                }
+
             let item =
                 option {
                     let! presentation = presentationOption
-                    let list = presentation |> ProgressiveAudioModel.getPlayList
 
-                    return
-                        list
-                        |> List.head
-                        |> (fun (txt, uri) -> (txt, uri |> ProgressiveAudioModel.buildAudioRootUri))
+                    return presentation |> ProgressiveAudioModel.getPlayList |> List.head
                 }
+
             { model with presentation = presentationOption; currentPlaylistItem = item }
+
         | PlayPauseControlClick -> { model with isPlaying = not model.isPlaying }
         | PlayerCreditsClick -> { model with isCreditsModalVisible = not model.isCreditsModalVisible }
         | PlaylistClick item -> { model with currentPlaylistItem = item |> Some }
@@ -80,3 +96,12 @@ type ProgressiveAudioModel =
     member this.presentationDescription = this.presentation |> Option.map ProgressiveAudioModel.getDescription
 
     member this.presentationPlayList = this.presentation |> Option.map ProgressiveAudioModel.getPlayList
+
+    [<JSInvokable>]
+    member this.animateAsync(uiData: {|
+                                       animationStatus: string option
+                                       audioDuration: double option
+                                       audioReadyState: int option
+                                       isAudioPaused: bool option |}) =
+
+        this.blazorServices.jsRuntime |> consoleInfoAsync [| uiData |]
