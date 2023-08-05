@@ -1,6 +1,7 @@
 namespace Songhay.Player.ProgressiveAudio.Models
 
 open System
+open Elmish
 open Microsoft.AspNetCore.Components
 open Microsoft.JSInterop
 
@@ -47,7 +48,7 @@ type ProgressiveAudioModel =
     static member initialize (jsRuntime: IJSRuntime) (navigationManager: NavigationManager) =
         {
             blazorServices = {| jsRuntime = jsRuntime; navigationManager = navigationManager |}
-            currentPlaylistItem = None 
+            currentPlaylistItem = None
             error = None
             isCreditsModalVisible = false
             isPlaying = false
@@ -86,9 +87,30 @@ type ProgressiveAudioModel =
 
             { model with presentation = presentationOption; currentPlaylistItem = item }
 
-        | PlayPauseControlClick -> { model with isPlaying = not model.isPlaying }
+        | PlayPauseControlClick ->
+            let dotNetObjectReference = DotNetObjectReference.Create(model)
+            let qualifiedName =
+                if model.isPlaying then rxProgressiveAudioInteropStopAnimation
+                else rxProgressiveAudioInteropStartAnimation
+
+            model.blazorServices.jsRuntime.InvokeVoidAsync(qualifiedName, dotNetObjectReference) |> ignore
+
+            { model with isPlaying = not model.isPlaying }
+
+        | PlayerAnimationTick ->
+            model
         | PlayerCreditsClick -> { model with isCreditsModalVisible = not model.isCreditsModalVisible }
-        | PlaylistClick item -> { model with currentPlaylistItem = item |> Some }
+        | PlaylistClick item ->
+            let dotNetObjectReference = DotNetObjectReference.Create(model)
+
+            task {
+                do! model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropStopAnimation, dotNetObjectReference)
+                do! model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropLoadTrack, (item |> snd).AbsoluteUri)
+                do! model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropStartAnimation, dotNetObjectReference)
+            } |> ignore
+
+            { model with currentPlaylistItem = item |> Some }
+
         | PlayerError exn -> { model with error = Some exn.Message }
 
     member this.presentationCredits = this.presentation |> Option.map ProgressiveAudioModel.getCredits
@@ -103,5 +125,7 @@ type ProgressiveAudioModel =
                                        audioDuration: double option
                                        audioReadyState: int option
                                        isAudioPaused: bool option |}) =
+
+        let cmd = Cmd.ofMsg PlayerAnimationTick
 
         this.blazorServices.jsRuntime |> consoleInfoAsync [| uiData |]

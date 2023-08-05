@@ -10,6 +10,7 @@ open Songhay.Modules.Bolero
 type ProgressiveAudioMessage =
     | GetPlayerManifest | GotPlayerManifest of Presentation option
     | PlayPauseControlClick
+    | PlayerAnimationTick
     | PlayerCreditsClick
     | PlaylistClick of (DisplayText * Uri)
     | PlayerError of exn

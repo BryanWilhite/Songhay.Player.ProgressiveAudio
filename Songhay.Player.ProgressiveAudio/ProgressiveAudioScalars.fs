@@ -2,6 +2,8 @@ namespace Songhay.Player.ProgressiveAudio
 
 open Microsoft.FSharp.Core
 
+open Songhay.Modules.Bolero.JsRuntimeUtility
+
 module ProgressiveAudioScalars =
 
     [<Literal>]
@@ -9,3 +11,9 @@ module ProgressiveAudioScalars =
 
     [<Literal>]
     let rxProgressiveAudioRoot = "https://songhay.blob.core.windows.net/player-audio/"
+
+    let rxProgressiveAudioInteropLoadTrack = $"{rx}.ProgressiveAudioUtility.loadAudioTrack"
+
+    let rxProgressiveAudioInteropStopAnimation = $"{rx}.ProgressiveAudioUtility.stopPlayAnimationAsync"
+
+    let rxProgressiveAudioInteropStartAnimation = $"{rx}.ProgressiveAudioUtility.startPlayAnimation"

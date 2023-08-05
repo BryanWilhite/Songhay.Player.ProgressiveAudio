@@ -7,7 +7,6 @@ open Microsoft.AspNetCore.Components
 open Microsoft.JSInterop
 
 open Songhay.Modules.Bolero.Models
-open Songhay.Modules.Bolero.JsRuntimeUtility
 open Songhay.Modules.Bolero.Visuals.Bulma.CssClass
 open Songhay.Player.ProgressiveAudio.Models
 
@@ -29,15 +28,7 @@ type PlaylistElmishComponent() =
                             }
                             a {
                                 attr.href "#"
-                                on.async.click (
-                                    fun _ ->
-                                        let qualifiedName = $"{rx}.ProgressiveAudioUtility.loadAudioTrack"
-                                        model.blazorServices
-                                            .jsRuntime.InvokeVoidAsync(qualifiedName, uri.AbsoluteUri)
-                                            .AsTask()
-                                        |> Async.AwaitTask
-
-                                )
+                                on.click (fun _ -> dispatch <| PlaylistClick (txt, uri))
                                 DomElementEvent.Click.PreventDefault
                                 text txt.Value
                             }

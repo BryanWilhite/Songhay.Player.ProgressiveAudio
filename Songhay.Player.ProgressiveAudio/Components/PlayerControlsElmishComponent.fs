@@ -7,7 +7,6 @@ open Bolero
 open Bolero.Html
 
 open Songhay.Modules.Bolero.Models
-open Songhay.Modules.Bolero.JsRuntimeUtility
 open Songhay.Modules.Bolero.SvgUtility
 open Songhay.Modules.Bolero.Visuals.BodyElement
 open Songhay.Modules.Bolero.Visuals.Bulma.CssClass
@@ -22,23 +21,9 @@ type PlayerControlsElmishComponent() =
         div {
             [ "controls"; elementIsFlex; AlignCentered.CssClass ] |> CssClasses.toHtmlClassFromList
             attr.id "play-pause-block"
-            buttonElementAsync
+            buttonElement
                 NoCssClasses
-                (fun _ ->
-                    let dotNetObjectReference = DotNetObjectReference.Create(model)
-                    let qualifiedName =
-                        if model.isPlaying then
-                            $"{rx}.ProgressiveAudioUtility.stopPlayAnimationAsync"
-                        else
-                            $"{rx}.ProgressiveAudioUtility.startPlayAnimation"
-
-                    dispatch PlayPauseControlClick
-
-                    model.blazorServices
-                        .jsRuntime.InvokeVoidAsync(qualifiedName, dotNetObjectReference)
-                        .AsTask()
-                    |> Async.AwaitTask
-                )
+                (fun _ -> dispatch PlayPauseControlClick)
                 (svg {
                     "xmlns" => SvgUri
                     "fill" => "currentColor"
