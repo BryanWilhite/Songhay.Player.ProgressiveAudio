@@ -12,9 +12,11 @@ open Songhay.Modules.Publications.Models
 open Songhay.Modules.Bolero.JsRuntimeUtility
 open Songhay.Player.ProgressiveAudio.ProgressiveAudioScalars
 
+[<NoEquality; NoComparison>] // 😐 see https://stackoverflow.com/a/65794346/22944
 type ProgressiveAudioModel =
     {
         blazorServices: {| jsRuntime: IJSRuntime; navigationManager: NavigationManager |}
+        elmishServices: {| dispatcher: Dispatch<ProgressiveAudioMessage> option |} // the `dispatcher` type breaks structural equality 😐
         currentPlaylistItem: (DisplayText * Uri) option
         error: string option
         isCreditsModalVisible: bool
@@ -48,6 +50,7 @@ type ProgressiveAudioModel =
     static member initialize (jsRuntime: IJSRuntime) (navigationManager: NavigationManager) =
         {
             blazorServices = {| jsRuntime = jsRuntime; navigationManager = navigationManager |}
+            elmishServices = {| dispatcher = None |} 
             currentPlaylistItem = None
             error = None
             isCreditsModalVisible = false
@@ -59,6 +62,7 @@ type ProgressiveAudioModel =
 
     static member updateModel (message: ProgressiveAudioMessage) (model: ProgressiveAudioModel) =
         match message with
+        | InitializeDispatch dispatch -> { model with elmishServices = {| dispatcher = dispatch |> Some |} }
         | GetPlayerManifest -> { model with presentation = None }
         | GotPlayerManifest data ->
 
@@ -85,7 +89,11 @@ type ProgressiveAudioModel =
                     return presentation |> ProgressiveAudioModel.getPlayList |> List.head
                 }
 
-            { model with presentation = presentationOption; currentPlaylistItem = item }
+            {
+                model with
+                    presentation = presentationOption
+                    currentPlaylistItem = item
+            }
 
         | PlayPauseControlClick ->
             let dotNetObjectReference = DotNetObjectReference.Create(model)
@@ -98,6 +106,7 @@ type ProgressiveAudioModel =
             { model with isPlaying = not model.isPlaying }
 
         | PlayerAnimationTick ->
+            model.blazorServices.jsRuntime |> consoleInfoAsync [| "yup!"; nameof(PlayerAnimationTick) |] |> ignore
             model
         | PlayerCreditsClick -> { model with isCreditsModalVisible = not model.isCreditsModalVisible }
         | PlaylistClick item ->
@@ -126,6 +135,8 @@ type ProgressiveAudioModel =
                                        audioReadyState: int option
                                        isAudioPaused: bool option |}) =
 
-        let cmd = Cmd.ofMsg PlayerAnimationTick
+        this.elmishServices.dispatcher
+        |> Option.map (fun dispatch -> dispatch PlayerAnimationTick)
+        |> ignore
 
         this.blazorServices.jsRuntime |> consoleInfoAsync [| uiData |]
