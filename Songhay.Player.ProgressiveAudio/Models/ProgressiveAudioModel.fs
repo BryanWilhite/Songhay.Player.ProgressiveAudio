@@ -1,22 +1,21 @@
 namespace Songhay.Player.ProgressiveAudio.Models
 
 open System
-open Elmish
 open Microsoft.AspNetCore.Components
 open Microsoft.JSInterop
 
 open FsToolkit.ErrorHandling
+
+open Bolero
 
 open Songhay.Modules.Models
 open Songhay.Modules.Publications.Models
 open Songhay.Modules.Bolero.JsRuntimeUtility
 open Songhay.Player.ProgressiveAudio.ProgressiveAudioScalars
 
-[<NoEquality; NoComparison>] // 😐 see https://stackoverflow.com/a/65794346/22944
 type ProgressiveAudioModel =
     {
-        blazorServices: {| jsRuntime: IJSRuntime; navigationManager: NavigationManager |}
-        elmishServices: {| dispatcher: Dispatch<ProgressiveAudioMessage> option |} // the `dispatcher` type breaks structural equality 😐
+        blazorServices: {| jsRuntime: IJSRuntime; navigationManager: NavigationManager; playerControlsRef: Component option |}
         currentPlaylistItem: (DisplayText * Uri) option
         error: string option
         isCreditsModalVisible: bool
@@ -49,8 +48,7 @@ type ProgressiveAudioModel =
 
     static member initialize (jsRuntime: IJSRuntime) (navigationManager: NavigationManager) =
         {
-            blazorServices = {| jsRuntime = jsRuntime; navigationManager = navigationManager |}
-            elmishServices = {| dispatcher = None |} 
+            blazorServices = {| jsRuntime = jsRuntime; navigationManager = navigationManager; playerControlsRef = None |}
             currentPlaylistItem = None
             error = None
             isCreditsModalVisible = false
@@ -62,8 +60,15 @@ type ProgressiveAudioModel =
 
     static member updateModel (message: ProgressiveAudioMessage) (model: ProgressiveAudioModel) =
         match message with
-        | InitializeElmishServices dispatch -> { model with elmishServices = {| dispatcher = dispatch |> Some |} }
         | GetPlayerManifest -> { model with presentation = None }
+        | GotPlayerControlsRef ref ->
+            {
+                model with blazorServices = {|
+                                              jsRuntime = model.blazorServices.jsRuntime
+                                              navigationManager = model.blazorServices.navigationManager
+                                              playerControlsRef = ref |> Some
+                                            |}
+            }
         | GotPlayerManifest data ->
 
             let presentationOption =
@@ -96,7 +101,7 @@ type ProgressiveAudioModel =
             }
 
         | PlayPauseControlClick ->
-            let dotNetObjectReference = DotNetObjectReference.Create(model)
+            let dotNetObjectReference = DotNetObjectReference.Create(model.blazorServices.playerControlsRef.Value)
             let qualifiedName =
                 if model.isPlaying then rxProgressiveAudioInteropStopAnimation
                 else rxProgressiveAudioInteropStartAnimation
@@ -110,7 +115,7 @@ type ProgressiveAudioModel =
             model
         | PlayerCreditsClick -> { model with isCreditsModalVisible = not model.isCreditsModalVisible }
         | PlaylistClick item ->
-            let dotNetObjectReference = DotNetObjectReference.Create(model)
+            let dotNetObjectReference = DotNetObjectReference.Create(model.blazorServices.playerControlsRef.Value)
 
             task {
                 do! model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropStopAnimation, dotNetObjectReference)
@@ -127,16 +132,3 @@ type ProgressiveAudioModel =
     member this.presentationDescription = this.presentation |> Option.map ProgressiveAudioModel.getDescription
 
     member this.presentationPlayList = this.presentation |> Option.map ProgressiveAudioModel.getPlayList
-
-    [<JSInvokable>]
-    member this.animateAsync(uiData: {|
-                                       animationStatus: string option
-                                       audioDuration: double option
-                                       audioReadyState: int option
-                                       isAudioPaused: bool option |}) =
-
-        this.elmishServices.dispatcher
-        |> Option.map (fun dispatch -> dispatch PlayerAnimationTick)
-        |> ignore
-
-        this.blazorServices.jsRuntime |> consoleInfoAsync [| uiData |]

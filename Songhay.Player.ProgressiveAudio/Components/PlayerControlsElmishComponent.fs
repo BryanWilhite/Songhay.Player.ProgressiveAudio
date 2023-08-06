@@ -7,6 +7,7 @@ open Bolero
 open Bolero.Html
 
 open Songhay.Modules.Bolero.Models
+open Songhay.Modules.Bolero.JsRuntimeUtility
 open Songhay.Modules.Bolero.SvgUtility
 open Songhay.Modules.Bolero.Visuals.BodyElement
 open Songhay.Modules.Bolero.Visuals.Bulma.CssClass
@@ -83,4 +84,21 @@ type PlayerControlsElmishComponent() =
     member val JSRuntime = Unchecked.defaultof<IJSRuntime> with get, set
 
     override this.View model dispatch =
+
+        if model.blazorServices.playerControlsRef.IsNone then
+            dispatch <| ProgressiveAudioMessage.GotPlayerControlsRef this
+        else
+            ()
+
         (model, dispatch) ||> container
+
+    [<JSInvokable>]
+    member this.animateAsync(uiData: {|
+                                       animationStatus: string option
+                                       audioDuration: double option
+                                       audioReadyState: int option
+                                       isAudioPaused: bool option |}) =
+
+        this.Dispatch PlayerAnimationTick
+
+        this.JSRuntime |> consoleInfoAsync [| uiData |]

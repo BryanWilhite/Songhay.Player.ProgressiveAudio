@@ -1,9 +1,8 @@
 namespace Songhay.Player.ProgressiveAudio.Models
 
 open System
+open Bolero
 open Microsoft.JSInterop
-
-open Elmish
 
 open Songhay.Modules.Models
 open Songhay.Modules.Publications.Models
@@ -11,7 +10,7 @@ open Songhay.Modules.Bolero
 
 type ProgressiveAudioMessage =
     | GetPlayerManifest | GotPlayerManifest of Presentation option
-    | InitializeElmishServices of Dispatch<ProgressiveAudioMessage>
+    | GotPlayerControlsRef of Component
     | PlayPauseControlClick
     | PlayerAnimationTick
     | PlayerCreditsClick

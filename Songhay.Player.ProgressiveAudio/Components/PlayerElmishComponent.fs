@@ -58,8 +58,4 @@ type PlayerElmishComponent() =
         ecomp<PlayerElmishComponent, _, _> model dispatch { attr.empty() }
 
     override this.View model dispatch =
-
-        if model.elmishServices.dispatcher.IsNone then dispatch <| InitializeElmishServices dispatch
-        else ()
-
         (model, dispatch) ||> sectionNode
