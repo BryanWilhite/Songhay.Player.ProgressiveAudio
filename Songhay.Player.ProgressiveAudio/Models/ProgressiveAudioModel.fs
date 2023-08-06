@@ -62,7 +62,7 @@ type ProgressiveAudioModel =
 
     static member updateModel (message: ProgressiveAudioMessage) (model: ProgressiveAudioModel) =
         match message with
-        | InitializeDispatch dispatch -> { model with elmishServices = {| dispatcher = dispatch |> Some |} }
+        | InitializeElmishServices dispatch -> { model with elmishServices = {| dispatcher = dispatch |> Some |} }
         | GetPlayerManifest -> { model with presentation = None }
         | GotPlayerManifest data ->
 

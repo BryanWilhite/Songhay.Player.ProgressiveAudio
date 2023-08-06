@@ -59,7 +59,7 @@ type PlayerElmishComponent() =
 
     override this.View model dispatch =
 
-        if model.elmishServices.dispatcher.IsNone then dispatch <| InitializeDispatch dispatch
+        if model.elmishServices.dispatcher.IsNone then dispatch <| InitializeElmishServices dispatch
         else ()
 
         (model, dispatch) ||> sectionNode

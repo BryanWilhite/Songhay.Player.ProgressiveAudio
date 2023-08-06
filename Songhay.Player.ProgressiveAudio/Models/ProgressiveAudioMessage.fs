@@ -11,7 +11,7 @@ open Songhay.Modules.Bolero
 
 type ProgressiveAudioMessage =
     | GetPlayerManifest | GotPlayerManifest of Presentation option
-    | InitializeDispatch of Dispatch<ProgressiveAudioMessage>
+    | InitializeElmishServices of Dispatch<ProgressiveAudioMessage>
     | PlayPauseControlClick
     | PlayerAnimationTick
     | PlayerCreditsClick
