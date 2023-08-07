@@ -41,18 +41,18 @@ type ProgressiveAudioModel =
         |> List.choose (function | PresentationPart.Playlist pl -> pl |> Some | _ -> None)
         |> List.head
 
-    static member internal getTimeDisplayText secs =
-        let minutes = Math.Floor(secs / 60m)
-        let seconds = Math.Floor(secs % 60m)
-
-        $"{minutes:``00``}:{seconds:``00``}"
-
-    static member buildAudioRootUri (relativeUri: Uri) =
+    static member internal buildAudioRootUri (relativeUri: Uri) =
         if relativeUri.IsAbsoluteUri then relativeUri
         else
             let builder = UriBuilder(rxProgressiveAudioRoot)
             builder.Path <- $"{builder.Path}{relativeUri.OriginalString.TrimStart([|'.';'/'|])}"
             builder.Uri
+
+    static member internal getTimeDisplayText secs =
+        let minutes = Math.Floor(secs / 60m)
+        let seconds = Math.Floor(secs % 60m)
+
+        $"{minutes:``00``}:{seconds:``00``}"
 
     static member initialize (jsRuntime: IJSRuntime) (navigationManager: NavigationManager) =
         {
