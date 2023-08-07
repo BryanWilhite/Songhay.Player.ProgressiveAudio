@@ -47,7 +47,7 @@ type PlayerControlsElmishComponent() =
                     [ fontSize Size6; elementFlexSelfAlignment Center ] |> CssClasses.toHtmlClassFromList
                     attr.id "play-pause-progress-output"
                     attr.``for`` "play-pause-range"
-                    text model.playingProgress
+                    text model.playingProgressDisplay
                 }
                 span {
                     [ fontSize Size7; elementFlexSelfAlignment Center ] |> CssClasses.toHtmlClassFromList
@@ -57,7 +57,7 @@ type PlayerControlsElmishComponent() =
                     [ fontSize Size7; elementFlexSelfAlignment Center ] |> CssClasses.toHtmlClassFromList
                     attr.id "play-pause-duration-output"
                     attr.``for`` "play-pause-range"
-                    text model.playingDuration
+                    text model.playingDurationDisplay
                 }
             }
         }
@@ -95,6 +95,7 @@ type PlayerControlsElmishComponent() =
     [<JSInvokable>]
     member this.animateAsync(uiData: {|
                                        animationStatus: string option
+                                       audioCurrentTime: double option
                                        audioDuration: double option
                                        audioReadyState: int option
                                        isAudioPaused: bool option |}) =

@@ -13,6 +13,7 @@ export class ProgressiveAudioUtility {
                 'animateAsync',
                 {
                     animationStatus: ProgressiveAudioUtility.playAnimation?.getDiagnosticStatus(),
+                    audioCurrentTime: audio?.currentTime,
                     audioDuration: audio?.duration,
                     audioReadyState: audio?.readyState,
                     isAudioPaused: audio?.paused

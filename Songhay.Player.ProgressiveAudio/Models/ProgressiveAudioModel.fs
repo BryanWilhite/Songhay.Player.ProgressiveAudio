@@ -20,8 +20,10 @@ type ProgressiveAudioModel =
         error: string option
         isCreditsModalVisible: bool
         isPlaying: bool
-        playingDuration: string
-        playingProgress: string
+        playingCurrentTime: double
+        playingDuration: double
+        playingDurationDisplay: string
+        playingProgressDisplay: string
         presentation: Presentation option
     }
 
@@ -39,6 +41,12 @@ type ProgressiveAudioModel =
         |> List.choose (function | PresentationPart.Playlist pl -> pl |> Some | _ -> None)
         |> List.head
 
+    static member internal getTimeDisplayText secs =
+        let minutes = Math.Floor(secs / 60m)
+        let seconds = Math.Floor(secs % 60m)
+
+        $"{minutes:``00``}:{seconds:``00``}"
+
     static member buildAudioRootUri (relativeUri: Uri) =
         if relativeUri.IsAbsoluteUri then relativeUri
         else
@@ -53,8 +61,10 @@ type ProgressiveAudioModel =
             error = None
             isCreditsModalVisible = false
             isPlaying = false
-            playingDuration = "00:00" 
-            playingProgress = "00:00" 
+            playingDuration = 0
+            playingCurrentTime = 0
+            playingDurationDisplay = "00:00"
+            playingProgressDisplay = "00:00"
             presentation = None
         }
 
