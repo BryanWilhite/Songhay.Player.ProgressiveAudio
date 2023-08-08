@@ -20,10 +20,10 @@ type ProgressiveAudioModel =
         error: string option
         isCreditsModalVisible: bool
         isPlaying: bool
-        playingCurrentTime: double
-        playingDuration: double
+        playingCurrentTime: decimal
+        playingDuration: decimal
         playingDurationDisplay: string
-        playingProgressDisplay: string
+        playingCurrentTimeDisplay: string
         presentation: Presentation option
     }
 
@@ -61,10 +61,10 @@ type ProgressiveAudioModel =
             error = None
             isCreditsModalVisible = false
             isPlaying = false
-            playingDuration = 0
-            playingCurrentTime = 0
+            playingDuration = 0m
             playingDurationDisplay = "00:00"
-            playingProgressDisplay = "00:00"
+            playingCurrentTime = 0m
+            playingCurrentTimeDisplay = "00:00"
             presentation = None
         }
 
@@ -120,9 +120,17 @@ type ProgressiveAudioModel =
 
             { model with isPlaying = not model.isPlaying }
 
-        | PlayerAnimationTick ->
-            model.blazorServices.jsRuntime |> consoleInfoAsync [| "yup!"; nameof(PlayerAnimationTick) |] |> ignore
-            model
+        | PlayerAnimationTick data ->
+            model.blazorServices.jsRuntime |> consoleInfoAsync [| nameof(PlayerAnimationTick) |] |> ignore
+
+            {
+                model with
+                    playingCurrentTime = data.audioCurrentTime
+                    playingCurrentTimeDisplay = data.audioCurrentTime |> ProgressiveAudioModel.getTimeDisplayText
+                    playingDuration = data.audioDuration |> Math.Floor
+                    playingDurationDisplay = data.audioDuration |> ProgressiveAudioModel.getTimeDisplayText 
+            }
+
         | PlayerCreditsClick -> { model with isCreditsModalVisible = not model.isCreditsModalVisible }
         | PlaylistClick item ->
             let dotNetObjectReference = DotNetObjectReference.Create(model.blazorServices.playerControlsRef.Value)

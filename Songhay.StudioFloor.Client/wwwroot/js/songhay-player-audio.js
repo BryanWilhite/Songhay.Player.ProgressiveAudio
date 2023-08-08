@@ -1138,6 +1138,7 @@ class ProgressiveAudioUtility {
             try {
                 yield instance.invokeMethodAsync('animateAsync', {
                     animationStatus: (_a = ProgressiveAudioUtility.playAnimation) === null || _a === void 0 ? void 0 : _a.getDiagnosticStatus(),
+                    audioCurrentTime: audio === null || audio === void 0 ? void 0 : audio.currentTime,
                     audioDuration: audio === null || audio === void 0 ? void 0 : audio.duration,
                     audioReadyState: audio === null || audio === void 0 ? void 0 : audio.readyState,
                     isAudioPaused: audio === null || audio === void 0 ? void 0 : audio.paused

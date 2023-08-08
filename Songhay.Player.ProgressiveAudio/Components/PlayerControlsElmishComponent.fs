@@ -39,7 +39,7 @@ type PlayerControlsElmishComponent() =
                 m (L, L1) |> CssClasses.toHtmlClass
                 attr.id "play-pause-range"
                 attr.``type`` "range"
-                attr.value 0
+                attr.value model.playingCurrentTime
             }
             span {
                 [ elementIsFlex; elementFlexWrap NoWrap; elementFlexContentAlignment Center; m (L, L1) ] |> CssClasses.toHtmlClassFromList
@@ -47,7 +47,7 @@ type PlayerControlsElmishComponent() =
                     [ fontSize Size6; elementFlexSelfAlignment Center ] |> CssClasses.toHtmlClassFromList
                     attr.id "play-pause-progress-output"
                     attr.``for`` "play-pause-range"
-                    text model.playingProgressDisplay
+                    text model.playingCurrentTimeDisplay
                 }
                 span {
                     [ fontSize Size7; elementFlexSelfAlignment Center ] |> CssClasses.toHtmlClassFromList
@@ -95,11 +95,16 @@ type PlayerControlsElmishComponent() =
     [<JSInvokable>]
     member this.animateAsync(uiData: {|
                                        animationStatus: string option
-                                       audioCurrentTime: double option
-                                       audioDuration: double option
+                                       audioCurrentTime: decimal option
+                                       audioDuration: decimal option
                                        audioReadyState: int option
                                        isAudioPaused: bool option |}) =
 
-        this.Dispatch PlayerAnimationTick
+        this.Dispatch <|
+            PlayerAnimationTick {
+                audioCurrentTime = uiData.audioCurrentTime.Value
+                audioDuration = uiData.audioCurrentTime.Value
+                audioReadyState = uiData.audioReadyState.Value
+            }
 
         this.JSRuntime |> consoleInfoAsync [| uiData |]
