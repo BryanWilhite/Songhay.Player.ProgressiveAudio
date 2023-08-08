@@ -1,5 +1,6 @@
 namespace Songhay.Player.ProgressiveAudio.Components
 
+open System.Threading.Tasks
 open Microsoft.AspNetCore.Components
 open Microsoft.JSInterop
 
@@ -7,7 +8,6 @@ open Bolero
 open Bolero.Html
 
 open Songhay.Modules.Bolero.Models
-open Songhay.Modules.Bolero.JsRuntimeUtility
 open Songhay.Modules.Bolero.SvgUtility
 open Songhay.Modules.Bolero.Visuals.BodyElement
 open Songhay.Modules.Bolero.Visuals.Bulma.CssClass
@@ -39,7 +39,8 @@ type PlayerControlsElmishComponent() =
                 m (L, L1) |> CssClasses.toHtmlClass
                 attr.id "play-pause-range"
                 attr.``type`` "range"
-                attr.value model.playingCurrentTime
+                attr.max model.playingDuration
+                attr.value $"{model.playingCurrentTime}"
             }
             span {
                 [ elementIsFlex; elementFlexWrap NoWrap; elementFlexContentAlignment Center; m (L, L1) ] |> CssClasses.toHtmlClassFromList
@@ -72,6 +73,8 @@ type PlayerControlsElmishComponent() =
                 audio {
                     attr.src (if uriOption.IsSome then uriOption.Value else null)
                     attr.preload "metadata"
+                    on.loadedmetadata (fun _ -> dispatch PlayMetadataLoaded)
+                    on.ended (fun _ -> dispatch PlayEnded)
                 }
                 (model, dispatch) ||> playPauseBlock
             }
@@ -100,11 +103,14 @@ type PlayerControlsElmishComponent() =
                                        audioReadyState: int option
                                        isAudioPaused: bool option |}) =
 
-        this.Dispatch <|
+        let tick =
             PlayerAnimationTick {
                 audioCurrentTime = uiData.audioCurrentTime.Value
-                audioDuration = uiData.audioCurrentTime.Value
+                audioDuration = uiData.audioDuration.Value
                 audioReadyState = uiData.audioReadyState.Value
             }
 
-        this.JSRuntime |> consoleInfoAsync [| uiData |]
+        let result = this.Dispatch tick
+
+        //this.JSRuntime |> Songhay.Modules.Bolero.JsRuntimeUtility.consoleInfoAsync [| uiData |]
+        Task.FromResult result

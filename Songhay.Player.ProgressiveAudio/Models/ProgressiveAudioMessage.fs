@@ -12,6 +12,7 @@ type ProgressiveAudioMessage =
     | GetPlayerManifest | GotPlayerManifest of Presentation option
     | GotPlayerControlsRef of Component
     | PlayPauseControlClick
+    | PlayMetadataLoaded | PlayEnded
     | PlayerAnimationTick of PlayerAnimationTickData
     | PlayerCreditsClick
     | PlaylistClick of (DisplayText * Uri)

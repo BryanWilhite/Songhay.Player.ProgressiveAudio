@@ -80,7 +80,6 @@ type ProgressiveAudioModel =
                                             |}
             }
         | GotPlayerManifest data ->
-
             let presentationOption =
                 option {
                     let! presentation = data
@@ -109,9 +108,16 @@ type ProgressiveAudioModel =
                     presentation = presentationOption
                     currentPlaylistItem = item
             }
+        | PlayMetadataLoaded ->
+            let dotNetObjectReference = DotNetObjectReference.Create(model.blazorServices.playerControlsRef.Value)
+            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropHandleMetadataLoaded, dotNetObjectReference) |> ignore
 
+            model
+
+        | PlayEnded -> { model with isPlaying = false }
         | PlayPauseControlClick ->
             let dotNetObjectReference = DotNetObjectReference.Create(model.blazorServices.playerControlsRef.Value)
+
             let qualifiedName =
                 if model.isPlaying then rxProgressiveAudioInteropStopAnimation
                 else rxProgressiveAudioInteropStartAnimation
@@ -121,8 +127,6 @@ type ProgressiveAudioModel =
             { model with isPlaying = not model.isPlaying }
 
         | PlayerAnimationTick data ->
-            model.blazorServices.jsRuntime |> consoleInfoAsync [| nameof(PlayerAnimationTick) |] |> ignore
-
             {
                 model with
                     playingCurrentTime = data.audioCurrentTime
@@ -141,7 +145,7 @@ type ProgressiveAudioModel =
                 do! model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropStartAnimation, dotNetObjectReference)
             } |> ignore
 
-            { model with currentPlaylistItem = item |> Some }
+            { model with currentPlaylistItem = item |> Some; isPlaying = true }
 
         | PlayerError exn -> { model with error = Some exn.Message }
 

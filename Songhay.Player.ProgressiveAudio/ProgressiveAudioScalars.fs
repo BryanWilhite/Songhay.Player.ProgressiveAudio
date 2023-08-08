@@ -12,8 +12,10 @@ module ProgressiveAudioScalars =
     [<Literal>]
     let rxProgressiveAudioRoot = "https://songhay.blob.core.windows.net/player-audio/"
 
+    let rxProgressiveAudioInteropHandleMetadataLoaded = $"{rx}.ProgressiveAudioUtility.handleAudioMetadataLoadedAsync"
+
     let rxProgressiveAudioInteropLoadTrack = $"{rx}.ProgressiveAudioUtility.loadAudioTrack"
 
-    let rxProgressiveAudioInteropStopAnimation = $"{rx}.ProgressiveAudioUtility.stopPlayAnimationAsync"
+    let rxProgressiveAudioInteropStartAnimation = $"{rx}.ProgressiveAudioUtility.startPlayAnimationAsync"
 
-    let rxProgressiveAudioInteropStartAnimation = $"{rx}.ProgressiveAudioUtility.startPlayAnimation"
+    let rxProgressiveAudioInteropStopAnimation = $"{rx}.ProgressiveAudioUtility.stopPlayAnimationAsync"
