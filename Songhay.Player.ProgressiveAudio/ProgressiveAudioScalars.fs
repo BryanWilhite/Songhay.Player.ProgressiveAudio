@@ -16,6 +16,6 @@ module ProgressiveAudioScalars =
 
     let rxProgressiveAudioInteropLoadTrack = $"{rx}.ProgressiveAudioUtility.loadAudioTrack"
 
-    let rxProgressiveAudioInteropStartAnimation = $"{rx}.ProgressiveAudioUtility.startPlayAnimationAsync"
+    let rxProgressiveAudioInteropStartAnimation = $"{rx}.ProgressiveAudioUtility.startPlayAnimation"
 
     let rxProgressiveAudioInteropStopAnimation = $"{rx}.ProgressiveAudioUtility.stopPlayAnimationAsync"

@@ -7,6 +7,6 @@ export declare class ProgressiveAudioUtility {
     static handleAudioMetadataLoadedAsync(instance: DotNet.DotNetObject): Promise<void>;
     static invokeDotNetMethodAsync(instance: DotNet.DotNetObject, audio: HTMLAudioElement | null): Promise<void>;
     static loadAudioTrack(src: string): void;
-    static startPlayAnimationAsync(instance: DotNet.DotNetObject): Promise<void>;
+    static startPlayAnimation(instance: DotNet.DotNetObject): void;
     static stopPlayAnimationAsync(instance: DotNet.DotNetObject): Promise<void>;
 }

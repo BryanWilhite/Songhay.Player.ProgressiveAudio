@@ -1135,6 +1135,7 @@ class ProgressiveAudioUtility {
     static getPlayPauseButtonElement() {
         return window.document.querySelector('#play-pause-block>button');
     }
+    // noinspection JSUnusedGlobalSymbols
     static handleAudioMetadataLoadedAsync(instance) {
         return __awaiter(this, void 0, void 0, function* () {
             const button = ProgressiveAudioUtility.getPlayPauseButtonElement();
@@ -1166,35 +1167,40 @@ class ProgressiveAudioUtility {
             }
         });
     }
+    // noinspection JSUnusedGlobalSymbols
     static loadAudioTrack(src) {
         const audio = ProgressiveAudioUtility.getHTMLAudioElement();
         audio === null || audio === void 0 ? void 0 : audio.setAttribute('src', src);
         audio === null || audio === void 0 ? void 0 : audio.load();
     }
-    static startPlayAnimationAsync(instance) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const button = ProgressiveAudioUtility.getPlayPauseButtonElement();
-            const audio = ProgressiveAudioUtility.getHTMLAudioElement();
-            if (button) {
-                button.disabled = true;
-            }
+    // noinspection JSUnusedGlobalSymbols
+    static startPlayAnimation(instance) {
+        const button = ProgressiveAudioUtility.getPlayPauseButtonElement();
+        const audio = ProgressiveAudioUtility.getHTMLAudioElement();
+        const fps = 1; // frames per second
+        const readyStatePollFreq = 250; // milliseconds
+        if (button) {
+            button.disabled = true;
+        }
+        const timeId = window.setTimeout(() => __awaiter(this, void 0, void 0, function* () {
+            // poll faster than animation ticks until `readyState` changes:
             if (!(audio === null || audio === void 0 ? void 0 : audio.ended) && (audio === null || audio === void 0 ? void 0 : audio.paused) && (audio === null || audio === void 0 ? void 0 : audio.readyState) > 0) {
+                window.clearTimeout(timeId);
                 yield audio.play();
             }
-            console.warn('startPlayAnimationAsync', { ended: audio === null || audio === void 0 ? void 0 : audio.ended, paused: audio === null || audio === void 0 ? void 0 : audio.paused, state: audio === null || audio === void 0 ? void 0 : audio.readyState });
-            ProgressiveAudioUtility.playAnimation = WindowAnimation.registerAndGenerate(1, (_) => __awaiter(this, void 0, void 0, function* () {
-                if (audio === null || audio === void 0 ? void 0 : audio.ended) {
-                    audio.currentTime = 0;
-                    yield ProgressiveAudioUtility.stopPlayAnimationAsync(instance);
-                    return;
-                }
-                yield ProgressiveAudioUtility.invokeDotNetMethodAsync(instance, audio);
-            }));
-            WindowAnimation.animate();
-            if (button) {
-                button.disabled = false;
+        }), readyStatePollFreq);
+        ProgressiveAudioUtility.playAnimation = WindowAnimation.registerAndGenerate(fps, (_) => __awaiter(this, void 0, void 0, function* () {
+            if (audio === null || audio === void 0 ? void 0 : audio.ended) {
+                audio.currentTime = 0;
+                yield ProgressiveAudioUtility.stopPlayAnimationAsync(instance);
+                return;
             }
-        });
+            yield ProgressiveAudioUtility.invokeDotNetMethodAsync(instance, audio);
+        }));
+        WindowAnimation.animate();
+        if (button) {
+            button.disabled = false;
+        }
     }
     static stopPlayAnimationAsync(instance) {
         var _a, _b;
