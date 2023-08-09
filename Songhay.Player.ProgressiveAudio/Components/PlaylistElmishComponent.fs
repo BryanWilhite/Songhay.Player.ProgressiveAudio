@@ -15,13 +15,17 @@ type PlaylistElmishComponent() =
 
     let container (model: ProgressiveAudioModel) dispatch =
         ol {
-            [ "panel"; "track-list" ] |> CssClasses.toHtmlClassFromList
+            [ panel; "track-list" ] |> CssClasses.toHtmlClassFromList
             attr.id "playlist"
             cond model.presentationPlayList.IsSome <| function
                 | true ->
                     forEach model.presentationPlayList.Value <| fun (txt, uri) ->
                         li {
-                            "panel-block" |> CssClasses.toHtmlClass
+                            [
+                                "panel-block"
+                                if model.currentPlaylistItem = Some (txt, uri) then "is-active"
+                                else ()
+                            ] |> CssClasses.toHtmlClassFromList
                             span {
                                 [ "panel-icon"; fontSize Size3 ] |> CssClasses.toHtmlClassFromList
                                 text "⬤"
