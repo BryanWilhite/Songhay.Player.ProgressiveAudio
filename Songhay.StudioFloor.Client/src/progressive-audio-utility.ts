@@ -1,12 +1,18 @@
-import {WindowAnimation} from 'songhay';
+import { WindowAnimation } from 'songhay';
 
 export class ProgressiveAudioUtility {
+    static isInputEventingApplied = false;
+
     static getHTMLAudioElement(): HTMLAudioElement | null {
         return window.document.querySelector('#audio-player-container>audio');
     }
 
     static getPlayPauseButtonElement(): HTMLButtonElement | null {
         return window.document.querySelector('#play-pause-block>button');
+    }
+
+    static getPlayPauseInputElement(): HTMLInputElement | null {
+        return window.document.querySelector('#play-pause-block>input');
     }
 
     static playAnimation: WindowAnimation | null = null;
@@ -59,6 +65,16 @@ export class ProgressiveAudioUtility {
         const readyStatePollFreq: number = 250; // milliseconds
 
         if(button) { button.disabled = true; }
+
+        if(!ProgressiveAudioUtility.isInputEventingApplied) {
+            const input: HTMLInputElement | null = ProgressiveAudioUtility.getPlayPauseInputElement();
+
+            input?.addEventListener('change', () => {
+                const audio: HTMLAudioElement | null = ProgressiveAudioUtility.getHTMLAudioElement();
+
+                if(audio) { console.warn({input}); audio.currentTime = parseFloat(input?.value); }
+            });
+        }
 
         const timeId = window.setTimeout(async () => {
             // poll faster than animation ticks until `readyState` changes:

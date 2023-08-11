@@ -11,8 +11,8 @@ open Songhay.Modules.Bolero
 type ProgressiveAudioMessage =
     | GetPlayerManifest | GotPlayerManifest of Presentation option
     | GotPlayerControlsRef of Component
-    | PlayPauseControlClick
-    | PlayMetadataLoaded | PlayEnded
+    | PlayPauseButtonClickEvent | PlayPauseInputEvent | PlayPauseChangeEvent
+    | PlayAudioMetadataLoadedEvent | PlayAudioEndedEvent
     | PlayerAnimationTick of PlayerAnimationTickData
     | PlayerCreditsClick
     | PlaylistClick of (DisplayText * Uri)

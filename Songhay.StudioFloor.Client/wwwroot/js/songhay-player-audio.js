@@ -1135,6 +1135,9 @@ class ProgressiveAudioUtility {
     static getPlayPauseButtonElement() {
         return window.document.querySelector('#play-pause-block>button');
     }
+    static getPlayPauseInputElement() {
+        return window.document.querySelector('#play-pause-block>input');
+    }
     // noinspection JSUnusedGlobalSymbols
     static handleAudioMetadataLoadedAsync(instance) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -1182,6 +1185,16 @@ class ProgressiveAudioUtility {
         if (button) {
             button.disabled = true;
         }
+        if (!ProgressiveAudioUtility.isInputEventingApplied) {
+            const input = ProgressiveAudioUtility.getPlayPauseInputElement();
+            input === null || input === void 0 ? void 0 : input.addEventListener('change', () => {
+                const audio = ProgressiveAudioUtility.getHTMLAudioElement();
+                if (audio) {
+                    console.warn({ input });
+                    audio.currentTime = parseFloat(input === null || input === void 0 ? void 0 : input.value);
+                }
+            });
+        }
         const timeId = window.setTimeout(() => __awaiter(this, void 0, void 0, function* () {
             // poll faster than animation ticks until `readyState` changes:
             if (!(audio === null || audio === void 0 ? void 0 : audio.ended) && (audio === null || audio === void 0 ? void 0 : audio.paused) && (audio === null || audio === void 0 ? void 0 : audio.readyState) > 0) {
@@ -1221,6 +1234,7 @@ class ProgressiveAudioUtility {
         });
     }
 }
+ProgressiveAudioUtility.isInputEventingApplied = false;
 ProgressiveAudioUtility.playAnimation = null;
 
 ;// CONCATENATED MODULE: ./src/_index.ts

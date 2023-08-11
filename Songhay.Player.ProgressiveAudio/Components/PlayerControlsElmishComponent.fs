@@ -24,7 +24,7 @@ type PlayerControlsElmishComponent() =
             attr.id "play-pause-block"
             buttonElement
                 NoCssClasses
-                (fun _ -> dispatch PlayPauseControlClick)
+                (fun _ -> dispatch PlayPauseButtonClickEvent)
                 (svg {
                     "xmlns" => SvgUri
                     "fill" => "currentColor"
@@ -41,6 +41,8 @@ type PlayerControlsElmishComponent() =
                 attr.``type`` "range"
                 attr.max model.playingDuration
                 attr.value $"{model.playingCurrentTime}"
+                on.change (fun _ -> dispatch PlayPauseChangeEvent)
+                on.input (fun _ -> dispatch PlayPauseInputEvent)
             }
             span {
                 [ elementIsFlex; elementFlexWrap NoWrap; elementFlexContentAlignment Center; m (L, L1) ] |> CssClasses.toHtmlClassFromList
@@ -73,8 +75,8 @@ type PlayerControlsElmishComponent() =
                 audio {
                     attr.src (if uriOption.IsSome then uriOption.Value else null)
                     attr.preload "metadata"
-                    on.loadedmetadata (fun _ -> dispatch PlayMetadataLoaded)
-                    on.ended (fun _ -> dispatch PlayEnded)
+                    on.loadedmetadata (fun _ -> dispatch PlayAudioMetadataLoadedEvent)
+                    on.ended (fun _ -> dispatch PlayAudioEndedEvent)
                 }
                 (model, dispatch) ||> playPauseBlock
             }

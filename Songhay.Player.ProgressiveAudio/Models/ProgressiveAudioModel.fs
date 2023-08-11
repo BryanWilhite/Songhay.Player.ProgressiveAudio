@@ -10,7 +10,6 @@ open Bolero
 
 open Songhay.Modules.Models
 open Songhay.Modules.Publications.Models
-open Songhay.Modules.Bolero.JsRuntimeUtility
 open Songhay.Player.ProgressiveAudio.ProgressiveAudioScalars
 
 type ProgressiveAudioModel =
@@ -69,6 +68,17 @@ type ProgressiveAudioModel =
         }
 
     static member updateModel (message: ProgressiveAudioMessage) (model: ProgressiveAudioModel) =
+        let dotNetObjectReference() = DotNetObjectReference.Create(model.blazorServices.playerControlsRef.Value)
+
+        let handleMeta() =
+            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropHandleMetadataLoaded, dotNetObjectReference())
+
+        let pause() =
+            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropStopAnimation, dotNetObjectReference())
+
+        let play() =
+            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropStartAnimation, dotNetObjectReference())
+
         match message with
         | GetPlayerManifest -> { model with presentation = None }
         | GotPlayerControlsRef ref ->
@@ -108,23 +118,27 @@ type ProgressiveAudioModel =
                     presentation = presentationOption
                     currentPlaylistItem = item
             }
-        | PlayMetadataLoaded ->
-            let dotNetObjectReference = DotNetObjectReference.Create(model.blazorServices.playerControlsRef.Value)
-            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropHandleMetadataLoaded, dotNetObjectReference) |> ignore
 
+        | PlayAudioMetadataLoadedEvent ->
+            handleMeta() |> ignore
             model
 
-        | PlayEnded -> { model with isPlaying = false }
-        | PlayPauseControlClick ->
-            let dotNetObjectReference = DotNetObjectReference.Create(model.blazorServices.playerControlsRef.Value)
-
-            let qualifiedName =
-                if model.isPlaying then rxProgressiveAudioInteropStopAnimation
-                else rxProgressiveAudioInteropStartAnimation
-
-            model.blazorServices.jsRuntime.InvokeVoidAsync(qualifiedName, dotNetObjectReference) |> ignore
-
+        | PlayAudioEndedEvent -> { model with isPlaying = false }
+        | PlayPauseButtonClickEvent ->
+            if model.isPlaying then pause() |> ignore else play() |> ignore
             { model with isPlaying = not model.isPlaying }
+
+        | PlayPauseInputEvent ->
+            task {
+                do! pause()
+                do! handleMeta()
+            } |> ignore
+
+            { model with isPlaying = false }
+
+        | PlayPauseChangeEvent ->
+            play() |> ignore
+            { model with isPlaying = true }
 
         | PlayerAnimationTick data ->
             {
@@ -137,12 +151,10 @@ type ProgressiveAudioModel =
 
         | PlayerCreditsClick -> { model with isCreditsModalVisible = not model.isCreditsModalVisible }
         | PlaylistClick item ->
-            let dotNetObjectReference = DotNetObjectReference.Create(model.blazorServices.playerControlsRef.Value)
-
             task {
-                do! model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropStopAnimation, dotNetObjectReference)
+                do! pause()
                 do! model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropLoadTrack, (item |> snd).AbsoluteUri)
-                do! model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropStartAnimation, dotNetObjectReference)
+                do! play()
             } |> ignore
 
             { model with currentPlaylistItem = item |> Some; isPlaying = true }
