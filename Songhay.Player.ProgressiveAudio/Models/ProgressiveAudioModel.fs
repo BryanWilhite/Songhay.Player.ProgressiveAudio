@@ -73,6 +73,9 @@ type ProgressiveAudioModel =
         let handleMeta() =
             model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropHandleMetadataLoaded, dotNetObjectReference())
 
+        let load (item: DisplayText * Uri) =
+            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropLoadTrack, (item |> snd).AbsoluteUri)
+
         let pause() =
             model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropStopAnimation, dotNetObjectReference())
 
@@ -153,7 +156,7 @@ type ProgressiveAudioModel =
         | PlaylistClick item ->
             task {
                 do! pause()
-                do! model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropLoadTrack, (item |> snd).AbsoluteUri)
+                do! load item
                 do! play()
             } |> ignore
 
