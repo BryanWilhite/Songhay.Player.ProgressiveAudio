@@ -47,7 +47,6 @@ export class ProgressiveAudioUtility {
         }
     }
 
-
     // noinspection JSUnusedGlobalSymbols
     static loadAudioTrack(src: string) : void {
         const audio: HTMLAudioElement | null = ProgressiveAudioUtility.getHTMLAudioElement();
@@ -55,7 +54,6 @@ export class ProgressiveAudioUtility {
         audio?.setAttribute('src', src);
         audio?.load();
     }
-
 
     // noinspection JSUnusedGlobalSymbols
     static startPlayAnimation(instance: DotNet.DotNetObject) : void {
@@ -74,6 +72,8 @@ export class ProgressiveAudioUtility {
 
                 if(audio) { console.warn({input}); audio.currentTime = parseFloat(input?.value); }
             });
+
+            ProgressiveAudioUtility.isInputEventingApplied = true;
         }
 
         const timeId = window.setTimeout(async () => {

@@ -66,6 +66,7 @@ export class ProgressiveAudioUtility {
                     audio.currentTime = parseFloat(input === null || input === void 0 ? void 0 : input.value);
                 }
             });
+            ProgressiveAudioUtility.isInputEventingApplied = true;
         }
         const timeId = window.setTimeout(() => __awaiter(this, void 0, void 0, function* () {
             // poll faster than animation ticks until `readyState` changes:
