@@ -13,6 +13,7 @@
 
     <ItemGroup>
       <Compile Include="ProgressiveAudioScalars.fs" />
+      <Compile Include="ProgressiveAudioUtility.fs" />
       <Compile Include="Models\PlayerAnimationTickData.fs" />
       <Compile Include="Models\ProgressiveAudioMessage.fs" />
       <Compile Include="Models\ProgressiveAudioModel.fs" />

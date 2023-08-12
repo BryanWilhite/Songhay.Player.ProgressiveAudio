@@ -10,7 +10,9 @@ open Bolero
 
 open Songhay.Modules.Models
 open Songhay.Modules.Publications.Models
+
 open Songhay.Player.ProgressiveAudio.ProgressiveAudioScalars
+open Songhay.Player.ProgressiveAudio.ProgressiveAudioUtility
 
 type ProgressiveAudioModel =
     {
@@ -39,19 +41,6 @@ type ProgressiveAudioModel =
         p.parts
         |> List.choose (function | PresentationPart.Playlist pl -> pl |> Some | _ -> None)
         |> List.head
-
-    static member internal buildAudioRootUri (relativeUri: Uri) =
-        if relativeUri.IsAbsoluteUri then relativeUri
-        else
-            let builder = UriBuilder(rxProgressiveAudioRoot)
-            builder.Path <- $"{builder.Path}{relativeUri.OriginalString.TrimStart([|'.';'/'|])}"
-            builder.Uri
-
-    static member internal getTimeDisplayText secs =
-        let minutes = Math.Floor(secs / 60m)
-        let seconds = Math.Floor(secs % 60m)
-
-        $"{minutes:``00``}:{seconds:``00``}"
 
     static member initialize (jsRuntime: IJSRuntime) (navigationManager: NavigationManager) =
         {
@@ -92,35 +81,23 @@ type ProgressiveAudioModel =
                                               playerControlsRef = ref |> Some
                                             |}
             }
+
         | GotPlayerManifest data ->
             let presentationOption =
-                option {
-                    let! presentation = data
+                toPresentationOption
+                    data
+                    (fun (txt, uri) -> (txt, uri |> buildAudioRootUri))
 
-                    let map list =
-                        list
-                        |> List.map(fun (txt, uri) -> (txt, uri |> ProgressiveAudioModel.buildAudioRootUri))
-                        |> Playlist
-
-                    let parts =
-                        presentation.parts
-                        |> List.map(fun part -> match part with | Playlist list -> list |> map | _ -> part)
-
-                    return { presentation with parts = parts }
-                }
-
-            let item =
+            let currentItem =
                 option {
                     let! presentation = presentationOption
 
                     return presentation |> ProgressiveAudioModel.getPlayList |> List.head
                 }
 
-            {
-                model with
+            { model with
                     presentation = presentationOption
-                    currentPlaylistItem = item
-            }
+                    currentPlaylistItem = currentItem }
 
         | PlayAudioMetadataLoadedEvent ->
             handleMeta() |> ignore
@@ -147,9 +124,9 @@ type ProgressiveAudioModel =
             {
                 model with
                     playingCurrentTime = data.audioCurrentTime
-                    playingCurrentTimeDisplay = data.audioCurrentTime |> ProgressiveAudioModel.getTimeDisplayText
+                    playingCurrentTimeDisplay = data.audioCurrentTime |> getTimeDisplayText
                     playingDuration = data.audioDuration |> Math.Floor
-                    playingDurationDisplay = data.audioDuration |> ProgressiveAudioModel.getTimeDisplayText 
+                    playingDurationDisplay = data.audioDuration |> getTimeDisplayText 
             }
 
         | PlayerCreditsClick -> { model with isCreditsModalVisible = not model.isCreditsModalVisible }
