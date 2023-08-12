@@ -10,6 +10,7 @@ open Bolero
 
 open Songhay.Modules.Models
 open Songhay.Modules.Publications.Models
+open Songhay.Modules.Bolero.JsRuntimeUtility
 
 open Songhay.Player.ProgressiveAudio.ProgressiveAudioScalars
 open Songhay.Player.ProgressiveAudio.ProgressiveAudioUtility
@@ -58,6 +59,10 @@ type ProgressiveAudioModel =
 
     static member updateModel (message: ProgressiveAudioMessage) (model: ProgressiveAudioModel) =
         let dotNetObjectReference() = DotNetObjectReference.Create(model.blazorServices.playerControlsRef.Value)
+
+        let handleInputChange (htmlRef: HtmlRef) =
+            let elementRef = htmlRef |> tryGetElementReference |> Result.valueOr raise
+            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropSetAudioCurrentTime, elementRef).AsTask()
 
         let handleMeta() =
             model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropHandleMetadataLoaded, dotNetObjectReference())
@@ -116,8 +121,11 @@ type ProgressiveAudioModel =
 
             { model with isPlaying = false }
 
-        | PlayPauseChangeEvent ->
-            play() |> ignore
+        | PlayPauseChangeEvent inputRef ->
+            task {
+                do! handleInputChange inputRef
+                do! play()
+            } |> ignore
             { model with isPlaying = true }
 
         | PlayerAnimationTick data ->

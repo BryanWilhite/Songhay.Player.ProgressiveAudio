@@ -18,6 +18,8 @@ open Songhay.Player.ProgressiveAudio.Models
 type PlayerControlsElmishComponent() =
     inherit ElmishComponent<ProgressiveAudioModel, ProgressiveAudioMessage>()
 
+    let inputRangeElementRef = HtmlRef()
+
     let playPauseBlock model dispatch =
         div {
             [ "controls"; elementIsFlex; AlignCentered.CssClass ] |> CssClasses.toHtmlClassFromList
@@ -37,12 +39,13 @@ type PlayerControlsElmishComponent() =
 
             input {
                 m (L, L1) |> CssClasses.toHtmlClass
+                on.change (fun _ -> dispatch <| PlayPauseChangeEvent inputRangeElementRef)
+                on.input (fun _ -> dispatch PlayPauseInputEvent)
                 attr.id "play-pause-range"
                 attr.``type`` "range"
                 attr.max model.playingDuration
                 attr.value $"{model.playingCurrentTime}"
-                on.change (fun _ -> dispatch PlayPauseChangeEvent)
-                on.input (fun _ -> dispatch PlayPauseInputEvent)
+                attr.ref inputRangeElementRef
             }
             span {
                 [ elementIsFlex; elementFlexWrap NoWrap; elementFlexContentAlignment Center; m (L, L1) ] |> CssClasses.toHtmlClassFromList
@@ -73,10 +76,10 @@ type PlayerControlsElmishComponent() =
             div {
                 attr.id "audio-player-container"
                 audio {
-                    attr.src (if uriOption.IsSome then uriOption.Value else null)
-                    attr.preload "metadata"
                     on.loadedmetadata (fun _ -> dispatch PlayAudioMetadataLoadedEvent)
                     on.ended (fun _ -> dispatch PlayAudioEndedEvent)
+                    attr.src (if uriOption.IsSome then uriOption.Value else null)
+                    attr.preload "metadata"
                 }
                 (model, dispatch) ||> playPauseBlock
             }

@@ -1176,6 +1176,13 @@ class ProgressiveAudioUtility {
         audio === null || audio === void 0 ? void 0 : audio.setAttribute('src', src);
         audio === null || audio === void 0 ? void 0 : audio.load();
     }
+    static setAudioCurrentTime(input) {
+        const audio = ProgressiveAudioUtility.getHTMLAudioElement();
+        console.warn('setAudioCurrentTime', { input });
+        if (audio && input) {
+            audio.currentTime = parseFloat(input.value);
+        }
+    }
     // noinspection JSUnusedGlobalSymbols
     static startPlayAnimation(instance) {
         const button = ProgressiveAudioUtility.getPlayPauseButtonElement();
@@ -1184,17 +1191,6 @@ class ProgressiveAudioUtility {
         const readyStatePollFreq = 250; // milliseconds
         if (button) {
             button.disabled = true;
-        }
-        if (!ProgressiveAudioUtility.isInputEventingApplied) {
-            const input = ProgressiveAudioUtility.getPlayPauseInputElement();
-            input === null || input === void 0 ? void 0 : input.addEventListener('change', () => {
-                const audio = ProgressiveAudioUtility.getHTMLAudioElement();
-                if (audio) {
-                    console.warn({ input });
-                    audio.currentTime = parseFloat(input === null || input === void 0 ? void 0 : input.value);
-                }
-            });
-            ProgressiveAudioUtility.isInputEventingApplied = true;
         }
         const timeId = window.setTimeout(() => __awaiter(this, void 0, void 0, function* () {
             // poll faster than animation ticks until `readyState` changes:
@@ -1235,7 +1231,6 @@ class ProgressiveAudioUtility {
         });
     }
 }
-ProgressiveAudioUtility.isInputEventingApplied = false;
 ProgressiveAudioUtility.playAnimation = null;
 
 ;// CONCATENATED MODULE: ./src/_index.ts
