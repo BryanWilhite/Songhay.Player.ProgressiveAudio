@@ -1129,17 +1129,9 @@ function __disposeResources(env) {
 
 
 class ProgressiveAudioUtility {
-    static getHTMLAudioElement() {
-        return window.document.querySelector('#audio-player-container>audio');
-    }
-    static getPlayPauseButtonElement() {
-        return window.document.querySelector('#play-pause-block>button');
-    }
     // noinspection JSUnusedGlobalSymbols
-    static handleAudioMetadataLoadedAsync(instance) {
+    static handleAudioMetadataLoadedAsync(instance, button, audio) {
         return __awaiter(this, void 0, void 0, function* () {
-            const button = ProgressiveAudioUtility.getPlayPauseButtonElement();
-            const audio = ProgressiveAudioUtility.getHTMLAudioElement();
             ProgressiveAudioUtility.toggleElementEnabled(button);
             yield ProgressiveAudioUtility.invokeDotNetMethodAsync(instance, audio);
             ProgressiveAudioUtility.toggleElementEnabled(button);
@@ -1168,16 +1160,13 @@ class ProgressiveAudioUtility {
         audio === null || audio === void 0 ? void 0 : audio.setAttribute('src', src);
         audio === null || audio === void 0 ? void 0 : audio.load();
     }
-    static setAudioCurrentTime(input) {
-        const audio = ProgressiveAudioUtility.getHTMLAudioElement();
+    static setAudioCurrentTime(input, audio) {
         if (audio && input) {
             audio.currentTime = parseFloat(input.value);
         }
     }
     // noinspection JSUnusedGlobalSymbols
-    static startPlayAnimation(instance) {
-        const button = ProgressiveAudioUtility.getPlayPauseButtonElement();
-        const audio = ProgressiveAudioUtility.getHTMLAudioElement();
+    static startPlayAnimation(instance, button, audio) {
         const fps = 1; // frames per second
         const readyStatePollFreq = 250; // milliseconds
         ProgressiveAudioUtility.toggleElementEnabled(button);
@@ -1191,7 +1180,7 @@ class ProgressiveAudioUtility {
         ProgressiveAudioUtility.playAnimation = WindowAnimation.registerAndGenerate(fps, (_) => __awaiter(this, void 0, void 0, function* () {
             if (audio === null || audio === void 0 ? void 0 : audio.ended) {
                 audio.currentTime = 0;
-                yield ProgressiveAudioUtility.stopPlayAnimationAsync(instance);
+                yield ProgressiveAudioUtility.stopPlayAnimationAsync(instance, button, audio);
                 return;
             }
             yield ProgressiveAudioUtility.invokeDotNetMethodAsync(instance, audio);
@@ -1199,11 +1188,9 @@ class ProgressiveAudioUtility {
         WindowAnimation.animate();
         ProgressiveAudioUtility.toggleElementEnabled(button);
     }
-    static stopPlayAnimationAsync(instance) {
+    static stopPlayAnimationAsync(instance, button, audio) {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
-            const button = ProgressiveAudioUtility.getPlayPauseButtonElement();
-            const audio = ProgressiveAudioUtility.getHTMLAudioElement();
             ProgressiveAudioUtility.toggleElementEnabled(button);
             if (audio && !audio.paused && audio.readyState > 0) {
                 audio.pause();

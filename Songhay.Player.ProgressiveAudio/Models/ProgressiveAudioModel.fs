@@ -21,7 +21,8 @@ type ProgressiveAudioModel =
                           jsRuntime: IJSRuntime
                           navigationManager: NavigationManager
                           audioElementRef: HtmlRef option
-                          playerControlsRef: Component option
+                          buttonElementRef: HtmlRef option
+                          playerControlsComp: Component option
                         |}
         currentPlaylistItem: (DisplayText * Uri) option
         error: string option
@@ -54,7 +55,8 @@ type ProgressiveAudioModel =
                                jsRuntime = jsRuntime
                                navigationManager = navigationManager
                                audioElementRef = None
-                               playerControlsRef = None
+                               buttonElementRef = None
+                               playerControlsComp = None
                             |}
             currentPlaylistItem = None
             error = None
@@ -68,14 +70,17 @@ type ProgressiveAudioModel =
         }
 
     static member updateModel (message: ProgressiveAudioMessage) (model: ProgressiveAudioModel) =
-        let dotNetObjectReference() = DotNetObjectReference.Create(model.blazorServices.playerControlsRef.Value)
+        let dotNetObjectReference() = DotNetObjectReference.Create(model.blazorServices.playerControlsComp.Value)
+
+        let button() = model.blazorServices.buttonElementRef.Value |> tryGetElementReference |> Result.valueOr raise
+        let audio() = model.blazorServices.audioElementRef.Value |> tryGetElementReference |> Result.valueOr raise
 
         let handleInputChange (htmlRef: HtmlRef) =
             let elementRef = htmlRef |> tryGetElementReference |> Result.valueOr raise
-            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropSetAudioCurrentTime, elementRef)
+            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropSetAudioCurrentTime, elementRef, audio())
 
         let handleMeta() =
-            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropHandleMetadataLoaded, dotNetObjectReference())
+            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropHandleMetadataLoaded, dotNetObjectReference(), button(), audio())
 
         let load (uri: Uri) =
             let htmlRef = model.blazorServices.audioElementRef.Value
@@ -83,20 +88,21 @@ type ProgressiveAudioModel =
             model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropLoadTrack, elementRef, uri.AbsoluteUri)
 
         let pause() =
-            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropStopAnimation, dotNetObjectReference())
+            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropStopAnimation, dotNetObjectReference(), button(), audio())
 
         let play() =
-            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropStartAnimation, dotNetObjectReference())
+            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropStartAnimation, dotNetObjectReference(), button(), audio())
 
         match message with
         | GetPlayerManifest -> { model with presentation = None }
-        | GotPlayerControlsRef bag ->
+        | GotPlayerControlsRefs bag ->
             {
                 model with blazorServices = {|
                                               jsRuntime = model.blazorServices.jsRuntime
                                               navigationManager = model.blazorServices.navigationManager
                                               audioElementRef = bag.audioElementRef |> Some
-                                              playerControlsRef = bag.playerControlsRef |> Some
+                                              buttonElementRef = bag.buttonElementRef |> Some
+                                              playerControlsComp = bag.playerControlsComp |> Some
                                             |}
             }
 

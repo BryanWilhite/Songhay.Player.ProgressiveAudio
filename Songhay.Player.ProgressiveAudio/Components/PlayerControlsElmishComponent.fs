@@ -9,7 +9,6 @@ open Bolero.Html
 
 open Songhay.Modules.Bolero.Models
 open Songhay.Modules.Bolero.SvgUtility
-open Songhay.Modules.Bolero.Visuals.BodyElement
 open Songhay.Modules.Bolero.Visuals.Bulma.CssClass
 
 open Songhay.Modules.Models
@@ -20,16 +19,19 @@ type PlayerControlsElmishComponent() =
 
     let audioElementRef = HtmlRef()
 
+    let buttonElementRef = HtmlRef()
+
     let inputRangeElementRef = HtmlRef()
 
     let playPauseBlock model dispatch =
         div {
             [ "controls"; elementIsFlex; AlignCentered.CssClass ] |> CssClasses.toHtmlClassFromList
             attr.id "play-pause-block"
-            buttonElement
-                NoCssClasses
-                (fun _ -> dispatch PlayPauseButtonClickEvent)
-                (svg {
+
+            button {
+                on.click (fun _ -> dispatch PlayPauseButtonClickEvent)
+                attr.ref buttonElementRef
+                svg {
                     "xmlns" => SvgUri
                     "fill" => "currentColor"
                     "preserveAspectRatio" => "xMidYMid meet"
@@ -37,7 +39,8 @@ type PlayerControlsElmishComponent() =
                     cond model.isPlaying <| function
                         | true -> ProgressiveAudioSvgData.Get PAUSE.ToAlphanumeric
                         | false -> ProgressiveAudioSvgData.Get PLAY.ToAlphanumeric
-                })
+                }
+            }
 
             input {
                 m (L, L1) |> CssClasses.toHtmlClass
@@ -96,11 +99,12 @@ type PlayerControlsElmishComponent() =
 
     override this.View model dispatch =
 
-        if model.blazorServices.playerControlsRef.IsNone then
-            dispatch <| ProgressiveAudioMessage.GotPlayerControlsRef {|
-                                                                       audioElementRef = audioElementRef
-                                                                       playerControlsRef = this
-                                                                    |}
+        if model.blazorServices.playerControlsComp.IsNone then
+            dispatch <| GotPlayerControlsRefs {|
+                                               buttonElementRef = buttonElementRef
+                                               audioElementRef = audioElementRef
+                                               playerControlsComp = this
+                                            |}
         else
             ()
 

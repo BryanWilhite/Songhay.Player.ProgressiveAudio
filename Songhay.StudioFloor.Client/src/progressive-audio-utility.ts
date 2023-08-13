@@ -1,21 +1,11 @@
 import { WindowAnimation } from 'songhay';
 
 export class ProgressiveAudioUtility {
-    static getHTMLAudioElement(): HTMLAudioElement | null {
-        return window.document.querySelector('#audio-player-container>audio');
-    }
-
-    static getPlayPauseButtonElement(): HTMLButtonElement | null {
-        return window.document.querySelector('#play-pause-block>button');
-    }
 
     static playAnimation: WindowAnimation | null = null;
 
     // noinspection JSUnusedGlobalSymbols
-    static async handleAudioMetadataLoadedAsync(instance: DotNet.DotNetObject) : Promise<void> {
-        const button: HTMLButtonElement | null = ProgressiveAudioUtility.getPlayPauseButtonElement();
-        const audio: HTMLAudioElement | null = ProgressiveAudioUtility.getHTMLAudioElement();
-
+    static async handleAudioMetadataLoadedAsync(instance: DotNet.DotNetObject, button: HTMLButtonElement | null, audio: HTMLAudioElement | null) : Promise<void> {
         ProgressiveAudioUtility.toggleElementEnabled(button);
 
         await ProgressiveAudioUtility.invokeDotNetMethodAsync(instance, audio);
@@ -47,16 +37,12 @@ export class ProgressiveAudioUtility {
         audio?.load();
     }
 
-    static setAudioCurrentTime(input: HTMLInputElement | null) : void {
-        const audio: HTMLAudioElement | null = ProgressiveAudioUtility.getHTMLAudioElement();
-
+    static setAudioCurrentTime(input: HTMLInputElement | null, audio: HTMLAudioElement | null) : void {
         if(audio && input) { audio.currentTime = parseFloat(input.value); }
     }
 
     // noinspection JSUnusedGlobalSymbols
-    static startPlayAnimation(instance: DotNet.DotNetObject) : void {
-        const button: HTMLButtonElement | null = ProgressiveAudioUtility.getPlayPauseButtonElement();
-        const audio: HTMLAudioElement | null = ProgressiveAudioUtility.getHTMLAudioElement();
+    static startPlayAnimation(instance: DotNet.DotNetObject, button: HTMLButtonElement | null, audio: HTMLAudioElement | null) : void {
         const fps: number = 1; // frames per second
         const readyStatePollFreq: number = 250; // milliseconds
 
@@ -76,7 +62,7 @@ export class ProgressiveAudioUtility {
             if(audio?.ended) {
                 audio.currentTime = 0;
 
-                await ProgressiveAudioUtility.stopPlayAnimationAsync(instance);
+                await ProgressiveAudioUtility.stopPlayAnimationAsync(instance, button, audio);
 
                 return;
             }
@@ -89,9 +75,7 @@ export class ProgressiveAudioUtility {
         ProgressiveAudioUtility.toggleElementEnabled(button);
     }
 
-    static async stopPlayAnimationAsync(instance: DotNet.DotNetObject): Promise<void> {
-        const button: HTMLButtonElement | null = ProgressiveAudioUtility.getPlayPauseButtonElement();
-        const audio: HTMLAudioElement | null = ProgressiveAudioUtility.getHTMLAudioElement();
+    static async stopPlayAnimationAsync(instance: DotNet.DotNetObject, button: HTMLButtonElement | null, audio: HTMLAudioElement | null): Promise<void> {
 
         ProgressiveAudioUtility.toggleElementEnabled(button);
 
