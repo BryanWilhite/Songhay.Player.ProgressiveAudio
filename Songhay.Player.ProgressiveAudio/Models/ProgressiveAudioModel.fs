@@ -17,7 +17,12 @@ open Songhay.Player.ProgressiveAudio.ProgressiveAudioUtility
 
 type ProgressiveAudioModel =
     {
-        blazorServices: {| jsRuntime: IJSRuntime; navigationManager: NavigationManager; playerControlsRef: Component option |}
+        blazorServices: {|
+                          jsRuntime: IJSRuntime
+                          navigationManager: NavigationManager
+                          audioElementRef: HtmlRef option
+                          playerControlsRef: Component option
+                        |}
         currentPlaylistItem: (DisplayText * Uri) option
         error: string option
         isCreditsModalVisible: bool
@@ -45,7 +50,12 @@ type ProgressiveAudioModel =
 
     static member initialize (jsRuntime: IJSRuntime) (navigationManager: NavigationManager) =
         {
-            blazorServices = {| jsRuntime = jsRuntime; navigationManager = navigationManager; playerControlsRef = None |}
+            blazorServices = {|
+                               jsRuntime = jsRuntime
+                               navigationManager = navigationManager
+                               audioElementRef = None
+                               playerControlsRef = None
+                            |}
             currentPlaylistItem = None
             error = None
             isCreditsModalVisible = false
@@ -62,13 +72,15 @@ type ProgressiveAudioModel =
 
         let handleInputChange (htmlRef: HtmlRef) =
             let elementRef = htmlRef |> tryGetElementReference |> Result.valueOr raise
-            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropSetAudioCurrentTime, elementRef).AsTask()
+            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropSetAudioCurrentTime, elementRef)
 
         let handleMeta() =
             model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropHandleMetadataLoaded, dotNetObjectReference())
 
-        let load (item: DisplayText * Uri) =
-            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropLoadTrack, (item |> snd).AbsoluteUri)
+        let load (uri: Uri) =
+            let htmlRef = model.blazorServices.audioElementRef.Value
+            let elementRef = htmlRef |> tryGetElementReference |> Result.valueOr raise
+            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropLoadTrack, elementRef, uri.AbsoluteUri)
 
         let pause() =
             model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropStopAnimation, dotNetObjectReference())
@@ -78,12 +90,13 @@ type ProgressiveAudioModel =
 
         match message with
         | GetPlayerManifest -> { model with presentation = None }
-        | GotPlayerControlsRef ref ->
+        | GotPlayerControlsRef bag ->
             {
                 model with blazorServices = {|
                                               jsRuntime = model.blazorServices.jsRuntime
                                               navigationManager = model.blazorServices.navigationManager
-                                              playerControlsRef = ref |> Some
+                                              audioElementRef = bag.audioElementRef |> Some
+                                              playerControlsRef = bag.playerControlsRef |> Some
                                             |}
             }
 
@@ -138,14 +151,14 @@ type ProgressiveAudioModel =
             }
 
         | PlayerCreditsClick -> { model with isCreditsModalVisible = not model.isCreditsModalVisible }
-        | PlaylistClick item ->
+        | PlaylistClick (txt, uri) ->
             task {
                 do! pause()
-                do! load item
+                do! load uri
                 do! play()
             } |> ignore
 
-            { model with currentPlaylistItem = item |> Some; isPlaying = true }
+            { model with currentPlaylistItem = (txt, uri) |> Some; isPlaying = true }
 
         | PlayerError exn -> { model with error = Some exn.Message }
 

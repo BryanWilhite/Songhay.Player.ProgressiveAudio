@@ -18,6 +18,8 @@ open Songhay.Player.ProgressiveAudio.Models
 type PlayerControlsElmishComponent() =
     inherit ElmishComponent<ProgressiveAudioModel, ProgressiveAudioMessage>()
 
+    let audioElementRef = HtmlRef()
+
     let inputRangeElementRef = HtmlRef()
 
     let playPauseBlock model dispatch =
@@ -80,6 +82,7 @@ type PlayerControlsElmishComponent() =
                     on.ended (fun _ -> dispatch PlayAudioEndedEvent)
                     attr.src (if uriOption.IsSome then uriOption.Value else null)
                     attr.preload "metadata"
+                    attr.ref audioElementRef
                 }
                 (model, dispatch) ||> playPauseBlock
             }
@@ -94,7 +97,10 @@ type PlayerControlsElmishComponent() =
     override this.View model dispatch =
 
         if model.blazorServices.playerControlsRef.IsNone then
-            dispatch <| ProgressiveAudioMessage.GotPlayerControlsRef this
+            dispatch <| ProgressiveAudioMessage.GotPlayerControlsRef {|
+                                                                       audioElementRef = audioElementRef
+                                                                       playerControlsRef = this
+                                                                    |}
         else
             ()
 
