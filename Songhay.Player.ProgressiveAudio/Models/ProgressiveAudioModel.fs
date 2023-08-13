@@ -20,6 +20,7 @@ type ProgressiveAudioModel =
         blazorServices: {|
                           jsRuntime: IJSRuntime
                           navigationManager: NavigationManager
+                          sectionElementRef: HtmlRef option
                           audioElementRef: HtmlRef option
                           buttonElementRef: HtmlRef option
                           playerControlsComp: Component option
@@ -33,6 +34,7 @@ type ProgressiveAudioModel =
         playingDurationDisplay: string
         playingCurrentTimeDisplay: string
         presentation: Presentation option
+        presentationKey: Identifier option
     }
 
     static member private getCredits p =
@@ -54,6 +56,7 @@ type ProgressiveAudioModel =
             blazorServices = {|
                                jsRuntime = jsRuntime
                                navigationManager = navigationManager
+                               sectionElementRef = None
                                audioElementRef = None
                                buttonElementRef = None
                                playerControlsComp = None
@@ -67,6 +70,7 @@ type ProgressiveAudioModel =
             playingCurrentTime = 0m
             playingCurrentTimeDisplay = "00:00"
             presentation = None
+            presentationKey = None 
         }
 
     static member updateModel (message: ProgressiveAudioMessage) (model: ProgressiveAudioModel) =
@@ -95,11 +99,23 @@ type ProgressiveAudioModel =
 
         match message with
         | GetPlayerManifest -> { model with presentation = None }
+        | GotPlayerSection sectionElementRef ->
+            {
+                model with blazorServices = {|
+                                              jsRuntime = model.blazorServices.jsRuntime
+                                              navigationManager = model.blazorServices.navigationManager
+                                              sectionElementRef = sectionElementRef |> Some
+                                              audioElementRef = model.blazorServices.audioElementRef
+                                              buttonElementRef = model.blazorServices.buttonElementRef
+                                              playerControlsComp = model.blazorServices.playerControlsComp
+                                            |}
+            }
         | GotPlayerControlsRefs bag ->
             {
                 model with blazorServices = {|
                                               jsRuntime = model.blazorServices.jsRuntime
                                               navigationManager = model.blazorServices.navigationManager
+                                              sectionElementRef = model.blazorServices.sectionElementRef
                                               audioElementRef = bag.audioElementRef |> Some
                                               buttonElementRef = bag.buttonElementRef |> Some
                                               playerControlsComp = bag.playerControlsComp |> Some
@@ -109,6 +125,7 @@ type ProgressiveAudioModel =
         | GotPlayerManifest data ->
             let presentationOption =
                 toPresentationOption
+                    model.blazorServices.jsRuntime
                     data
                     (fun (txt, uri) -> (txt, uri |> buildAudioRootUri))
 
@@ -121,6 +138,7 @@ type ProgressiveAudioModel =
 
             { model with
                     presentation = presentationOption
+                    presentationKey = data |> fst |> Some 
                     currentPlaylistItem = currentItem }
 
         | PlayAudioMetadataLoadedEvent ->

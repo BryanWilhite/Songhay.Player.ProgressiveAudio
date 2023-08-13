@@ -16,6 +16,8 @@ open Songhay.Player.ProgressiveAudio.Models
 type PlayerElmishComponent() =
     inherit ElmishComponent<ProgressiveAudioModel, ProgressiveAudioMessage>()
 
+    let sectionElementRef = HtmlRef()
+
     let spinnerContainer =
         bulmaContainer
             ContainerWidthFluid
@@ -25,6 +27,7 @@ type PlayerElmishComponent() =
     let sectionNode model dispatch =
         section {
             [ "player"; "progressive-audio" ] |> CssClasses.toHtmlClassFromList
+            attr.ref sectionElementRef
 
             PlayerTitleComponent.BComp <|
                 match model.presentation.IsSome with
@@ -58,4 +61,5 @@ type PlayerElmishComponent() =
         ecomp<PlayerElmishComponent, _, _> model dispatch { attr.empty() }
 
     override this.View model dispatch =
+        dispatch <| GotPlayerSection sectionElementRef
         (model, dispatch) ||> sectionNode

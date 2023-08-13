@@ -4,23 +4,21 @@ open System
 open System.Net
 open System.Net.Http
 open System.Text.Json
-open Microsoft.AspNetCore.Components
 open Microsoft.FSharp.Core
-open Microsoft.JSInterop
 open Elmish
 
 open FsToolkit.ErrorHandling
-open FsToolkit.ErrorHandling.Operator.Option
 open Bolero.Remoting.Client
 
 open Songhay.Modules.HttpClientUtility
 open Songhay.Modules.HttpRequestMessageUtility
+open Songhay.Modules.Models
 open Songhay.Modules.Publications.Models
 open Songhay.Modules.Bolero
 open Songhay.Modules.Bolero.JsRuntimeUtility
 open Songhay.Modules.Bolero.RemoteHandlerUtility
 
-open Songhay.Player.ProgressiveAudio.ProgressiveAudioScalars
+open Songhay.Player.ProgressiveAudio.ProgressiveAudioUtility
 open Songhay.Player.ProgressiveAudio.Models
 
 open Songhay.StudioFloor.Client.Models
@@ -28,13 +26,6 @@ open Songhay.StudioFloor.Client.Models
 module ProgramComponentUtility =
 
     module Remote =
-        let getPresentationManifestUri (presentationKey: string ) =
-            ($"{rxProgressiveAudioApiRoot}/api/Player/v1/audio/{presentationKey}", UriKind.Absolute) |> Uri
-
-        let getPresentationPlaylistItemUri (presentationKey: string ) (relativePath: string) =
-            let segment = relativePath.TrimStart('.', '/')
-            ($"{rxProgressiveAudioApiRoot}/api/Player/v1/audio/{presentationKey}/{segment}", UriKind.Absolute) |> Uri
-
         let tryDownloadToStringAsync (client: HttpClient, uri: Uri) =
             async {
                 let! responseResult = client |> trySendAsync (get uri) |> Async.AwaitTask
@@ -44,24 +35,6 @@ module ProgramComponentUtility =
 
                 return output
             }
-
-    let getPresentationKey (jsRuntime: IJSRuntime) (navMan: NavigationManager) =
-
-        let uriFragmentOption =
-            match (navMan.Uri, UriKind.Absolute) |> Uri |> fun uri -> uri.Fragment with
-            | s when s.Length > 0 -> Some s
-            | _ -> None
-
-        jsRuntime |> consoleWarnAsync [| nameof uriFragmentOption ; uriFragmentOption |] |> ignore
-
-        let getTypeAndKey (s: string) =
-            match s.Split('/') with
-            | [| _ ; t ; k |] ->
-                if t = "audio" then Some k
-                else None
-            | _ -> None
-
-        uriFragmentOption >>= (fun s -> s |> getTypeAndKey)
 
     let getCommandForGetReadMe model =
         let success (result: Result<string, HttpStatusCode>) =
@@ -88,17 +61,13 @@ module ProgramComponentUtility =
 
         match message with
         | GetPlayerManifest ->
-            let keyOption =
-                (
-                    model.blazorServices.jsRuntime,
-                    model.blazorServices.navigationManager
-                ) ||> getPresentationKey
+            let keyOption = (model.blazorServices.jsRuntime, model.blazorServices.navigationManager) ||> getPresentationKey
             if keyOption.IsNone then
                 let ex = FormatException $"The expected {nameof Presentation} key was not found."
                 let msg = model.blazorServices.jsRuntime |> passErrorToConsole None ex |> StudioFloorMessage.Error
                 Cmd.ofMsg msg
             else
-                let uri = keyOption.Value |> Remote.getPresentationManifestUri
+                let uri = keyOption.Value |> getPresentationManifestUri
                 let success (result: Result<string, HttpStatusCode>) =
                     result
                     |> Result.either
@@ -110,8 +79,9 @@ module ProgramComponentUtility =
                         )
                     |> Result.either
                         (
-                            fun x ->
-                                let paMessage = ProgressiveAudioMessage.GotPlayerManifest <| Some x
+                            fun presentation ->
+                                let id = Identifier.fromString keyOption.Value
+                                let paMessage = ProgressiveAudioMessage.GotPlayerManifest <| (id ,Some presentation)
                                 StudioFloorMessage.ProgressiveAudioMessage paMessage
                         )
                         (
