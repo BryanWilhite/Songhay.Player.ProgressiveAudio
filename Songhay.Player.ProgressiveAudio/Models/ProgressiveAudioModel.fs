@@ -124,9 +124,11 @@ type ProgressiveAudioModel =
 
         | GotPlayerManifest data ->
             let presentationOption =
+                data
+                |>
                 toPresentationOption
                     model.blazorServices.jsRuntime
-                    data
+                    model.blazorServices.sectionElementRef
                     (fun (txt, uri) -> (txt, uri |> buildAudioRootUri))
 
             let currentItem =

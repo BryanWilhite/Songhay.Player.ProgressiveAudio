@@ -1,6 +1,7 @@
 namespace Songhay.Player.ProgressiveAudio
 
 open System
+open Bolero
 open Microsoft.AspNetCore.Components
 open Microsoft.JSInterop
 
@@ -55,11 +56,22 @@ module ProgressiveAudioUtility =
 
     let toPresentationOption
         (jsRuntime: IJSRuntime)
-        (data: Identifier * Presentation option)
-        (playListMapper: DisplayText * Uri -> DisplayText * Uri) =
+        (sectionElementRef: HtmlRef option)
+        (playListMapper: DisplayText * Uri -> DisplayText * Uri)
+        (data: Identifier * Presentation option) =
+
+        let setStyle (elementRef: HtmlRef) (vv: CssVariableAndValue) =
+            let p = vv.Pair |> fst
+            let v = vv.Pair |> snd
+            jsRuntime
+                |> setComputedStylePropertyValueAsync elementRef p.Value v.Value
+                |> ignore
 
         option {
             let! presentation = data |> snd
+            let! elementRef = sectionElementRef
+
+            presentation.cssVariables |> List.iter (fun vv -> vv |> setStyle elementRef)
 
             let map list =
                 list
