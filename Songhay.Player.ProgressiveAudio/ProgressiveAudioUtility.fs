@@ -54,24 +54,36 @@ module ProgressiveAudioUtility =
 
         $"{minutes:``00``}:{seconds:``00``}"
 
+    let mapCssPair (vv: CssVariableAndValue) =
+        let cssVariable = vv.Pair |> fst
+        let cssValue = vv.Pair |> snd
+        let propertyValue =
+            match cssVariable.Value with
+            | name when name.EndsWith "color" -> cssValue.Value.ToLowerInvariant().Replace("0x", "#")
+            | _ -> cssValue.Value
+
+        cssVariable.Value, propertyValue
+
     let toPresentationOption
         (jsRuntime: IJSRuntime)
         (sectionElementRef: HtmlRef option)
         (playListMapper: DisplayText * Uri -> DisplayText * Uri)
         (data: Identifier * Presentation option) =
 
-        let setStyle (elementRef: HtmlRef) (vv: CssVariableAndValue) =
-            let p = vv.Pair |> fst
-            let v = vv.Pair |> snd
-            jsRuntime
-                |> setComputedStylePropertyValueAsync elementRef p.Value v.Value
-                |> ignore
-
         option {
             let! presentation = data |> snd
             let! elementRef = sectionElementRef
 
-            presentation.cssVariables |> List.iter (fun vv -> vv |> setStyle elementRef)
+            presentation.cssVariables
+            |> List.iter
+                    (
+                        fun vv ->
+                            let name, value = vv |> mapCssPair
+
+                            jsRuntime
+                                |> setComputedStylePropertyValueAsync elementRef name value
+                                |> ignore
+                    )
 
             let map list =
                 list
