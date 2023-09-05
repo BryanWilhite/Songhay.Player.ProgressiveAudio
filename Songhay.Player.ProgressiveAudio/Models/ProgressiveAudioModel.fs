@@ -37,20 +37,6 @@ type ProgressiveAudioModel =
         presentationKey: Identifier option
     }
 
-    static member private getCredits p =
-        p.parts
-        |> List.choose (function | PresentationPart.Credits l -> Some l | _ -> None)
-
-    static member private getDescription p =
-        p.parts
-        |> List.choose (function | PresentationPart.PresentationDescription s -> Some s | _ -> None)
-        |> List.head
-
-    static member private getPlayList p =
-        p.parts
-        |> List.choose (function | PresentationPart.Playlist pl -> pl |> Some | _ -> None)
-        |> List.head
-
     static member initialize (jsRuntime: IJSRuntime) (navigationManager: NavigationManager) =
         {
             blazorServices = {|
@@ -134,8 +120,9 @@ type ProgressiveAudioModel =
             let currentItem =
                 option {
                     let! presentation = presentationOption
+                    let! playList = presentation.playList
 
-                    return presentation |> ProgressiveAudioModel.getPlayList |> List.head
+                    return playList |> List.head
                 }
 
             { model with
@@ -188,8 +175,20 @@ type ProgressiveAudioModel =
 
         | PlayerError exn -> { model with error = Some exn.Message }
 
-    member this.presentationCredits = this.presentation |> Option.map ProgressiveAudioModel.getCredits
+    member this.presentationCredits =
+        option {
+            let! pres = this.presentation
+            return! pres.credits
+        }
 
-    member this.presentationDescription = this.presentation |> Option.map ProgressiveAudioModel.getDescription
+    member this.presentationDescription =
+        option {
+            let! pres = this.presentation
+            return! pres.description
+        }
 
-    member this.presentationPlayList = this.presentation |> Option.map ProgressiveAudioModel.getPlayList
+    member this.presentationPlayList =
+        option {
+            let! pres = this.presentation
+            return! pres.playList
+        }

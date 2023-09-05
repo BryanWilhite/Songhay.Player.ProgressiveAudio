@@ -23,8 +23,8 @@ type PlayerCreditsElmishComponent() =
         let creditItemsNode =
             model.presentationCredits
             |> Option.either
-                (fun lists ->
-                    forEach lists <| fun l -> forEach l <| fun c ->
+                (fun roleCredits ->
+                    forEach roleCredits <| fun roleCredit ->
                         li {
                             [
                                 (nameof RoleCredit |> toKabobCase).Value
@@ -34,12 +34,12 @@ type PlayerCreditsElmishComponent() =
                                 elementFlexJustifyContent SpaceBetween
                             ] |> CssClasses.toHtmlClassFromList
                             span {
-                                [ nameof c.name; fontSize Size3 ] |> CssClasses.toHtmlClassFromList
-                                text c.name
+                                [ nameof roleCredit.name; fontSize Size3 ] |> CssClasses.toHtmlClassFromList
+                                text roleCredit.name
                             }
                             span {
-                                [ nameof c.role ] |> CssClasses.toHtmlClassFromList
-                                text c.role
+                                [ nameof roleCredit.role ] |> CssClasses.toHtmlClassFromList
+                                text roleCredit.role
                             }
                         }
                 )

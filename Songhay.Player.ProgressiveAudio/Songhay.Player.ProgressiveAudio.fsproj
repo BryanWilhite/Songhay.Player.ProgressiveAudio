@@ -7,7 +7,7 @@
 
     <ItemGroup>
       <PackageReference Include="Songhay.Modules.Bolero" Version="6.3.0" />
-      <PackageReference Include="Songhay.Modules.Publications" Version="6.2.0" />
+      <PackageReference Include="Songhay.Modules.Publications" Version="6.3.1" />
       <PackageReference Remove="FSharp.Core" />
     </ItemGroup>
 

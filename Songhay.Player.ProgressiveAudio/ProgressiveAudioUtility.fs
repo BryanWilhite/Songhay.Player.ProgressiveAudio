@@ -42,7 +42,7 @@ module ProgressiveAudioUtility =
         uriFragmentOption >>= (fun s -> s |> getTypeAndKey)
 
     let getPresentationManifestUri (presentationKey: string ) =
-        ($"{rxProgressiveAudioApiRoot}/api/Player/v1/audio/{presentationKey}", UriKind.Absolute) |> Uri
+            ($"{rxProgressiveAudioRoot}{presentationKey}/{presentationKey}_presentation.json", UriKind.Absolute) |> Uri
 
     let getPresentationPlaylistItemUri (presentationKey: string ) (relativePath: string) =
         let segment = relativePath.TrimStart('.', '/')

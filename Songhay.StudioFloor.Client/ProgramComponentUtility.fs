@@ -14,7 +14,6 @@ open Songhay.Modules.HttpClientUtility
 open Songhay.Modules.HttpRequestMessageUtility
 open Songhay.Modules.Models
 open Songhay.Modules.Publications.Models
-open Songhay.Modules.Bolero
 open Songhay.Modules.Bolero.JsRuntimeUtility
 open Songhay.Modules.Bolero.RemoteHandlerUtility
 
@@ -71,7 +70,7 @@ module ProgramComponentUtility =
                 let success (result: Result<string, HttpStatusCode>) =
                     result
                     |> Result.either
-                        LegacyPresentationUtility.tryGetPresentation
+                        Presentation.fromInput
                         (
                             fun statusCode ->
                                 let ex = JsonException($"{nameof HttpStatusCode}: {statusCode}")
@@ -86,7 +85,7 @@ module ProgramComponentUtility =
                         )
                         (
                             fun ex ->
-                                let label = $"{nameof LegacyPresentationUtility.tryGetPresentation}:" |> Some
+                                let label = $"{nameof Presentation}.{nameof Presentation.fromInput}:" |> Some
                                 model.blazorServices.jsRuntime |> passErrorToConsole label ex |> StudioFloorMessage.Error
                         )
 
