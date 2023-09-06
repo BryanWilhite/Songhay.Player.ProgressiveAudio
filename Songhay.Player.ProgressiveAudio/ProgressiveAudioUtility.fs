@@ -25,7 +25,7 @@ module ProgressiveAudioUtility =
 
     let getConventionalCssProperties (presentationKey: string) =
         let bgImgUrl = $"url({rxProgressiveAudioRoot}{presentationKey}/jpg/background.jpg)"
-        let buttonImgUrl = $"url({rxProgressiveAudioRoot}shared-styles-svg/akyinkyin.svg)"
+        let buttonImgUrl = $"url({rxAkyinkyinSvgDataUri})"
 
         [
             CssVariableAndValue (CssVariable.fromInput "rx-player-width", CssValue "800px")
