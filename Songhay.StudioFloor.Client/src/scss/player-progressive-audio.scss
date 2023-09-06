@@ -98,6 +98,7 @@ section.player {
             left: var(--rx-player-prose-x);
             width: var(--rx-player-prose-width);
             height: var(--rx-player-prose-height);
+            overflow-y: auto;
 
             background-color: var(--rx-player-prose-background-color);
             color: var(--rx-player-prose-color);
@@ -112,6 +113,7 @@ section.player {
             left: var(--rx-player-playlist-x);
             width: var(--rx-player-playlist-width);
             height: var(--rx-player-playlist-height);
+            overflow-y: auto;
 
             background-color: var(--rx-player-playlist-background-color);
             color: var(--rx-player-playlist-color);

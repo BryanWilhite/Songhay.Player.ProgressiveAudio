@@ -23,6 +23,17 @@ module ProgressiveAudioUtility =
             builder.Path <- $"{builder.Path}{relativeUri.OriginalString.TrimStart([|'.';'/'|])}"
             builder.Uri
 
+    let getConventionalCssProperties (presentationKey: string) =
+        let bgImgUrl = $"url({rxProgressiveAudioRoot}{presentationKey}/jpg/background.jpg)"
+        let buttonImgUrl = $"url({rxProgressiveAudioRoot}shared-styles-svg/akyinkyin.svg)"
+
+        [
+            CssVariableAndValue (CssVariable.fromInput "rx-player-width", CssValue "800px")
+            CssVariableAndValue (CssVariable.fromInput "rx-player-height", CssValue "600px")
+            CssVariableAndValue (CssVariable.fromInput "rx-player-background-image", CssValue bgImgUrl)
+            CssVariableAndValue (CssVariable.fromInput "rx-player-credits-button-background-image", CssValue buttonImgUrl)
+        ]
+
     let getPresentationKey (jsRuntime: IJSRuntime) (navMan: NavigationManager) =
 
         let uriFragmentOption =
@@ -42,7 +53,7 @@ module ProgressiveAudioUtility =
         uriFragmentOption >>= (fun s -> s |> getTypeAndKey)
 
     let getPresentationManifestUri (presentationKey: string ) =
-            ($"{rxProgressiveAudioRoot}{presentationKey}/{presentationKey}_presentation.json", UriKind.Absolute) |> Uri
+        ($"{rxProgressiveAudioRoot}{presentationKey}/{presentationKey}_presentation.json", UriKind.Absolute) |> Uri
 
     let getPresentationPlaylistItemUri (presentationKey: string ) (relativePath: string) =
         let segment = relativePath.TrimStart('.', '/')
@@ -71,9 +82,11 @@ module ProgressiveAudioUtility =
         (data: Identifier * Presentation option) =
 
         option {
+            let key = data |> fst
             let! presentation = data |> snd
             let! elementRef = sectionElementRef
 
+            getConventionalCssProperties(key.StringValue) @
             presentation.cssVariables
             |> List.iter
                     (
