@@ -121,6 +121,25 @@ section.player {
 
             & > li {
                 margin: 0;
+
+                & > span {
+                    color: var(--rx-player-title-color);
+                }
+
+                &.is-active > span {
+                    color: #000 !important;
+                }
+
+                & > a:link,
+                & > a:visited {
+                    color: var(--rx-player-playlist-color) !important;
+                    text-decoration: none;
+                }
+
+                & > a:hover {
+                    background-color: #fff !important;
+                    color: #000 !important;
+                }
             }
         }
         
@@ -144,6 +163,10 @@ section.player {
 
             & > input {
                 width: 90px;
+            }
+
+            & > span {
+                color: var(--rx-player-prose-color);
             }
         }
 

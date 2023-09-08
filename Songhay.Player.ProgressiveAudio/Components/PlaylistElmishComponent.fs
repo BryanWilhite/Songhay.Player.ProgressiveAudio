@@ -27,10 +27,12 @@ type PlaylistElmishComponent() =
                                 else ()
                             ] |> CssClasses.toHtmlClassFromList
                             span {
-                                [ "panel-icon"; fontSize Size3 ] |> CssClasses.toHtmlClassFromList
+                                [ "panel-icon"; fontSize Size5 ] |> CssClasses.toHtmlClassFromList
                                 text "⬤"
                             }
                             a {
+                                [ fontSize Size7 ] |> CssClasses.toHtmlClassFromList
+
                                 attr.href "#"
                                 on.click (fun _ -> dispatch <| PlaylistClick (txt, uri))
                                 DomElementEvent.Click.PreventDefault

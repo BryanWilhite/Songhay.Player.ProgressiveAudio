@@ -24,10 +24,10 @@ type PlayerTitleComponent() =
         h2 {
             [
                 "title"
-                elementFontWeight Normal
+                elementFontWeight Medium
                 fontSize Size5
-                p (T, L2)
-                p (L, L2)
+                p (T, L4)
+                p (L, L4)
             ] |> CssClasses.toHtmlClassFromList
 
             rawHtml this.Title
