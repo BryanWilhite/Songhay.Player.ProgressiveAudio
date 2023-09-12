@@ -24,6 +24,7 @@
       <Compile Include="Components\PlayerCreditsElmishComponent.fs" />
       <Compile Include="Components\PlaylistElmishComponent.fs" />
       <Compile Include="Components\PlayerElmishComponent.fs" />
+      <Compile Include="Assembly.fs" />
     </ItemGroup>
 
 </Project>

@@ -16,6 +16,13 @@ open Songhay.Player.ProgressiveAudio.ProgressiveAudioScalars
 
 module ProgressiveAudioUtility =
 
+    let internal toUriFragmentOption (location: string) =
+        if String.IsNullOrWhiteSpace location then None
+        else
+            match (location, UriKind.Absolute) |> Uri |> fun uri -> uri.Fragment with
+            | s when s.Length > 0 -> Some <| s.TrimStart '#'
+            | _ -> None
+
     let buildAudioRootUri (relativeUri: Uri) =
         if relativeUri.IsAbsoluteUri then relativeUri
         else
@@ -34,23 +41,11 @@ module ProgressiveAudioUtility =
             CssVariableAndValue (CssVariable.fromInput "rx-player-credits-button-background-image", CssValue buttonImgUrl)
         ]
 
-    let getPresentationKey (jsRuntime: IJSRuntime) (navMan: NavigationManager) =
+    let getPresentationKey (_: IJSRuntime) (navMan: NavigationManager) =
 
-        let uriFragmentOption =
-            match (navMan.Uri, UriKind.Absolute) |> Uri |> fun uri -> uri.Fragment with
-            | s when s.Length > 0 -> Some s
-            | _ -> None
+        // jsRuntime |> consoleWarnAsync [| nameof uriFragmentOption ; (navMan.Uri |> uriFragmentOption) |] |> ignore
 
-        jsRuntime |> consoleWarnAsync [| nameof uriFragmentOption ; uriFragmentOption |] |> ignore
-
-        let getTypeAndKey (s: string) =
-            match s.Split('/') with
-            | [| _ ; t ; k |] ->
-                if t = "audio" then Some k
-                else None
-            | _ -> None
-
-        uriFragmentOption >>= (fun s -> s |> getTypeAndKey)
+        navMan.Uri |> toUriFragmentOption
 
     let getPresentationManifestUri (presentationKey: string ) =
         ($"{rxProgressiveAudioRoot}{presentationKey}/{presentationKey}_presentation.json", UriKind.Absolute) |> Uri
