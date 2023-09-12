@@ -14,15 +14,22 @@ open Songhay.Modules.Bolero.Visuals.Bulma.CssClass
 open Songhay.Modules.Models
 open Songhay.Player.ProgressiveAudio.Models
 
+/// <summary>
+/// Defines the player Controls <see cref="ElmishComponent{TModel,TMessage}"/>.
+/// </summary>
 type PlayerControlsElmishComponent() =
     inherit ElmishComponent<ProgressiveAudioModel, ProgressiveAudioMessage>()
 
+    /// <summary><see cref="HtmlRef"/> for the <c>audio</c> element in the <see cref="playPauseBlock"/></summary>
     let audioElementRef = HtmlRef()
 
+    /// <summary><see cref="HtmlRef"/> for the <c>button</c> element in the <see cref="playPauseBlock"/></summary>
     let buttonElementRef = HtmlRef()
 
+    /// <summary><see cref="HtmlRef"/> for the <c>input[type="range"]</c> element in the <see cref="playPauseBlock"/></summary>
     let inputRangeElementRef = HtmlRef()
 
+    /// <summary>the <c>div.controls</c> element</summary>
     let playPauseBlock model dispatch =
         div {
             [ "controls"; elementIsFlex; AlignCentered.CssClass ] |> CssClasses.toHtmlClassFromList
@@ -73,30 +80,41 @@ type PlayerControlsElmishComponent() =
             }
         }
 
+    /// <summary>the <c>div#audio-player-container</c> element</summary>
     let container model dispatch =
 
         let uriOption = model.currentPlaylistItem |> Option.map snd
 
-        concat {
-            div {
-                attr.id "audio-player-container"
-                audio {
-                    on.loadedmetadata (fun _ -> dispatch PlayAudioMetadataLoadedEvent)
-                    on.ended (fun _ -> dispatch PlayAudioEndedEvent)
-                    attr.src (if uriOption.IsSome then uriOption.Value else null)
-                    attr.preload "metadata"
-                    attr.ref audioElementRef
-                }
-                (model, dispatch) ||> playPauseBlock
+        div {
+            attr.id "audio-player-container"
+            audio {
+                on.loadedmetadata (fun _ -> dispatch PlayAudioMetadataLoadedEvent)
+                on.ended (fun _ -> dispatch PlayAudioEndedEvent)
+                attr.src (if uriOption.IsSome then uriOption.Value else null)
+                attr.preload "metadata"
+                attr.ref audioElementRef
             }
+            (model, dispatch) ||> playPauseBlock
         }
 
+    /// <summary>
+    /// The conventional static member that returns
+    /// this instance with <see cref="ecomp"/>
+    /// </summary>
+    /// <param name="model">the Elmish model of this domain</param>
+    /// <param name="dispatch">the Elmish message dispatcher</param>
     static member EComp model dispatch =
         ecomp<PlayerControlsElmishComponent, _, _> model dispatch { attr.empty() }
 
+    /// <summary><see cref="Inject"/>s the <see cref="IJSRuntime"/> of this domain</summary>
     [<Inject>]
     member val JSRuntime = Unchecked.defaultof<IJSRuntime> with get, set
 
+    /// <summary>
+    /// Overrides <see cref="ElmishComponent.View"/>
+    /// </summary>
+    /// <param name="model">the Elmish model of this domain</param>
+    /// <param name="dispatch">the Elmish message dispatcher</param>
     override this.View model dispatch =
 
         if model.blazorServices.playerControlsComp.IsNone then
@@ -110,6 +128,10 @@ type PlayerControlsElmishComponent() =
 
         (model, dispatch) ||> container
 
+    /// <summary>
+    /// The <see cref="JSInvokable"/> member the browser uses to call this instance.
+    /// </summary>
+    /// <param name="uiData">maps to <see cref="PlayerAnimationTick"/></param>
     [<JSInvokable>]
     member this.animateAsync(uiData: {|
                                        animationStatus: string option

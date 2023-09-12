@@ -5,7 +5,7 @@ open Xunit.Abstractions
 open FsUnit.CustomMatchers
 open FsUnit.Xunit
 
-open Songhay.Player.ProgressiveAudio.ProgressiveAudioUtility
+open Songhay.Player.ProgressiveAudio.ProgressiveAudioPresentationUtility
 
 type ProgressiveAudioUtilityTests(outputHelper: ITestOutputHelper) =
 

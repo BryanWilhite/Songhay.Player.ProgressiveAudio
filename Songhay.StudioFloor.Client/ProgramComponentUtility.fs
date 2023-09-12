@@ -17,7 +17,7 @@ open Songhay.Modules.Publications.Models
 open Songhay.Modules.Bolero.JsRuntimeUtility
 open Songhay.Modules.Bolero.RemoteHandlerUtility
 
-open Songhay.Player.ProgressiveAudio.ProgressiveAudioUtility
+open Songhay.Player.ProgressiveAudio.ProgressiveAudioPresentationUtility
 open Songhay.Player.ProgressiveAudio.Models
 
 open Songhay.StudioFloor.Client.Models

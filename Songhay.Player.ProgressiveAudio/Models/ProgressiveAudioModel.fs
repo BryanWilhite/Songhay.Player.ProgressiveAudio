@@ -13,10 +13,14 @@ open Songhay.Modules.Publications.Models
 open Songhay.Modules.Bolero.JsRuntimeUtility
 
 open Songhay.Player.ProgressiveAudio.ProgressiveAudioScalars
-open Songhay.Player.ProgressiveAudio.ProgressiveAudioUtility
+open Songhay.Player.ProgressiveAudio.ProgressiveAudioPresentationUtility
 
+/// <summary>
+/// The Elmish model of this domain.
+/// </summary>
 type ProgressiveAudioModel =
     {
+        /// <summary>conventional Blazor services of this domain</summary>
         blazorServices: {|
                           jsRuntime: IJSRuntime
                           navigationManager: NavigationManager
@@ -25,18 +29,33 @@ type ProgressiveAudioModel =
                           buttonElementRef: HtmlRef option
                           playerControlsComp: Component option
                         |}
+        /// <summary>current playlist item info</summary>
         currentPlaylistItem: (DisplayText * Uri) option
+        /// <summary>current error text</summary>
         error: string option
+        /// <summary>returns <c>true</c> when the credits modal is visible</summary>
         isCreditsModalVisible: bool
+        /// <summary>returns <c>true</c> when the <see cref="Presentation"/> is playing</summary>
         isPlaying: bool
+        /// <summary>the latest value of <see cref="PlayerAnimationTickData.audioCurrentTime"/></summary>
         playingCurrentTime: decimal
+        /// <summary>the latest value of <see cref="PlayerAnimationTickData.audioDuration"/></summary>
         playingDuration: decimal
+        /// <summary>the latest value of <see cref="PlayerAnimationTickData.audioDuration"/> formatted with <see cref="getTimeDisplayText"/></summary>
         playingDurationDisplay: string
+        /// <summary>the latest value of <see cref="PlayerAnimationTickData.audioCurrentTime"/> formatted with <see cref="getTimeDisplayText"/></summary>
         playingCurrentTimeDisplay: string
+        /// <summary>the current <see cref="Presentation"/></summary>
         presentation: Presentation option
+        /// <summary>the current <see cref="Presentation"/> <see cref="Identifier"/></summary>
         presentationKey: Identifier option
     }
 
+    /// <summary>
+    /// Centralizes the Elmish initialization routine.
+    /// </summary>
+    /// <param name="jsRuntime">the <see cref="IJSRuntime"/></param>
+    /// <param name="navigationManager">the <see cref="NavigationManager"/></param>
     static member initialize (jsRuntime: IJSRuntime) (navigationManager: NavigationManager) =
         {
             blazorServices = {|
@@ -59,6 +78,11 @@ type ProgressiveAudioModel =
             presentationKey = None 
         }
 
+    /// <summary>
+    /// Centralizes the model-updating for the Elmish <c>update</c> function.
+    /// </summary>
+    /// <param name="message">the <see cref="ProgressiveAudioMessage"/></param>
+    /// <param name="model">the <see cref="ProgressiveAudioModel"/></param>
     static member updateModel (message: ProgressiveAudioMessage) (model: ProgressiveAudioModel) =
         let dotNetObjectReference() = DotNetObjectReference.Create(model.blazorServices.playerControlsComp.Value)
 
@@ -175,18 +199,27 @@ type ProgressiveAudioModel =
 
         | PlayerError exn -> { model with error = Some exn.Message }
 
+    /// <summary>
+    /// Chooses any <see cref="RoleCredit"/> list of the current <see cref="Presentation"/>.
+    /// </summary>
     member this.presentationCredits =
         option {
             let! pres = this.presentation
             return! pres.credits
         }
 
+    /// <summary>
+    /// Chooses any <see cref="Description"/> <see cref="string"/> of the current <see cref="Presentation"/>.
+    /// </summary>
     member this.presentationDescription =
         option {
             let! pres = this.presentation
             return! pres.description
         }
 
+    /// <summary>
+    /// Chooses any <see cref="Playlist"/> tuple list of the current <see cref="Presentation"/>.
+    /// </summary>
     member this.presentationPlayList =
         option {
             let! pres = this.presentation

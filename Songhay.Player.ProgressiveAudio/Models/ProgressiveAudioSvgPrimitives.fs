@@ -7,16 +7,25 @@ open Songhay.Modules.Bolero.Visuals.SvgElement
 
 open Songhay.Modules.Models
 
+/// <summary>
+/// Defines the keys to identify SVG visuals.
+/// </summary>
 type ProgressiveAudioSvgKeys =
     | PLAY
     | PAUSE
 
+    /// <summary>The <see cref="string"/> value of this instance (in lower case)</summary>
     member this.Value = this.ToString().ToLowerInvariant()
 
+    /// <summary>converts this instance into an <see cref="Identifier"/></summary>
     member this.ToAlphanumeric = Alphanumeric this.Value
 
+/// <summary>
+/// Centralizes a collection of the SVG visuals of this domain.
+/// </summary>
 type ProgressiveAudioSvgData() =
 
+    /// <summary>the collection of the SVG visuals</summary>
     static let Collection =
         [
             PLAY.ToAlphanumeric,
@@ -29,6 +38,8 @@ type ProgressiveAudioSvgData() =
             }
         ] |> dict
 
+    /// <summary>gets an SVG <see cref="Node"/> with the specified <see cref="Identifier"/></summary>
     static member Get (id: Identifier) = Collection[id]
 
+    /// <summary>returns <c>true</c> when the specified <see cref="Identifier"/> maps to an SVG visual</summary>
     static member HasKey (id: Identifier) = Collection.ContainsKey(id)

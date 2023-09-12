@@ -10,9 +10,13 @@ open Songhay.Modules.Bolero.Models
 open Songhay.Modules.Bolero.Visuals.Bulma.CssClass
 open Songhay.Player.ProgressiveAudio.Models
 
+/// <summary>
+/// Defines the player Playlist <see cref="ElmishComponent{TModel,TMessage}"/>.
+/// </summary>
 type PlaylistElmishComponent() =
     inherit ElmishComponent<ProgressiveAudioModel, ProgressiveAudioMessage>()
 
+    /// <summary>the <c>ol#playlist</c> element</summary>
     let container (model: ProgressiveAudioModel) dispatch =
         ol {
             [ panel; "track-list" ] |> CssClasses.toHtmlClassFromList
@@ -43,11 +47,23 @@ type PlaylistElmishComponent() =
                     li { text "[ Loading… ]" }
         }
 
+    /// <summary>
+    /// The conventional static member that returns
+    /// this instance with <see cref="ecomp"/>
+    /// </summary>
+    /// <param name="model">the Elmish model of this domain</param>
+    /// <param name="dispatch">the Elmish message dispatcher</param>
     static member EComp model dispatch =
         ecomp<PlaylistElmishComponent, _, _> model dispatch { attr.empty() }
 
+    /// <summary><see cref="Inject"/>s the <see cref="IJSRuntime"/> of this domain</summary>
     [<Inject>]
     member val JSRuntime = Unchecked.defaultof<IJSRuntime> with get, set
 
+    /// <summary>
+    /// Overrides <see cref="ElmishComponent.View"/>
+    /// </summary>
+    /// <param name="model">the Elmish model of this domain</param>
+    /// <param name="dispatch">the Elmish message dispatcher</param>
     override this.View model dispatch =
         (model, dispatch) ||> container

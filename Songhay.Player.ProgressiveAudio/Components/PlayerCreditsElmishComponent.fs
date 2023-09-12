@@ -16,9 +16,13 @@ open Songhay.Modules.Bolero.Visuals.Bulma.Component
 open Songhay.Modules.Publications.Models
 open Songhay.Player.ProgressiveAudio.Models
 
+/// <summary>
+/// Defines the player Credits <see cref="ElmishComponent{TModel,TMessage}"/>.
+/// </summary>
 type PlayerCreditsElmishComponent() =
     inherit ElmishComponent<ProgressiveAudioModel, ProgressiveAudioMessage>()
 
+    /// <summary>the child node customizing <see cref="bulmaModalContainer"/></summary>
     let modalNode (model: ProgressiveAudioModel) dispatch =
         let creditItemsNode =
             model.presentationCredits
@@ -77,6 +81,7 @@ type PlayerCreditsElmishComponent() =
                 bulmaModalContent NoCssClasses modalNode
             })
 
+    /// <summary>the <c>button.credits</c> element and <see cref="modalNode"/></summary>
     let buttonNode model dispatch =
         concat {
             button {
@@ -92,11 +97,23 @@ type PlayerCreditsElmishComponent() =
             (model, dispatch) ||> modalNode
         }
 
+    /// <summary>
+    /// The conventional static member that returns
+    /// this instance with <see cref="ecomp"/>
+    /// </summary>
+    /// <param name="model">the Elmish model of this domain</param>
+    /// <param name="dispatch">the Elmish message dispatcher</param>
     static member EComp model dispatch =
         ecomp<PlayerCreditsElmishComponent, _, _> model dispatch { attr.empty() }
 
+    /// <summary><see cref="Inject"/>s the <see cref="IJSRuntime"/> of this domain</summary>
     [<Inject>]
     member val JSRuntime = Unchecked.defaultof<IJSRuntime> with get, set
 
+    /// <summary>
+    /// Overrides <see cref="ElmishComponent.View"/>
+    /// </summary>
+    /// <param name="model">the Elmish model of this domain</param>
+    /// <param name="dispatch">the Elmish message dispatcher</param>
     override this.View model dispatch =
         (model, dispatch) ||> buttonNode

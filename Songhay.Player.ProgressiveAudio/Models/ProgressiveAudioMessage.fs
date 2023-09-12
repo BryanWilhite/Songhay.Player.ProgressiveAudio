@@ -8,6 +8,9 @@ open Songhay.Modules.Models
 open Songhay.Modules.Publications.Models
 open Songhay.Modules.Bolero
 
+/// <summary>
+/// The Elmish messages of this domain.
+/// </summary>
 type ProgressiveAudioMessage =
     | GetPlayerManifest | GotPlayerManifest of (Identifier * Presentation option)
     | GotPlayerControlsRefs of {| audioElementRef: HtmlRef; buttonElementRef: HtmlRef; playerControlsComp: Component |}
@@ -19,6 +22,7 @@ type ProgressiveAudioMessage =
     | PlaylistClick of (DisplayText * Uri)
     | PlayerError of exn
 
+    /// <summary>Centralizes failure message reporting to the browser</summary>
     member this.failureMessage (jsRuntime: IJSRuntime option) ex =
         let failureMsg = PlayerError ex
 
@@ -29,5 +33,6 @@ type ProgressiveAudioMessage =
 
         failureMsg
 
+    /// <summary>The <see cref="string"/> representation of this instance.</summary>
     override this.ToString() =
         $"{nameof ProgressiveAudioMessage}.{this.ToString()}"
