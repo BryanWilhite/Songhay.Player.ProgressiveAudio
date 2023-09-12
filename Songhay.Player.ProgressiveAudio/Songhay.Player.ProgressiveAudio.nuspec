@@ -19,8 +19,8 @@
         <repository type="git" url="https://github.com/BryanWilhite/Songhay.Player.ProgressiveAudio"></repository>
         <dependencies>
             <group targetFramework=".NET6.0">
-                <dependency id="Songhay.Modules.Bolero" Version="6.3.0" />
-                <dependency id="Songhay.Modules.Publications" Version="6.3.1" />
+                <dependency id="Songhay.Modules.Bolero" version="6.3.0" />
+                <dependency id="Songhay.Modules.Publications" version="6.3.1" />
             </group>
         </dependencies>
     </metadata>
