@@ -1,7 +1,6 @@
 namespace Songhay.Player.ProgressiveAudio.Models
 
 open System
-open Microsoft.AspNetCore.Components
 open Microsoft.JSInterop
 
 open FsToolkit.ErrorHandling
@@ -23,7 +22,6 @@ type ProgressiveAudioModel =
         /// <summary>conventional Blazor services of this domain</summary>
         blazorServices: {|
                           jsRuntime: IJSRuntime
-                          navigationManager: NavigationManager
                           sectionElementRef: HtmlRef option
                           audioElementRef: HtmlRef option
                           buttonElementRef: HtmlRef option
@@ -55,12 +53,10 @@ type ProgressiveAudioModel =
     /// Centralizes the Elmish initialization routine.
     /// </summary>
     /// <param name="jsRuntime">the <see cref="IJSRuntime"/></param>
-    /// <param name="navigationManager">the <see cref="NavigationManager"/></param>
-    static member initialize (jsRuntime: IJSRuntime) (navigationManager: NavigationManager) =
+    static member initialize (jsRuntime: IJSRuntime) =
         {
             blazorServices = {|
                                jsRuntime = jsRuntime
-                               navigationManager = navigationManager
                                sectionElementRef = None
                                audioElementRef = None
                                buttonElementRef = None
@@ -113,7 +109,6 @@ type ProgressiveAudioModel =
             {
                 model with blazorServices = {|
                                               jsRuntime = model.blazorServices.jsRuntime
-                                              navigationManager = model.blazorServices.navigationManager
                                               sectionElementRef = sectionElementRef |> Some
                                               audioElementRef = model.blazorServices.audioElementRef
                                               buttonElementRef = model.blazorServices.buttonElementRef
@@ -124,7 +119,6 @@ type ProgressiveAudioModel =
             {
                 model with blazorServices = {|
                                               jsRuntime = model.blazorServices.jsRuntime
-                                              navigationManager = model.blazorServices.navigationManager
                                               sectionElementRef = model.blazorServices.sectionElementRef
                                               audioElementRef = bag.audioElementRef |> Some
                                               buttonElementRef = bag.buttonElementRef |> Some

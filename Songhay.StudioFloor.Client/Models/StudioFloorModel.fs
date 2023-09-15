@@ -2,23 +2,22 @@ namespace Songhay.StudioFloor.Client.Models
 
 open System.Net.Http
 
-open Microsoft.AspNetCore.Components
 open Microsoft.JSInterop
 
 open Songhay.Player.ProgressiveAudio.Models
 
 type StudioFloorModel =
     {
-        blazorServices: {| httpClient: HttpClient; jsRuntime: IJSRuntime; navigationManager: NavigationManager |}
+        blazorServices: {| httpClient: HttpClient; jsRuntime: IJSRuntime |}
         paModel: ProgressiveAudioModel
         page: StudioFloorPage
         readMeData: string option
     }
 
-    static member initialize (httpClient: HttpClient) (jsRuntime: IJSRuntime) (navigationManager: NavigationManager) =
+    static member initialize (httpClient: HttpClient) (jsRuntime: IJSRuntime) =
         {
-            blazorServices = {| httpClient = httpClient; jsRuntime = jsRuntime; navigationManager = navigationManager |}
-            paModel = ProgressiveAudioModel.initialize jsRuntime navigationManager
+            blazorServices = {| httpClient = httpClient; jsRuntime = jsRuntime |}
+            paModel = ProgressiveAudioModel.initialize jsRuntime
             page = ReadMePage
             readMeData = None
         }

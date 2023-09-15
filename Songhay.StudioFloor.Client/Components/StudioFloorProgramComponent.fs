@@ -45,11 +45,8 @@ type StudioFloorProgramComponent() =
     [<Inject>]
     member val JSRuntime = Unchecked.defaultof<IJSRuntime> with get, set
 
-    [<Inject>]
-    member val NavigationManager = Unchecked.defaultof<NavigationManager> with get, set
-
     override this.Program =
-        let m = StudioFloorModel.initialize this.HttpClient this.JSRuntime this.NavigationManager
+        let m = StudioFloorModel.initialize this.HttpClient this.JSRuntime
         let cmd = Cmd.ofMsg StudioFloorMessage.GetReadMe
 
         Program.mkProgram (fun _ -> m, cmd) update view

@@ -1,8 +1,5 @@
 namespace Songhay.Player.ProgressiveAudio.Components
 
-open Microsoft.AspNetCore.Components
-open Microsoft.JSInterop
-
 open FsToolkit.ErrorHandling
 
 open Bolero
@@ -105,10 +102,6 @@ type PlayerCreditsElmishComponent() =
     /// <param name="dispatch">the Elmish message dispatcher</param>
     static member EComp model dispatch =
         ecomp<PlayerCreditsElmishComponent, _, _> model dispatch { attr.empty() }
-
-    /// <summary><see cref="Inject"/>s the <see cref="IJSRuntime"/> of this domain</summary>
-    [<Inject>]
-    member val JSRuntime = Unchecked.defaultof<IJSRuntime> with get, set
 
     /// <summary>
     /// Overrides <see cref="ElmishComponent.View"/>
