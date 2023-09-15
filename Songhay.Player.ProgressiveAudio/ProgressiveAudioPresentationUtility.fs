@@ -2,7 +2,6 @@ namespace Songhay.Player.ProgressiveAudio
 
 open System
 open Bolero
-open Microsoft.AspNetCore.Components
 open Microsoft.JSInterop
 
 open FsToolkit.ErrorHandling
@@ -17,13 +16,6 @@ open Songhay.Player.ProgressiveAudio.ProgressiveAudioScalars
 /// Shared utilities for Progressive Audio Presentations
 /// </summary>
 module ProgressiveAudioPresentationUtility =
-
-    let internal toUriFragmentOption (location: string) =
-        if String.IsNullOrWhiteSpace location then None
-        else
-            match (location, UriKind.Absolute) |> Uri |> fun uri -> uri.Fragment with
-            | s when s.Length > 0 -> Some <| s.TrimStart '#'
-            | _ -> None
 
     /// <summary>
     /// Builds an absolute <see cref="Uri"/>
@@ -51,17 +43,6 @@ module ProgressiveAudioPresentationUtility =
             CssVariableAndValue (CssVariable.fromInput "rx-player-background-image", CssValue bgImgUrl)
             CssVariableAndValue (CssVariable.fromInput "rx-player-credits-button-background-image", CssValue buttonImgUrl)
         ]
-
-    /// <summary>
-    /// Gets the conventional presentation key from the current browser location
-    /// of the form <c>http://localhost:5000/#default</c>
-    /// </summary>
-    /// <param name="navMan">the <see cref="NavigationManager"/></param>
-    let getPresentationKey (_: IJSRuntime) (navMan: NavigationManager) =
-
-        // jsRuntime |> consoleWarnAsync [| nameof uriFragmentOption ; (navMan.Uri |> uriFragmentOption) |] |> ignore
-
-        navMan.Uri |> toUriFragmentOption
 
     /// <summary>
     /// Gets the conventional presentation manifest <see cref="Uri"/> from the Presentation key.

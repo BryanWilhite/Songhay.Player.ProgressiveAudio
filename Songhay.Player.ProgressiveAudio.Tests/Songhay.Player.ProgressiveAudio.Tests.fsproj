@@ -8,9 +8,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Include="json\progressive-audio-default.json" />
-        <Content Include="json\my-presentation.json" />
-        <Compile Include="ProgressiveAudioUtilityTests.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 
