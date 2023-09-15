@@ -30,6 +30,6 @@ From the Studio Floor [directory](https://github.com/BryanWilhite/Songhay.Player
 dotnet run
 ```
 
-the screenshot above was the browser location `http://localhost:5000/#default` where `default` is the Presentation key that the player uses to load content.
+the screenshot above was the browser location `http://localhost:5000/audio/default` where `default` is the Presentation key that the player uses to load content.
 
 @[BryanWilhite](https://twitter.com/BryanWilhite)
