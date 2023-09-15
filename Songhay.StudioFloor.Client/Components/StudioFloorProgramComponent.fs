@@ -31,10 +31,6 @@ type StudioFloorProgramComponent() =
             let m = { model with page = page }
             let cmd = pcu.getCommandForSetPage page
             m, cmd
-        | SetTab tab ->
-            let m = { model with tab = tab }
-            let cmd = pcu.getCommandForSetTab tab
-            m, cmd
         | StudioFloorMessage.ProgressiveAudioMessage paMessage ->
             let m = { model with paModel = ProgressiveAudioModel.updateModel paMessage model.paModel }
             let cmd = pcu.getCommandForProgressiveAudio model paMessage

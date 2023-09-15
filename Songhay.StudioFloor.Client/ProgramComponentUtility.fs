@@ -52,13 +52,6 @@ module ProgramComponentUtility =
             Cmd.ofMsg msg
         | _ -> Cmd.none
 
-    let getCommandForSetTab tab =
-        match tab with
-        | PlayerTab ->
-            let msg = StudioFloorMessage.ProgressiveAudioMessage <| ProgressiveAudioMessage.GetPlayerManifest "foo"
-            Cmd.ofMsg msg
-        | _ -> Cmd.none
-
     let getCommandForProgressiveAudio model (message: ProgressiveAudioMessage) =
 
         let failure ex =

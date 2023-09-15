@@ -18,7 +18,7 @@ type TabsElmishComponent() =
         ecomp<TabsElmishComponent, _, _> model dispatch { attr.empty() }
 
     override this.ShouldRender(oldModel, newModel) =
-        oldModel.tab <> newModel.tab
+        oldModel.page <> newModel.page
         || oldModel.readMeData <> newModel.readMeData
         || oldModel.paModel.error <> newModel.paModel.error
         || oldModel.paModel <> newModel.paModel
@@ -26,18 +26,18 @@ type TabsElmishComponent() =
     override this.View model dispatch =
         concat {
             let tabs = [
-                (text "README", ReadMeTab)
-                (text "Progressive Audio Player", PlayerTab)
+                (text "README", ReadMePage)
+                (text "Progressive Audio Player", BRollAudioPage "default")
             ]
 
             bulmaTabs
                 (HasClasses <| CssClasses [ ColorEmpty.BackgroundCssClassLight; "is-toggle"; "is-fullwidth"; SizeLarge.CssClass ])
-                (fun pg -> model.tab = pg)
-                (fun pg _ -> SetTab pg |> dispatch)
+                (fun pg -> model.page = pg)
+                (fun pg _ -> SetPage pg |> dispatch)
                 tabs
 
-            cond model.tab <| function
-            | ReadMeTab ->
+            cond model.page <| function
+            | ReadMePage ->
                 if model.readMeData.IsNone then
                     text "loading…"
                 else
@@ -47,7 +47,7 @@ type TabsElmishComponent() =
                         (bulmaNotification
                             (HasClasses <| CssClasses [ "is-info" ])
                             (rawHtml model.readMeData.Value))
-            | PlayerTab ->
+            | BRollAudioPage _ ->
                 bulmaContainer
                     ContainerWidthFluid
                     NoCssClasses

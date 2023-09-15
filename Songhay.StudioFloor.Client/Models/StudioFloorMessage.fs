@@ -7,4 +7,3 @@ type StudioFloorMessage =
     | GetReadMe | GotReadMe of string
     | ProgressiveAudioMessage of ProgressiveAudioMessage
     | SetPage of StudioFloorPage
-    | SetTab of StudioFloorTab
