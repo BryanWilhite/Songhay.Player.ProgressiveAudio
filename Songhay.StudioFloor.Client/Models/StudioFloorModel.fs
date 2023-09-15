@@ -11,6 +11,7 @@ type StudioFloorModel =
     {
         blazorServices: {| httpClient: HttpClient; jsRuntime: IJSRuntime; navigationManager: NavigationManager |}
         paModel: ProgressiveAudioModel
+        page: StudioFloorPage
         tab: StudioFloorTab
         readMeData: string option
     }
@@ -19,6 +20,7 @@ type StudioFloorModel =
         {
             blazorServices = {| httpClient = httpClient; jsRuntime = jsRuntime; navigationManager = navigationManager |}
             paModel = ProgressiveAudioModel.initialize jsRuntime navigationManager
+            page = ReadMePage
             tab = ReadMeTab
             readMeData = None
         }

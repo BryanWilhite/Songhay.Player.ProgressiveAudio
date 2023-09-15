@@ -45,10 +45,17 @@ module ProgramComponentUtility =
 
         Cmd.OfAsync.either Remote.tryDownloadToStringAsync (model.blazorServices.httpClient, uri) success failure
 
+    let getCommandForSetPage page =
+        match page with
+        | BRollAudioPage key ->
+            let msg = StudioFloorMessage.ProgressiveAudioMessage <| ProgressiveAudioMessage.GetPlayerManifest key
+            Cmd.ofMsg msg
+        | _ -> Cmd.none
+
     let getCommandForSetTab tab =
         match tab with
         | PlayerTab ->
-            let msg = StudioFloorMessage.ProgressiveAudioMessage ProgressiveAudioMessage.GetPlayerManifest
+            let msg = StudioFloorMessage.ProgressiveAudioMessage <| ProgressiveAudioMessage.GetPlayerManifest "foo"
             Cmd.ofMsg msg
         | _ -> Cmd.none
 
@@ -59,35 +66,29 @@ module ProgramComponentUtility =
             |> StudioFloorMessage.ProgressiveAudioMessage
 
         match message with
-        | GetPlayerManifest ->
-            let keyOption = (model.blazorServices.jsRuntime, model.blazorServices.navigationManager) ||> getPresentationKey
-            if keyOption.IsNone then
-                let ex = FormatException $"The expected {nameof Presentation} key was not found."
-                let msg = model.blazorServices.jsRuntime |> passErrorToConsole None ex |> StudioFloorMessage.Error
-                Cmd.ofMsg msg
-            else
-                let uri = keyOption.Value |> getPresentationManifestUri
-                let success (result: Result<string, HttpStatusCode>) =
-                    result
-                    |> Result.either
-                        Presentation.fromInput
-                        (
-                            fun statusCode ->
-                                let ex = JsonException($"{nameof HttpStatusCode}: {statusCode}")
-                                Result.Error ex
-                        )
-                    |> Result.either
-                        (
-                            fun presentation ->
-                                let id = Identifier.fromString keyOption.Value
-                                let paMessage = ProgressiveAudioMessage.GotPlayerManifest <| (id ,Some presentation)
-                                StudioFloorMessage.ProgressiveAudioMessage paMessage
-                        )
-                        (
-                            fun ex ->
-                                let label = $"{nameof Presentation}.{nameof Presentation.fromInput}:" |> Some
-                                model.blazorServices.jsRuntime |> passErrorToConsole label ex |> StudioFloorMessage.Error
-                        )
+        | GetPlayerManifest key ->
+            let uri = key |> getPresentationManifestUri
+            let success (result: Result<string, HttpStatusCode>) =
+                result
+                |> Result.either
+                    Presentation.fromInput
+                    (
+                        fun statusCode ->
+                            let ex = JsonException($"{nameof HttpStatusCode}: {statusCode}")
+                            Result.Error ex
+                    )
+                |> Result.either
+                    (
+                        fun presentation ->
+                            let id = Identifier.fromString key
+                            let paMessage = ProgressiveAudioMessage.GotPlayerManifest <| (id ,Some presentation)
+                            StudioFloorMessage.ProgressiveAudioMessage paMessage
+                    )
+                    (
+                        fun ex ->
+                            let label = $"{nameof Presentation}.{nameof Presentation.fromInput}:" |> Some
+                            model.blazorServices.jsRuntime |> passErrorToConsole label ex |> StudioFloorMessage.Error
+                    )
 
-                Cmd.OfAsync.either Remote.tryDownloadToStringAsync (model.blazorServices.httpClient, uri) success failure
+            Cmd.OfAsync.either Remote.tryDownloadToStringAsync (model.blazorServices.httpClient, uri) success failure
         | _ -> Cmd.none

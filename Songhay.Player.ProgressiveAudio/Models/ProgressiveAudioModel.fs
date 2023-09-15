@@ -108,7 +108,7 @@ type ProgressiveAudioModel =
             model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropStartAnimation, dotNetObjectReference(), button(), audio())
 
         match message with
-        | GetPlayerManifest -> { model with presentation = None }
+        | GetPlayerManifest _ -> { model with presentation = None }
         | GotPlayerSection sectionElementRef ->
             {
                 model with blazorServices = {|

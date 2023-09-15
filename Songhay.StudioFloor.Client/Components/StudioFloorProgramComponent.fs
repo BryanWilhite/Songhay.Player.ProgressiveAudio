@@ -27,6 +27,10 @@ type StudioFloorProgramComponent() =
         | GotReadMe data ->
             let m = { model with readMeData = data |> Some }
             m, Cmd.none
+        | SetPage page ->
+            let m = { model with page = page }
+            let cmd = pcu.getCommandForSetPage page
+            m, cmd
         | SetTab tab ->
             let m = { model with tab = tab }
             let cmd = pcu.getCommandForSetTab tab
@@ -53,3 +57,4 @@ type StudioFloorProgramComponent() =
         let cmd = Cmd.ofMsg StudioFloorMessage.GetReadMe
 
         Program.mkProgram (fun _ -> m, cmd) update view
+        |> Program.withRouter ElmishRoutes.router

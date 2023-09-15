@@ -12,7 +12,7 @@ open Songhay.Modules.Bolero
 /// The Elmish messages of this domain.
 /// </summary>
 type ProgressiveAudioMessage =
-    | GetPlayerManifest | GotPlayerManifest of (Identifier * Presentation option)
+    | GetPlayerManifest of string | GotPlayerManifest of (Identifier * Presentation option)
     | GotPlayerControlsRefs of {| audioElementRef: HtmlRef; buttonElementRef: HtmlRef; playerControlsComp: Component |}
     | GotPlayerSection of HtmlRef
     | PlayPauseButtonClickEvent | PlayPauseInputEvent | PlayPauseChangeEvent of HtmlRef
