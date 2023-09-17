@@ -4,15 +4,30 @@ open Bolero
 open Bolero.Html
 
 open Songhay.Modules.Bolero.Models
-open Songhay.Modules.Bolero.Visuals.Bulma.Component
 open Songhay.Modules.Bolero.Visuals.Bulma.Element
 open Songhay.Modules.Bolero.Visuals.Bulma.Layout
 
 open Songhay.Player.ProgressiveAudio.Components
+
+open Songhay.StudioFloor.Client
 open Songhay.StudioFloor.Client.Models
 
 type TabsElmishComponent() =
     inherit ElmishComponent<StudioFloorModel, StudioFloorMessage>()
+
+    let getTabs (moreClasses: CssClassesOrEmpty) isActiveGetter (nodePair: (Node * 'page) list) =
+            div {
+                CssClasses [ "tabs" ] |> moreClasses.ToHtmlClassAttribute
+
+                ul {
+                    forEach nodePair <| fun (node, pg) ->
+                    li {
+                        attr.``class`` (if (isActiveGetter pg) then "is-active" else null)
+
+                        node
+                    }
+                }
+            }
 
     static member EComp model dispatch =
         ecomp<TabsElmishComponent, _, _> model dispatch { attr.empty() }
@@ -25,16 +40,15 @@ type TabsElmishComponent() =
 
     override this.View model dispatch =
         concat {
-            let tabs = [
-                (text "README", ReadMePage)
-                (text "Progressive Audio Player", BRollAudioPage "default")
+            let tabPairs = [
+                ( a { ElmishRoutes.router.HRef ReadMePage; text "README" }, ReadMePage )
+                ( a { ElmishRoutes.router.HRef <| BRollAudioPage "default"; text "Progressive Audio Player" }, BRollAudioPage "default" )
             ]
 
-            bulmaTabs
+            getTabs
                 (HasClasses <| CssClasses [ ColorEmpty.BackgroundCssClassLight; "is-toggle"; "is-fullwidth"; SizeLarge.CssClass ])
                 (fun pg -> model.page = pg)
-                (fun pg _ -> SetPage pg |> dispatch)
-                tabs
+                tabPairs
 
             cond model.page <| function
             | ReadMePage ->
