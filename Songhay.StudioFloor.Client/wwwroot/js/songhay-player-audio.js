@@ -1140,17 +1140,19 @@ class ProgressiveAudioUtility {
     static invokeDotNetMethodAsync(instance, audio) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            let data = null;
             try {
-                yield instance.invokeMethodAsync('animateAsync', {
+                data = {
                     animationStatus: (_a = ProgressiveAudioUtility.playAnimation) === null || _a === void 0 ? void 0 : _a.getDiagnosticStatus(),
                     audioCurrentTime: audio === null || audio === void 0 ? void 0 : audio.currentTime,
                     audioDuration: audio === null || audio === void 0 ? void 0 : audio.duration,
                     audioReadyState: audio === null || audio === void 0 ? void 0 : audio.readyState,
                     isAudioPaused: audio === null || audio === void 0 ? void 0 : audio.paused
-                });
+                };
+                yield (instance === null || instance === void 0 ? void 0 : instance.invokeMethodAsync('animateAsync', data));
             }
             catch (error) {
-                console.error({ error });
+                console.error({ error, instance, data });
                 WindowAnimation.cancelAnimation();
             }
         });

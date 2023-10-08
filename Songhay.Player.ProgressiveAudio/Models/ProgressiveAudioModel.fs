@@ -184,7 +184,6 @@ type ProgressiveAudioModel =
         | PlayerCreditsClick -> { model with isCreditsModalVisible = not model.isCreditsModalVisible }
         | PlaylistClick (txt, uri) ->
             task {
-                do! pause()
                 do! load uri
                 do! play()
             } |> ignore
