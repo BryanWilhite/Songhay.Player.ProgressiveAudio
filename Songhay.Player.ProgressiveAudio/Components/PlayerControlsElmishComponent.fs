@@ -139,23 +139,11 @@ type PlayerControlsElmishComponent() =
                                        audioDuration: decimal option
                                        audioReadyState: int option
                                        isAudioPaused: bool option |}) =
-        try
-            let tick =
-                PlayerAnimationTick {
-                    audioCurrentTime = uiData.audioCurrentTime.Value
-                    audioDuration = uiData.audioDuration.Value
-                    audioReadyState = uiData.audioReadyState.Value
-                }
+        let tick =
+            PlayerAnimationTick {
+                audioCurrentTime = uiData.audioCurrentTime.Value
+                audioDuration = uiData.audioDuration.Value
+                audioReadyState = uiData.audioReadyState.Value
+            }
 
-            this.Dispatch tick
-
-            Task.FromResult ()
-        with
-        | :? System.NullReferenceException ->
-            let msg = $"This `JSInvokable` method caused a `{nameof System.NullReferenceException}`"
-            this.JSRuntime |> Songhay.Modules.Bolero.JsRuntimeUtility.consoleErrorAsync [| msg; uiData |] |> ignore
-            Task.FromResult ()
-        | ex ->
-            let msg = $"This `JSInvokable` method caused a `{ex.GetType().Name}`"
-            this.JSRuntime |> Songhay.Modules.Bolero.JsRuntimeUtility.consoleErrorAsync [| msg; uiData |] |> ignore
-            Task.FromResult ()
+        Task.FromResult <| this.Dispatch tick

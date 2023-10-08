@@ -14,19 +14,23 @@ export class ProgressiveAudioUtility {
     }
 
     static async invokeDotNetMethodAsync(instance: DotNet.DotNetObject, audio: HTMLAudioElement | null) : Promise<void> {
+        let data : {} | null = null;
+
         try {
-            await instance.invokeMethodAsync(
+            data = {
+                animationStatus: ProgressiveAudioUtility.playAnimation?.getDiagnosticStatus(),
+                audioCurrentTime: audio?.currentTime,
+                audioDuration: audio?.duration,
+                audioReadyState: audio?.readyState,
+                isAudioPaused: audio?.paused
+            };
+
+            await instance?.invokeMethodAsync(
                 'animateAsync',
-                {
-                    animationStatus: ProgressiveAudioUtility.playAnimation?.getDiagnosticStatus(),
-                    audioCurrentTime: audio?.currentTime,
-                    audioDuration: audio?.duration,
-                    audioReadyState: audio?.readyState,
-                    isAudioPaused: audio?.paused
-                }
+                data
             );
         } catch (error) {
-            console.error({error});
+            console.error({ error, instance, data });
             WindowAnimation.cancelAnimation();
         }
     }
