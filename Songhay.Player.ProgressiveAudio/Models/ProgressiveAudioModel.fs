@@ -205,7 +205,7 @@ type ProgressiveAudioModel =
         | PlaylistClick (txt, uri) ->
             load uri |> ignore
 
-            { model with currentPlaylistItem = (txt, uri) |> Some }
+            { model with currentPlaylistItem = (txt, uri) |> Some; canPlay = false;  isPlaying = false }
 
         | PlayerError exn -> { model with error = Some exn.Message }
 

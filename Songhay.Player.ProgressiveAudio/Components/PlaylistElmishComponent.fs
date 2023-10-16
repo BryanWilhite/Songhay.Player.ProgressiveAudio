@@ -32,11 +32,16 @@ type PlaylistElmishComponent() =
                                 text "⬤"
                             }
                             a {
-                                [ fontSize Size7 ] |> CssClasses.toHtmlClassFromList
+                                [
+                                    fontSize Size7
+                                    if not model.canPlay then "anchor-disabled"
+                                ] |> CssClasses.toHtmlClassFromList
 
-                                attr.href "#"
                                 on.click (fun _ -> dispatch <| PlaylistClick (txt, uri))
                                 DomElementEvent.Click.PreventDefault
+
+                                attr.href "#"
+
                                 text txt.Value
                             }
                         }
