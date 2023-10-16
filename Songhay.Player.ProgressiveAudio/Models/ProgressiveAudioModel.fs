@@ -194,6 +194,7 @@ type ProgressiveAudioModel =
         | PlayerAnimationTick data ->
             {
                 model with
+                    canPlay = data.audioReadyState > 2 // `HAVE_FUTURE_DATA` or `HAVE_ENOUGH_DATA`
                     playingCurrentTime = data.audioCurrentTime
                     playingCurrentTimeDisplay = data.audioCurrentTime |> getTimeDisplayText
                     playingDuration = data.audioDuration |> Math.Floor
