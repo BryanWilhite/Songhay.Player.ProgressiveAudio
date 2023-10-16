@@ -15,8 +15,8 @@ type ProgressiveAudioMessage =
     | GetPlayerManifest of string | GotPlayerManifest of (Identifier * Presentation option)
     | GotPlayerControlsRefs of {| audioElementRef: HtmlRef; buttonElementRef: HtmlRef; playerControlsComp: Component |}
     | GotPlayerSection of HtmlRef
-    | PlayPauseButtonClickEvent | PlayPauseInputEvent | PlayPauseChangeEvent of HtmlRef
-    | PlayAudioMetadataLoadedEvent | PlayAudioEndedEvent
+    | PlayerPauseButtonClickEvent | PlayerPauseInputEvent | PlayerPauseChangeEvent of HtmlRef
+    | PlayerAudioLoadStartEvent | PlayerAudioMetadataLoadedEvent | PlayerAudioCanPlayEvent | PlayerAudioEndedEvent
     | PlayerAnimationTick of PlayerAnimationTickData
     | PlayerCreditsClick
     | PlaylistClick of (DisplayText * Uri)

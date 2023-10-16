@@ -148,16 +148,16 @@ type ProgressiveAudioModel =
                     presentationKey = data |> fst |> Some 
                     currentPlaylistItem = currentItem }
 
-        | PlayAudioMetadataLoadedEvent ->
+        | PlayerAudioMetadataLoadedEvent ->
             handleMeta() |> ignore
             model
 
-        | PlayAudioEndedEvent -> { model with isPlaying = false }
-        | PlayPauseButtonClickEvent ->
+        | PlayerAudioEndedEvent -> { model with isPlaying = false }
+        | PlayerPauseButtonClickEvent ->
             if model.isPlaying then pause() |> ignore else play() |> ignore
             { model with isPlaying = not model.isPlaying }
 
-        | PlayPauseInputEvent ->
+        | PlayerPauseInputEvent ->
             task {
                 do! pause()
                 do! handleMeta()
@@ -165,7 +165,7 @@ type ProgressiveAudioModel =
 
             { model with isPlaying = false }
 
-        | PlayPauseChangeEvent inputRef ->
+        | PlayerPauseChangeEvent inputRef ->
             task {
                 do! handleInputChange inputRef
                 do! play()

@@ -36,7 +36,7 @@ type PlayerControlsElmishComponent() =
             attr.id "play-pause-block"
 
             button {
-                on.click (fun _ -> dispatch PlayPauseButtonClickEvent)
+                on.click (fun _ -> dispatch PlayerPauseButtonClickEvent)
                 attr.ref buttonElementRef
                 svg {
                     "xmlns" => SvgUri
@@ -51,8 +51,8 @@ type PlayerControlsElmishComponent() =
 
             input {
                 m (L, L1) |> CssClasses.toHtmlClass
-                on.change (fun _ -> dispatch <| PlayPauseChangeEvent inputRangeElementRef)
-                on.input (fun _ -> dispatch PlayPauseInputEvent)
+                on.change (fun _ -> dispatch <| PlayerPauseChangeEvent inputRangeElementRef)
+                on.input (fun _ -> dispatch PlayerPauseInputEvent)
                 attr.id "play-pause-range"
                 attr.``type`` "range"
                 attr.max model.playingDuration
@@ -88,8 +88,10 @@ type PlayerControlsElmishComponent() =
         div {
             attr.id "audio-player-container"
             audio {
-                on.loadedmetadata (fun _ -> dispatch PlayAudioMetadataLoadedEvent)
-                on.ended (fun _ -> dispatch PlayAudioEndedEvent)
+                on.loadedmetadata (fun _ -> dispatch PlayerAudioMetadataLoadedEvent)
+                on.loadstart (fun _ -> dispatch PlayerAudioLoadStartEvent)
+                on.canplay (fun _ -> dispatch PlayerAudioCanPlayEvent)
+                on.ended (fun _ -> dispatch PlayerAudioEndedEvent)
                 attr.src (if uriOption.IsSome then uriOption.Value else null)
                 attr.preload "metadata"
                 attr.ref audioElementRef
