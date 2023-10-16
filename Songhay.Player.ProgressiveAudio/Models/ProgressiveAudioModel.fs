@@ -27,6 +27,9 @@ type ProgressiveAudioModel =
                           buttonElementRef: HtmlRef option
                           playerControlsComp: Component option
                         |}
+        /// <summary>returns <c>true</c> when the event of the same name fires for the <c>audio</c> element</summary>
+        /// <remarks>See https://developer.mozilla.org/en-US/docs/Web/Guide/Audio_and_video_delivery/Cross-browser_audio_basics#canplay</remarks>
+        canPlay: bool
         /// <summary>current playlist item info</summary>
         currentPlaylistItem: (DisplayText * Uri) option
         /// <summary>current error text</summary>
@@ -62,6 +65,7 @@ type ProgressiveAudioModel =
                                buttonElementRef = None
                                playerControlsComp = None
                             |}
+            canPlay = false 
             currentPlaylistItem = None
             error = None
             isCreditsModalVisible = false
@@ -105,6 +109,7 @@ type ProgressiveAudioModel =
 
         match message with
         | GetPlayerManifest _ -> { model with presentation = None }
+
         | GotPlayerSection sectionElementRef ->
             {
                 model with blazorServices = {|
@@ -115,6 +120,7 @@ type ProgressiveAudioModel =
                                               playerControlsComp = model.blazorServices.playerControlsComp
                                             |}
             }
+
         | GotPlayerControlsRefs bag ->
             {
                 model with blazorServices = {|
@@ -148,13 +154,27 @@ type ProgressiveAudioModel =
                     presentationKey = data |> fst |> Some 
                     currentPlaylistItem = currentItem }
 
+        | PlayerAudioCanPlayEvent ->
+            play() |> ignore
+            { model with canPlay = true; isPlaying = true }
+
+        | PlayerAudioLoadStartEvent ->
+            model.blazorServices.jsRuntime |> consoleInfoAsync [| nameof PlayerAudioLoadStartEvent |] |> ignore
+            model
+
         | PlayerAudioMetadataLoadedEvent ->
             handleMeta() |> ignore
             model
 
         | PlayerAudioEndedEvent -> { model with isPlaying = false }
+
         | PlayerPauseButtonClickEvent ->
-            if model.isPlaying then pause() |> ignore else play() |> ignore
+            if model.isPlaying then pause() |> ignore
+            else
+                if model.canPlay then
+                    play() |> ignore
+                else
+                    ()
             { model with isPlaying = not model.isPlaying }
 
         | PlayerPauseInputEvent ->
@@ -168,8 +188,12 @@ type ProgressiveAudioModel =
         | PlayerPauseChangeEvent inputRef ->
             task {
                 do! handleInputChange inputRef
-                do! play()
+                if model.canPlay then
+                    do! play()
+                else
+                    ()
             } |> ignore
+
             { model with isPlaying = true }
 
         | PlayerAnimationTick data ->
@@ -182,13 +206,11 @@ type ProgressiveAudioModel =
             }
 
         | PlayerCreditsClick -> { model with isCreditsModalVisible = not model.isCreditsModalVisible }
-        | PlaylistClick (txt, uri) ->
-            task {
-                do! load uri
-                do! play()
-            } |> ignore
 
-            { model with currentPlaylistItem = (txt, uri) |> Some; isPlaying = true }
+        | PlaylistClick (txt, uri) ->
+            load uri |> ignore
+
+            { model with currentPlaylistItem = (txt, uri) |> Some }
 
         | PlayerError exn -> { model with error = Some exn.Message }
 
