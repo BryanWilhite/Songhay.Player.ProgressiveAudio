@@ -2,11 +2,10 @@
 import { WindowAnimation } from 'songhay';
 export declare class ProgressiveAudioUtility {
     static playAnimation: WindowAnimation | null;
-    static handleAudioMetadataLoadedAsync(instance: DotNet.DotNetObject, button: HTMLButtonElement | null, audio: HTMLAudioElement | null): Promise<void>;
+    static handleAudioMetadataLoadedAsync(instance: DotNet.DotNetObject, audio: HTMLAudioElement | null): Promise<void>;
     static invokeDotNetMethodAsync(instance: DotNet.DotNetObject, audio: HTMLAudioElement | null): Promise<void>;
     static loadAudioTrack(audio: HTMLAudioElement | null, src: string): void;
     static setAudioCurrentTime(input: HTMLInputElement | null, audio: HTMLAudioElement | null): void;
-    static startPlayAnimation(instance: DotNet.DotNetObject, button: HTMLButtonElement | null, audio: HTMLAudioElement | null): void;
-    static stopPlayAnimationAsync(instance: DotNet.DotNetObject, button: HTMLButtonElement | null, audio: HTMLAudioElement | null): Promise<void>;
-    static toggleElementEnabled(element: HTMLElement | null): void;
+    static startPlayAnimation(instance: DotNet.DotNetObject, audio: HTMLAudioElement | null): void;
+    static stopPlayAnimationAsync(instance: DotNet.DotNetObject, audio: HTMLAudioElement | null): Promise<void>;
 }

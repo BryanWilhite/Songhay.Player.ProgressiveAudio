@@ -23,9 +23,6 @@ type PlayerControlsElmishComponent() =
     /// <summary><see cref="HtmlRef"/> for the <c>audio</c> element in the <see cref="playPauseBlock"/></summary>
     let audioElementRef = HtmlRef()
 
-    /// <summary><see cref="HtmlRef"/> for the <c>button</c> element in the <see cref="playPauseBlock"/></summary>
-    let buttonElementRef = HtmlRef()
-
     /// <summary><see cref="HtmlRef"/> for the <c>input[type="range"]</c> element in the <see cref="playPauseBlock"/></summary>
     let inputRangeElementRef = HtmlRef()
 
@@ -37,7 +34,7 @@ type PlayerControlsElmishComponent() =
 
             button {
                 on.click (fun _ -> dispatch PlayerPauseButtonClickEvent)
-                attr.ref buttonElementRef
+                attr.disabled <| model.canPlay
                 svg {
                     "xmlns" => SvgUri
                     "fill" => "currentColor"
@@ -53,6 +50,7 @@ type PlayerControlsElmishComponent() =
                 m (L, L1) |> CssClasses.toHtmlClass
                 on.change (fun _ -> dispatch <| PlayerPauseChangeEvent inputRangeElementRef)
                 on.input (fun _ -> dispatch PlayerPauseInputEvent)
+                attr.disabled <| model.canPlay
                 attr.id "play-pause-range"
                 attr.``type`` "range"
                 attr.max model.playingDuration
@@ -120,11 +118,7 @@ type PlayerControlsElmishComponent() =
     override this.View model dispatch =
 
         if model.blazorServices.playerControlsComp.IsNone then
-            dispatch <| GotPlayerControlsRefs {|
-                                               buttonElementRef = buttonElementRef
-                                               audioElementRef = audioElementRef
-                                               playerControlsComp = this
-                                            |}
+            dispatch <| GotPlayerControlsRefs {| audioElementRef = audioElementRef; playerControlsComp = this |}
         else
             ()
 

@@ -1130,11 +1130,9 @@ function __disposeResources(env) {
 
 class ProgressiveAudioUtility {
     // noinspection JSUnusedGlobalSymbols
-    static handleAudioMetadataLoadedAsync(instance, button, audio) {
+    static handleAudioMetadataLoadedAsync(instance, audio) {
         return __awaiter(this, void 0, void 0, function* () {
-            ProgressiveAudioUtility.toggleElementEnabled(button);
             yield ProgressiveAudioUtility.invokeDotNetMethodAsync(instance, audio);
-            ProgressiveAudioUtility.toggleElementEnabled(button);
         });
     }
     static invokeDotNetMethodAsync(instance, audio) {
@@ -1168,45 +1166,27 @@ class ProgressiveAudioUtility {
         }
     }
     // noinspection JSUnusedGlobalSymbols
-    static startPlayAnimation(instance, button, audio) {
+    static startPlayAnimation(instance, audio) {
         const fps = 1; // frames per second
-        const readyStatePollFreq = 250; // milliseconds
-        ProgressiveAudioUtility.toggleElementEnabled(button);
-        const timeId = window.setTimeout(() => __awaiter(this, void 0, void 0, function* () {
-            // poll faster than animation ticks until `readyState` changes:
-            if (!(audio === null || audio === void 0 ? void 0 : audio.ended) && (audio === null || audio === void 0 ? void 0 : audio.paused) && (audio === null || audio === void 0 ? void 0 : audio.readyState) > 0) {
-                window.clearTimeout(timeId);
-                yield audio.play();
-            }
-        }), readyStatePollFreq);
         ProgressiveAudioUtility.playAnimation = WindowAnimation.registerAndGenerate(fps, (_) => __awaiter(this, void 0, void 0, function* () {
             if (audio === null || audio === void 0 ? void 0 : audio.ended) {
                 audio.currentTime = 0;
-                yield ProgressiveAudioUtility.stopPlayAnimationAsync(instance, button, audio);
+                yield ProgressiveAudioUtility.stopPlayAnimationAsync(instance, audio);
                 return;
             }
             yield ProgressiveAudioUtility.invokeDotNetMethodAsync(instance, audio);
         }));
         WindowAnimation.animate();
-        ProgressiveAudioUtility.toggleElementEnabled(button);
     }
-    static stopPlayAnimationAsync(instance, button, audio) {
+    static stopPlayAnimationAsync(instance, audio) {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
-            ProgressiveAudioUtility.toggleElementEnabled(button);
-            if (audio && !audio.paused && audio.readyState > 0) {
+            if (audio && audio.readyState > 0 && !audio.paused) {
                 audio.pause();
             }
             yield ProgressiveAudioUtility.invokeDotNetMethodAsync(instance, audio);
             WindowAnimation.cancelAnimation((_b = (_a = ProgressiveAudioUtility.playAnimation) === null || _a === void 0 ? void 0 : _a.id) !== null && _b !== void 0 ? _b : undefined);
-            ProgressiveAudioUtility.toggleElementEnabled(button);
         });
-    }
-    static toggleElementEnabled(element) {
-        if (!element) {
-            return;
-        }
-        element.toggleAttribute('disabled');
     }
 }
 ProgressiveAudioUtility.playAnimation = null;

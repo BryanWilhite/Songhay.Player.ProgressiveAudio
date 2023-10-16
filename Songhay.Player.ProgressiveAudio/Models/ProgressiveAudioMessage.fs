@@ -13,7 +13,7 @@ open Songhay.Modules.Bolero
 /// </summary>
 type ProgressiveAudioMessage =
     | GetPlayerManifest of string | GotPlayerManifest of (Identifier * Presentation option)
-    | GotPlayerControlsRefs of {| audioElementRef: HtmlRef; buttonElementRef: HtmlRef; playerControlsComp: Component |}
+    | GotPlayerControlsRefs of {| audioElementRef: HtmlRef; playerControlsComp: Component |}
     | GotPlayerSection of HtmlRef
     | PlayerPauseButtonClickEvent | PlayerPauseInputEvent | PlayerPauseChangeEvent of HtmlRef
     | PlayerAudioLoadStartEvent | PlayerAudioMetadataLoadedEvent | PlayerAudioCanPlayEvent | PlayerAudioEndedEvent

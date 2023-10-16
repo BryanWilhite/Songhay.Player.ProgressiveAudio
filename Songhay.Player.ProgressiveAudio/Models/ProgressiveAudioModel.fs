@@ -24,7 +24,6 @@ type ProgressiveAudioModel =
                           jsRuntime: IJSRuntime
                           sectionElementRef: HtmlRef option
                           audioElementRef: HtmlRef option
-                          buttonElementRef: HtmlRef option
                           playerControlsComp: Component option
                         |}
         /// <summary>returns <c>true</c> when the event of the same name fires for the <c>audio</c> element</summary>
@@ -62,7 +61,6 @@ type ProgressiveAudioModel =
                                jsRuntime = jsRuntime
                                sectionElementRef = None
                                audioElementRef = None
-                               buttonElementRef = None
                                playerControlsComp = None
                             |}
             canPlay = false 
@@ -86,7 +84,6 @@ type ProgressiveAudioModel =
     static member updateModel (message: ProgressiveAudioMessage) (model: ProgressiveAudioModel) =
         let dotNetObjectReference() = DotNetObjectReference.Create(model.blazorServices.playerControlsComp.Value)
 
-        let button() = model.blazorServices.buttonElementRef.Value |> tryGetElementReference |> Result.valueOr raise
         let audio() = model.blazorServices.audioElementRef.Value |> tryGetElementReference |> Result.valueOr raise
 
         let handleInputChange (htmlRef: HtmlRef) =
@@ -94,7 +91,7 @@ type ProgressiveAudioModel =
             model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropSetAudioCurrentTime, elementRef, audio())
 
         let handleMeta() =
-            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropHandleMetadataLoaded, dotNetObjectReference(), button(), audio())
+            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropHandleMetadataLoaded, dotNetObjectReference(), audio())
 
         let load (uri: Uri) =
             let htmlRef = model.blazorServices.audioElementRef.Value
@@ -102,10 +99,10 @@ type ProgressiveAudioModel =
             model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropLoadTrack, elementRef, uri.AbsoluteUri)
 
         let pause() =
-            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropStopAnimation, dotNetObjectReference(), button(), audio())
+            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropStopAnimation, dotNetObjectReference(), audio())
 
         let play() =
-            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropStartAnimation, dotNetObjectReference(), button(), audio())
+            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropStartAnimation, dotNetObjectReference(), audio())
 
         match message with
         | GetPlayerManifest _ -> { model with presentation = None }
@@ -116,7 +113,6 @@ type ProgressiveAudioModel =
                                               jsRuntime = model.blazorServices.jsRuntime
                                               sectionElementRef = sectionElementRef |> Some
                                               audioElementRef = model.blazorServices.audioElementRef
-                                              buttonElementRef = model.blazorServices.buttonElementRef
                                               playerControlsComp = model.blazorServices.playerControlsComp
                                             |}
             }
@@ -127,7 +123,6 @@ type ProgressiveAudioModel =
                                               jsRuntime = model.blazorServices.jsRuntime
                                               sectionElementRef = model.blazorServices.sectionElementRef
                                               audioElementRef = bag.audioElementRef |> Some
-                                              buttonElementRef = bag.buttonElementRef |> Some
                                               playerControlsComp = bag.playerControlsComp |> Some
                                             |}
             }
