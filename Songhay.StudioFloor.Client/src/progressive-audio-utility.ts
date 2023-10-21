@@ -42,8 +42,11 @@ export class ProgressiveAudioUtility {
     }
 
     // noinspection JSUnusedGlobalSymbols
-    static startPlayAnimation(instance: DotNet.DotNetObject, audio: HTMLAudioElement | null) : void {
+    static async startPlayAnimationAsync(instance: DotNet.DotNetObject, audio: HTMLAudioElement | null) : Promise<void> {
         const fps: number = 1; // frames per second
+
+        if(audio && audio.readyState > 2 && audio.paused) { await audio.play(); }
+        else { console.error("The audio could not play!", {audio}); }
 
         ProgressiveAudioUtility.playAnimation = WindowAnimation.registerAndGenerate(fps, async _ => {
 

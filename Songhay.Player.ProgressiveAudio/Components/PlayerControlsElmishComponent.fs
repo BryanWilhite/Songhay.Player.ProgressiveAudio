@@ -27,14 +27,15 @@ type PlayerControlsElmishComponent() =
     let inputRangeElementRef = HtmlRef()
 
     /// <summary>the <c>div.controls</c> element</summary>
-    let playPauseBlock model dispatch =
+    let rec playPauseBlock model dispatch =
+
         div {
             [ "controls"; elementIsFlex; AlignCentered.CssClass ] |> CssClasses.toHtmlClassFromList
             attr.id "play-pause-block"
 
             button {
-                on.click (fun _ -> dispatch PlayerPauseButtonClickEvent)
-                attr.disabled <| model.canPlay
+                on.click (fun _ -> dispatch PlayerPauseOrPlayButtonClickEvent)
+                attr.disabled <| not model.canPlay
                 svg {
                     "xmlns" => SvgUri
                     "fill" => "currentColor"
@@ -48,9 +49,9 @@ type PlayerControlsElmishComponent() =
 
             input {
                 m (L, L1) |> CssClasses.toHtmlClass
-                on.change (fun _ -> dispatch <| PlayerPauseChangeEvent inputRangeElementRef)
-                on.input (fun _ -> dispatch PlayerPauseInputEvent)
-                attr.disabled <| model.canPlay
+                on.change (fun _ -> dispatch <| PlayerInputRangeChangeEvent inputRangeElementRef)
+                on.input (fun _ -> dispatch PlayerInputRangeInputEvent)
+                attr.disabled <| not model.canPlay
                 attr.id "play-pause-range"
                 attr.``type`` "range"
                 attr.max model.playingDuration

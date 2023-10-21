@@ -38,17 +38,25 @@ export class ProgressiveAudioUtility {
         }
     }
     // noinspection JSUnusedGlobalSymbols
-    static startPlayAnimation(instance, audio) {
-        const fps = 1; // frames per second
-        ProgressiveAudioUtility.playAnimation = WindowAnimation.registerAndGenerate(fps, (_) => __awaiter(this, void 0, void 0, function* () {
-            if (audio === null || audio === void 0 ? void 0 : audio.ended) {
-                audio.currentTime = 0;
-                yield ProgressiveAudioUtility.stopPlayAnimationAsync(instance, audio);
-                return;
+    static startPlayAnimationAsync(instance, audio) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const fps = 1; // frames per second
+            if (audio && audio.readyState > 2 && audio.paused) {
+                yield audio.play();
             }
-            yield ProgressiveAudioUtility.invokeDotNetMethodAsync(instance, audio);
-        }));
-        WindowAnimation.animate();
+            else {
+                console.error("The audio could not play!", { audio });
+            }
+            ProgressiveAudioUtility.playAnimation = WindowAnimation.registerAndGenerate(fps, (_) => __awaiter(this, void 0, void 0, function* () {
+                if (audio === null || audio === void 0 ? void 0 : audio.ended) {
+                    audio.currentTime = 0;
+                    yield ProgressiveAudioUtility.stopPlayAnimationAsync(instance, audio);
+                    return;
+                }
+                yield ProgressiveAudioUtility.invokeDotNetMethodAsync(instance, audio);
+            }));
+            WindowAnimation.animate();
+        });
     }
     static stopPlayAnimationAsync(instance, audio) {
         var _a, _b;

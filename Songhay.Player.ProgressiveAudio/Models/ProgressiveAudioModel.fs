@@ -35,6 +35,8 @@ type ProgressiveAudioModel =
         error: string option
         /// <summary>returns <c>true</c> when the credits modal is visible</summary>
         isCreditsModalVisible: bool
+        /// <summary>returns <c>true</c> when the <see cref="Presentation"/> is loading (after playlist is clicked)</summary>
+        isLoadingAfterPlaylistIsClicked: bool
         /// <summary>returns <c>true</c> when the <see cref="Presentation"/> is playing</summary>
         isPlaying: bool
         /// <summary>the latest value of <see cref="PlayerAnimationTickData.audioCurrentTime"/></summary>
@@ -67,6 +69,7 @@ type ProgressiveAudioModel =
             currentPlaylistItem = None
             error = None
             isCreditsModalVisible = false
+            isLoadingAfterPlaylistIsClicked = false 
             isPlaying = false
             playingDuration = 0m
             playingDurationDisplay = "00:00"
@@ -144,18 +147,26 @@ type ProgressiveAudioModel =
                     return playList |> List.head
                 }
 
-            { model with
+            {
+                model with
                     presentation = presentationOption
                     presentationKey = data |> fst |> Some 
-                    currentPlaylistItem = currentItem }
+                    currentPlaylistItem = currentItem
+            }
 
         | PlayerAudioCanPlayEvent ->
-            play() |> ignore
-            { model with canPlay = true; isPlaying = true }
+            if model.isLoadingAfterPlaylistIsClicked && not model.isPlaying then
+                play() |> ignore
+                {
+                    model with
+                        canPlay = true
+                        isLoadingAfterPlaylistIsClicked = false
+                        isPlaying = true 
+                }
+            else
+                { model with canPlay = true }
 
-        | PlayerAudioLoadStartEvent ->
-            model.blazorServices.jsRuntime |> consoleInfoAsync [| nameof PlayerAudioLoadStartEvent |] |> ignore
-            model
+        | PlayerAudioLoadStartEvent -> model
 
         | PlayerAudioMetadataLoadedEvent ->
             handleMeta() |> ignore
@@ -163,16 +174,18 @@ type ProgressiveAudioModel =
 
         | PlayerAudioEndedEvent -> { model with isPlaying = false }
 
-        | PlayerPauseButtonClickEvent ->
+        | PlayerPauseOrPlayButtonClickEvent ->
             if model.isPlaying then pause() |> ignore
             else
                 if model.canPlay then
                     play() |> ignore
                 else
+                    model.blazorServices.jsRuntime |> consoleWarnAsync [| "player cannot play!" |] |> ignore
                     ()
+
             { model with isPlaying = not model.isPlaying }
 
-        | PlayerPauseInputEvent ->
+        | PlayerInputRangeInputEvent ->
             task {
                 do! pause()
                 do! handleMeta()
@@ -180,7 +193,7 @@ type ProgressiveAudioModel =
 
             { model with isPlaying = false }
 
-        | PlayerPauseChangeEvent inputRef ->
+        | PlayerInputRangeChangeEvent inputRef ->
             task {
                 do! handleInputChange inputRef
                 if model.canPlay then
@@ -206,9 +219,17 @@ type ProgressiveAudioModel =
         | PlaylistClick (txt, uri) ->
             load uri |> ignore
 
-            { model with currentPlaylistItem = (txt, uri) |> Some; canPlay = false;  isPlaying = false }
+            {
+                model with
+                    currentPlaylistItem = (txt, uri) |> Some
+                    canPlay = false
+                    isLoadingAfterPlaylistIsClicked = true 
+                    isPlaying = false
+            }
 
-        | PlayerError exn -> { model with error = Some exn.Message }
+        | PlayerError exn ->
+            model.blazorServices.jsRuntime |> consoleErrorAsync [| "player error!"; $"{message.StringValue}"; exn |] |> ignore
+            { model with error = Some exn.Message }
 
     /// <summary>
     /// Chooses any <see cref="RoleCredit"/> list of the current <see cref="Presentation"/>.

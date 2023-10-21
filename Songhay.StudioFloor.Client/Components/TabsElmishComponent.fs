@@ -35,7 +35,6 @@ type TabsElmishComponent() =
     override this.ShouldRender(oldModel, newModel) =
         oldModel.page <> newModel.page
         || oldModel.readMeData <> newModel.readMeData
-        || oldModel.paModel.error <> newModel.paModel.error
         || oldModel.paModel <> newModel.paModel
 
     override this.View model dispatch =

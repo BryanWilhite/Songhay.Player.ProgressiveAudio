@@ -15,7 +15,7 @@ type ProgressiveAudioMessage =
     | GetPlayerManifest of string | GotPlayerManifest of (Identifier * Presentation option)
     | GotPlayerControlsRefs of {| audioElementRef: HtmlRef; playerControlsComp: Component |}
     | GotPlayerSection of HtmlRef
-    | PlayerPauseButtonClickEvent | PlayerPauseInputEvent | PlayerPauseChangeEvent of HtmlRef
+    | PlayerPauseOrPlayButtonClickEvent | PlayerInputRangeInputEvent | PlayerInputRangeChangeEvent of HtmlRef
     | PlayerAudioLoadStartEvent | PlayerAudioMetadataLoadedEvent | PlayerAudioCanPlayEvent | PlayerAudioEndedEvent
     | PlayerAnimationTick of PlayerAnimationTickData
     | PlayerCreditsClick
@@ -34,5 +34,4 @@ type ProgressiveAudioMessage =
         failureMsg
 
     /// <summary>The <see cref="string"/> representation of this instance.</summary>
-    override this.ToString() =
-        $"{nameof ProgressiveAudioMessage}.{this.ToString()}"
+    member this.StringValue = $"{nameof ProgressiveAudioMessage}.{this}"

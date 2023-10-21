@@ -31,7 +31,7 @@ module ProgressiveAudioScalars =
     let rxProgressiveAudioInteropSetAudioCurrentTime = $"{rx}.ProgressiveAudioUtility.setAudioCurrentTime"
 
     /// <summary> conventional scalar </summary>
-    let rxProgressiveAudioInteropStartAnimation = $"{rx}.ProgressiveAudioUtility.startPlayAnimation"
+    let rxProgressiveAudioInteropStartAnimation = $"{rx}.ProgressiveAudioUtility.startPlayAnimationAsync"
 
     /// <summary> conventional scalar </summary>
     let rxProgressiveAudioInteropStopAnimation = $"{rx}.ProgressiveAudioUtility.stopPlayAnimationAsync"
