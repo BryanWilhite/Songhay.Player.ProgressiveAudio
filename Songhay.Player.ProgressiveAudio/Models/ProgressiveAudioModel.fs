@@ -155,6 +155,7 @@ type ProgressiveAudioModel =
             }
 
         | PlayerAudioCanPlayEvent ->
+            model.blazorServices.jsRuntime |> consoleWarnAsync [| $"{message.StringValue}" |] |> ignore
             if model.isLoadingAfterPlaylistIsClicked && not model.isPlaying then
                 play() |> ignore
                 {
@@ -166,13 +167,18 @@ type ProgressiveAudioModel =
             else
                 { model with canPlay = true }
 
-        | PlayerAudioLoadStartEvent -> model
+        | PlayerAudioLoadStartEvent ->
+            model.blazorServices.jsRuntime |> consoleWarnAsync [| $"{message.StringValue}" |] |> ignore
+            model
 
         | PlayerAudioMetadataLoadedEvent ->
+            model.blazorServices.jsRuntime |> consoleWarnAsync [| $"{message.StringValue}" |] |> ignore
             handleMeta() |> ignore
             model
 
-        | PlayerAudioEndedEvent -> { model with isPlaying = false }
+        | PlayerAudioEndedEvent ->
+            model.blazorServices.jsRuntime |> consoleWarnAsync [| $"{message.StringValue}" |] |> ignore
+            { model with isPlaying = false }
 
         | PlayerPauseOrPlayButtonClickEvent ->
             if model.isPlaying then pause() |> ignore
