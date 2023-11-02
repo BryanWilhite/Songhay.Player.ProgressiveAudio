@@ -38,19 +38,58 @@ export class ProgressiveAudioUtility {
     }
 
     static setAudioCurrentTime(input: HTMLInputElement | null, audio: HTMLAudioElement | null) : void {
-        if(audio && input) { audio.currentTime = parseFloat(input.value); }
+        if(audio && input) {
+            audio.pause();
+            audio.currentTime = parseFloat(input.value);
+            audio.dataset.hasSetCurrentTime = 'yes';
+        }
+        console.info('setAudioCurrentTime',
+            {
+                readyState: audio?.readyState,
+                paused: audio?.paused,
+                currentTime: audio?.currentTime,
+                hasSetCurrentTime: audio?.dataset.hasSetCurrentTime,
+                inputValue: input?.value
+            }
+        );
     }
 
     // noinspection JSUnusedGlobalSymbols
     static async startPlayAnimationAsync(instance: DotNet.DotNetObject, audio: HTMLAudioElement | null) : Promise<void> {
         const fps: number = 1; // frames per second
 
-        if(audio && audio.readyState > 2 && audio.paused) { await audio.play(); }
-        else { console.error("The audio could not play!", {audio}); }
+        if(audio && audio.readyState > 2 && audio.paused) {
+            await audio.play();
+        }
+        else if (audio && audio.dataset.hasSetCurrentTime === 'yes') {
+            await audio.play();
+            audio.dataset.hasSetCurrentTime = 'no';
+            console.info('startPlayAnimationAsync',
+                {
+                    readyState: audio?.readyState,
+                    paused: audio?.paused,
+                    currentTime: audio?.currentTime,
+                    hasSetCurrentTime: audio?.dataset.hasSetCurrentTime,
+                    audio
+                }
+            );
+        }
+        else {
+            console.error('The audio could not play!',
+                'startPlayAnimationAsync',
+                {
+                    readyState: audio?.readyState,
+                    paused: audio?.paused,
+                    currentTime: audio?.currentTime,
+                    hasSetCurrentTime: audio?.dataset.hasSetCurrentTime,
+                    audio
+                }
+            );
+        }
 
         ProgressiveAudioUtility.playAnimation = WindowAnimation.registerAndGenerate(fps, async _ => {
 
-            if(audio?.ended) {
+            if(audio?.ended) { console.warn('ended?');
                 audio.currentTime = 0;
 
                 await ProgressiveAudioUtility.stopPlayAnimationAsync(instance, audio);
@@ -71,5 +110,15 @@ export class ProgressiveAudioUtility {
         await ProgressiveAudioUtility.invokeDotNetMethodAsync(instance, audio);
 
         WindowAnimation.cancelAnimation(ProgressiveAudioUtility.playAnimation?.id ?? undefined);
+
+        console.info('stopPlayAnimationAsync',
+            {
+                readyState: audio?.readyState,
+                paused: audio?.paused,
+                currentTime: audio?.currentTime,
+                hasSetCurrentTime: audio?.dataset.hasSetCurrentTime,
+                audio
+            }
+        );
     }
 }

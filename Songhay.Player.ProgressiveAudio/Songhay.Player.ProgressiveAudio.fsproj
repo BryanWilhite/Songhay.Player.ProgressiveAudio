@@ -16,6 +16,7 @@
       <Compile Include="ProgressiveAudioPresentationUtility.fs" />
       <Compile Include="Models\PlayerAnimationTickData.fs" />
       <Compile Include="Models\ProgressiveAudioMessage.fs" />
+      <Compile Include="Models\ProgressiveAudioState.fs" />
       <Compile Include="Models\ProgressiveAudioModel.fs" />
       <Compile Include="Models\ProgressiveAudioSvgPrimitives.fs" />
       <Compile Include="Components\PlayerTitleComponent.fs" />

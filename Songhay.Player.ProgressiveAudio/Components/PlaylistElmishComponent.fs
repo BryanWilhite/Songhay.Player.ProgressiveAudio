@@ -34,7 +34,7 @@ type PlaylistElmishComponent() =
                             a {
                                 [
                                     fontSize Size7
-                                    if not model.canPlay then "anchor-disabled"
+                                    if not (model.presentationStates.hasState CanPlay) then "anchor-disabled"
                                 ] |> CssClasses.toHtmlClassFromList
 
                                 on.click (fun _ -> dispatch <| PlaylistClick (txt, uri))

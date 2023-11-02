@@ -34,8 +34,17 @@ export class ProgressiveAudioUtility {
     }
     static setAudioCurrentTime(input, audio) {
         if (audio && input) {
+            audio.pause();
             audio.currentTime = parseFloat(input.value);
+            audio.dataset.hasSetCurrentTime = 'yes';
         }
+        console.info('setAudioCurrentTime', {
+            readyState: audio === null || audio === void 0 ? void 0 : audio.readyState,
+            paused: audio === null || audio === void 0 ? void 0 : audio.paused,
+            currentTime: audio === null || audio === void 0 ? void 0 : audio.currentTime,
+            hasSetCurrentTime: audio === null || audio === void 0 ? void 0 : audio.dataset.hasSetCurrentTime,
+            inputValue: input === null || input === void 0 ? void 0 : input.value
+        });
     }
     // noinspection JSUnusedGlobalSymbols
     static startPlayAnimationAsync(instance, audio) {
@@ -44,11 +53,29 @@ export class ProgressiveAudioUtility {
             if (audio && audio.readyState > 2 && audio.paused) {
                 yield audio.play();
             }
+            else if (audio && audio.dataset.hasSetCurrentTime === 'yes') {
+                yield audio.play();
+                audio.dataset.hasSetCurrentTime = 'no';
+                console.info('startPlayAnimationAsync', {
+                    readyState: audio === null || audio === void 0 ? void 0 : audio.readyState,
+                    paused: audio === null || audio === void 0 ? void 0 : audio.paused,
+                    currentTime: audio === null || audio === void 0 ? void 0 : audio.currentTime,
+                    hasSetCurrentTime: audio === null || audio === void 0 ? void 0 : audio.dataset.hasSetCurrentTime,
+                    audio
+                });
+            }
             else {
-                console.error("The audio could not play!", { audio });
+                console.error('The audio could not play!', 'startPlayAnimationAsync', {
+                    readyState: audio === null || audio === void 0 ? void 0 : audio.readyState,
+                    paused: audio === null || audio === void 0 ? void 0 : audio.paused,
+                    currentTime: audio === null || audio === void 0 ? void 0 : audio.currentTime,
+                    hasSetCurrentTime: audio === null || audio === void 0 ? void 0 : audio.dataset.hasSetCurrentTime,
+                    audio
+                });
             }
             ProgressiveAudioUtility.playAnimation = WindowAnimation.registerAndGenerate(fps, (_) => __awaiter(this, void 0, void 0, function* () {
                 if (audio === null || audio === void 0 ? void 0 : audio.ended) {
+                    console.warn('ended?');
                     audio.currentTime = 0;
                     yield ProgressiveAudioUtility.stopPlayAnimationAsync(instance, audio);
                     return;
@@ -66,6 +93,13 @@ export class ProgressiveAudioUtility {
             }
             yield ProgressiveAudioUtility.invokeDotNetMethodAsync(instance, audio);
             WindowAnimation.cancelAnimation((_b = (_a = ProgressiveAudioUtility.playAnimation) === null || _a === void 0 ? void 0 : _a.id) !== null && _b !== void 0 ? _b : undefined);
+            console.info('stopPlayAnimationAsync', {
+                readyState: audio === null || audio === void 0 ? void 0 : audio.readyState,
+                paused: audio === null || audio === void 0 ? void 0 : audio.paused,
+                currentTime: audio === null || audio === void 0 ? void 0 : audio.currentTime,
+                hasSetCurrentTime: audio === null || audio === void 0 ? void 0 : audio.dataset.hasSetCurrentTime,
+                audio
+            });
         });
     }
 }

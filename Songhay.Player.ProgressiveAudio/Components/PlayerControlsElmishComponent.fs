@@ -35,13 +35,13 @@ type PlayerControlsElmishComponent() =
 
             button {
                 on.click (fun _ -> dispatch PlayerPauseOrPlayButtonClickEvent)
-                attr.disabled <| not model.canPlay
+                attr.disabled <| not (model.presentationStates.hasState CanPlay)
                 svg {
                     "xmlns" => SvgUri
                     "fill" => "currentColor"
                     "preserveAspectRatio" => "xMidYMid meet"
                     "viewBox" => "-45 -47 180 190"
-                    cond model.isPlaying <| function
+                    cond (model.presentationStates.hasState Playing) <| function
                         | true -> ProgressiveAudioSvgData.Get PAUSE.ToAlphanumeric
                         | false -> ProgressiveAudioSvgData.Get PLAY.ToAlphanumeric
                 }
@@ -51,7 +51,7 @@ type PlayerControlsElmishComponent() =
                 m (L, L1) |> CssClasses.toHtmlClass
                 on.change (fun _ -> dispatch <| PlayerInputRangeChangeEvent inputRangeElementRef)
                 on.input (fun _ -> dispatch PlayerInputRangeInputEvent)
-                attr.disabled <| not model.canPlay
+                attr.disabled <| not (model.presentationStates.hasState CanPlay)
                 attr.id "play-pause-range"
                 attr.``type`` "range"
                 attr.max model.playingDuration
@@ -93,6 +93,7 @@ type PlayerControlsElmishComponent() =
                 on.ended (fun _ -> dispatch PlayerAudioEndedEvent)
                 attr.src (if uriOption.IsSome then uriOption.Value else null)
                 attr.preload "metadata"
+                "data-has-set-current-time" => "no"
                 attr.ref audioElementRef
             }
             (model, dispatch) ||> playPauseBlock

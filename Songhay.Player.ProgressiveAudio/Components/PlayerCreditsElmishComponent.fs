@@ -71,7 +71,7 @@ type PlayerCreditsElmishComponent() =
 
         bulmaModalContainer
             NoCssClasses
-            model.isCreditsModalVisible
+            (model.presentationStates.hasState CreditsModalVisible)
             (concat {
                 bulmaModalBackground
                     (HasAttr (on.click <| fun _ -> ProgressiveAudioMessage.PlayerCreditsClick |> dispatch))

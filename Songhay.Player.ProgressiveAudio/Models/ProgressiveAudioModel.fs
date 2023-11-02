@@ -26,19 +26,10 @@ type ProgressiveAudioModel =
                           audioElementRef: HtmlRef option
                           playerControlsComp: Component option
                         |}
-        /// <summary>returns <c>true</c> when the event of the same name fires for the <c>audio</c> element</summary>
-        /// <remarks>See https://developer.mozilla.org/en-US/docs/Web/Guide/Audio_and_video_delivery/Cross-browser_audio_basics#canplay</remarks>
-        canPlay: bool
         /// <summary>current playlist item info</summary>
         currentPlaylistItem: (DisplayText * Uri) option
         /// <summary>current error text</summary>
         error: string option
-        /// <summary>returns <c>true</c> when the credits modal is visible</summary>
-        isCreditsModalVisible: bool
-        /// <summary>returns <c>true</c> when the <see cref="Presentation"/> is loading (after playlist is clicked)</summary>
-        isLoadingAfterPlaylistIsClicked: bool
-        /// <summary>returns <c>true</c> when the <see cref="Presentation"/> is playing</summary>
-        isPlaying: bool
         /// <summary>the latest value of <see cref="PlayerAnimationTickData.audioCurrentTime"/></summary>
         playingCurrentTime: decimal
         /// <summary>the latest value of <see cref="PlayerAnimationTickData.audioDuration"/></summary>
@@ -51,6 +42,8 @@ type ProgressiveAudioModel =
         presentation: Presentation option
         /// <summary>the current <see cref="Presentation"/> <see cref="Identifier"/></summary>
         presentationKey: Identifier option
+        /// <summary>defines the <see cref="ProgressiveAudioState"/> collection</summary>
+        presentationStates: ProgressiveAudioStates
     }
 
     /// <summary>
@@ -65,18 +58,15 @@ type ProgressiveAudioModel =
                                audioElementRef = None
                                playerControlsComp = None
                             |}
-            canPlay = false 
             currentPlaylistItem = None
             error = None
-            isCreditsModalVisible = false
-            isLoadingAfterPlaylistIsClicked = false 
-            isPlaying = false
             playingDuration = 0m
             playingDurationDisplay = "00:00"
             playingCurrentTime = 0m
             playingCurrentTimeDisplay = "00:00"
             presentation = None
-            presentationKey = None 
+            presentationKey = None
+            presentationStates = ProgressiveAudioStates.initialize
         }
 
     /// <summary>
@@ -156,16 +146,15 @@ type ProgressiveAudioModel =
 
         | PlayerAudioCanPlayEvent ->
             model.blazorServices.jsRuntime |> consoleWarnAsync [| $"{message.StringValue}" |] |> ignore
-            if model.isLoadingAfterPlaylistIsClicked && not model.isPlaying then
+
+            if model.presentationStates.hasState LoadingAfterPlaylistIsClicked && not (model.presentationStates.hasState Playing) then
                 play() |> ignore
-                {
-                    model with
-                        canPlay = true
-                        isLoadingAfterPlaylistIsClicked = false
-                        isPlaying = true 
-                }
+                model.presentationStates.addStates [CanPlay; Playing]
+                model.presentationStates.removeState LoadingAfterPlaylistIsClicked
             else
-                { model with canPlay = true }
+                model.presentationStates.addState CanPlay
+
+            model
 
         | PlayerAudioLoadStartEvent ->
             model.blazorServices.jsRuntime |> consoleWarnAsync [| $"{message.StringValue}" |] |> ignore
@@ -178,18 +167,19 @@ type ProgressiveAudioModel =
 
         | PlayerAudioEndedEvent ->
             model.blazorServices.jsRuntime |> consoleWarnAsync [| $"{message.StringValue}" |] |> ignore
-            { model with isPlaying = false }
+            model.presentationStates.removeState Playing
+            model
 
         | PlayerPauseOrPlayButtonClickEvent ->
-            if model.isPlaying then pause() |> ignore
+            if model.presentationStates.hasState Playing then pause() |> ignore
             else
-                if model.canPlay then
+                if model.presentationStates.hasState CanPlay then
                     play() |> ignore
                 else
                     model.blazorServices.jsRuntime |> consoleWarnAsync [| "player cannot play!" |] |> ignore
                     ()
-
-            { model with isPlaying = not model.isPlaying }
+            model.presentationStates.toggleState Playing
+            model
 
         | PlayerInputRangeInputEvent ->
             task {
@@ -197,41 +187,40 @@ type ProgressiveAudioModel =
                 do! handleMeta()
             } |> ignore
 
-            { model with isPlaying = false }
+            model.presentationStates.removeState Playing
+            model
 
         | PlayerInputRangeChangeEvent inputRef ->
             task {
                 do! handleInputChange inputRef
-                if model.canPlay then
-                    do! play()
-                else
-                    ()
             } |> ignore
 
-            { model with isPlaying = true }
+            model.presentationStates.addState SeekingAfterSliderDrag
+            model
 
         | PlayerAnimationTick data ->
+            if data.audioReadyState > 2 // `HAVE_FUTURE_DATA` or `HAVE_ENOUGH_DATA`
+            then model.presentationStates.addState CanPlay
+
             {
                 model with
-                    canPlay = data.audioReadyState > 2 // `HAVE_FUTURE_DATA` or `HAVE_ENOUGH_DATA`
                     playingCurrentTime = data.audioCurrentTime
                     playingCurrentTimeDisplay = data.audioCurrentTime |> getTimeDisplayText
                     playingDuration = data.audioDuration |> Math.Floor
                     playingDurationDisplay = data.audioDuration |> getTimeDisplayText 
             }
 
-        | PlayerCreditsClick -> { model with isCreditsModalVisible = not model.isCreditsModalVisible }
+        | PlayerCreditsClick ->
+            model.presentationStates.toggleState CreditsModalVisible
+            model
 
         | PlaylistClick (txt, uri) ->
             load uri |> ignore
 
-            {
-                model with
-                    currentPlaylistItem = (txt, uri) |> Some
-                    canPlay = false
-                    isLoadingAfterPlaylistIsClicked = true 
-                    isPlaying = false
-            }
+            model.presentationStates.removeStates [CanPlay; Playing]
+            model.presentationStates.addState LoadingAfterPlaylistIsClicked
+
+            { model with currentPlaylistItem = (txt, uri) |> Some }
 
         | PlayerError exn ->
             model.blazorServices.jsRuntime |> consoleErrorAsync [| "player error!"; $"{message.StringValue}"; exn |] |> ignore
