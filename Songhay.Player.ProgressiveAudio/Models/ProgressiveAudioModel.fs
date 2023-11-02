@@ -147,10 +147,21 @@ type ProgressiveAudioModel =
         | PlayerAudioCanPlayEvent ->
             model.blazorServices.jsRuntime |> consoleWarnAsync [| $"{message.StringValue}" |] |> ignore
 
-            if model.presentationStates.hasState LoadingAfterPlaylistIsClicked && not (model.presentationStates.hasState Playing) then
+            let autoplay =
+                not (model.presentationStates.hasState Playing)
+                &&
+                (
+                    model.presentationStates.hasState LoadingAfterPlaylistIsClicked
+                    ||
+                    model.presentationStates.hasState SeekingAfterSliderDrag
+                )
+
+            if autoplay then
                 play() |> ignore
+
                 model.presentationStates.addStates [CanPlay; Playing]
                 model.presentationStates.removeState LoadingAfterPlaylistIsClicked
+                model.presentationStates.removeState SeekingAfterSliderDrag
             else
                 model.presentationStates.addState CanPlay
 
