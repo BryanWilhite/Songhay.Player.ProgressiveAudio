@@ -33,9 +33,12 @@ type TabsElmishComponent() =
         ecomp<TabsElmishComponent, _, _> model dispatch { attr.empty() }
 
     override this.ShouldRender(oldModel, newModel) =
-        oldModel.page <> newModel.page
-        || oldModel.readMeData <> newModel.readMeData
-        || oldModel.paModel <> newModel.paModel
+        let shouldRender =
+            oldModel.page <> newModel.page
+            || oldModel.readMeData <> newModel.readMeData
+            || oldModel.paModel <> newModel.paModel
+
+        shouldRender
 
     override this.View model dispatch =
         concat {

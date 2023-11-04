@@ -39,7 +39,6 @@ export class ProgressiveAudioUtility {
 
     static setAudioCurrentTime(input: HTMLInputElement | null, audio: HTMLAudioElement | null) : void {
         if(audio && input) {
-            audio.pause();
             audio.currentTime = parseFloat(input.value);
             audio.dataset.hasSetCurrentTime = 'yes';
         }

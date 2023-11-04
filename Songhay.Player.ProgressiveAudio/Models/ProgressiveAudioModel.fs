@@ -43,7 +43,7 @@ type ProgressiveAudioModel =
         /// <summary>the current <see cref="Presentation"/> <see cref="Identifier"/></summary>
         presentationKey: Identifier option
         /// <summary>defines the <see cref="ProgressiveAudioState"/> collection</summary>
-        presentationStates: ProgressiveAudioStates
+        presentationStates: AppStateSet<ProgressiveAudioState>
     }
 
     /// <summary>
@@ -66,7 +66,7 @@ type ProgressiveAudioModel =
             playingCurrentTimeDisplay = "00:00"
             presentation = None
             presentationKey = None
-            presentationStates = ProgressiveAudioStates.initialize
+            presentationStates = AppStates Set.empty
         }
 
     /// <summary>
@@ -145,7 +145,6 @@ type ProgressiveAudioModel =
             }
 
         | PlayerAudioCanPlayEvent ->
-            model.blazorServices.jsRuntime |> consoleWarnAsync [| $"{message.StringValue}" |] |> ignore
 
             let autoplay =
                 not (model.presentationStates.hasState Playing)
@@ -156,16 +155,21 @@ type ProgressiveAudioModel =
                     model.presentationStates.hasState SeekingAfterSliderDrag
                 )
 
+            model.blazorServices.jsRuntime
+            |> consoleWarnAsync [| $"{message.StringValue}"; $"{nameof autoplay}: {autoplay}" |] |> ignore
+
             if autoplay then
                 play() |> ignore
 
-                model.presentationStates.addStates [CanPlay; Playing]
-                model.presentationStates.removeState LoadingAfterPlaylistIsClicked
-                model.presentationStates.removeState SeekingAfterSliderDrag
+                {
+                    model with
+                        presentationStates = model
+                                                 .presentationStates
+                                                 .addStates(CanPlay, Playing)
+                                                 .removeStates(LoadingAfterPlaylistIsClicked, SeekingAfterSliderDrag)
+                }
             else
-                model.presentationStates.addState CanPlay
-
-            model
+                { model with presentationStates = model.presentationStates.addState CanPlay }
 
         | PlayerAudioLoadStartEvent ->
             model.blazorServices.jsRuntime |> consoleWarnAsync [| $"{message.StringValue}" |] |> ignore
@@ -178,19 +182,20 @@ type ProgressiveAudioModel =
 
         | PlayerAudioEndedEvent ->
             model.blazorServices.jsRuntime |> consoleWarnAsync [| $"{message.StringValue}" |] |> ignore
-            model.presentationStates.removeState Playing
-            model
+
+            { model with presentationStates = model.presentationStates.removeState Playing }
 
         | PlayerPauseOrPlayButtonClickEvent ->
-            if model.presentationStates.hasState Playing then pause() |> ignore
-            else
-                if model.presentationStates.hasState CanPlay then
-                    play() |> ignore
+            task {
+                if model.presentationStates.hasState Playing then do! pause()
                 else
-                    model.blazorServices.jsRuntime |> consoleWarnAsync [| "player cannot play!" |] |> ignore
-                    ()
-            model.presentationStates.toggleState Playing
-            model
+                    if model.presentationStates.hasState CanPlay then
+                        do! play()
+                    else
+                        do! model.blazorServices.jsRuntime |> consoleWarnAsync [| "player cannot play!" |]
+            } |> ignore
+
+            { model with presentationStates = model.presentationStates.toggleState Playing }
 
         | PlayerInputRangeInputEvent ->
             task {
@@ -198,40 +203,42 @@ type ProgressiveAudioModel =
                 do! handleMeta()
             } |> ignore
 
-            model.presentationStates.removeState Playing
-            model
+            { model with presentationStates = model.presentationStates.removeState Playing }
 
         | PlayerInputRangeChangeEvent inputRef ->
             task {
                 do! handleInputChange inputRef
             } |> ignore
 
-            model.presentationStates.addState SeekingAfterSliderDrag
-            model
+            { model with presentationStates = model.presentationStates.addState SeekingAfterSliderDrag }
 
         | PlayerAnimationTick data ->
-            if data.audioReadyState > 2 // `HAVE_FUTURE_DATA` or `HAVE_ENOUGH_DATA`
-            then model.presentationStates.addState CanPlay
 
             {
                 model with
                     playingCurrentTime = data.audioCurrentTime
                     playingCurrentTimeDisplay = data.audioCurrentTime |> getTimeDisplayText
                     playingDuration = data.audioDuration |> Math.Floor
-                    playingDurationDisplay = data.audioDuration |> getTimeDisplayText 
+                    playingDurationDisplay = data.audioDuration |> getTimeDisplayText
+                    presentationStates =
+                        if data.audioReadyState > 2 // `HAVE_FUTURE_DATA` or `HAVE_ENOUGH_DATA`
+                        then model.presentationStates.addState CanPlay
+                        else model.presentationStates
             }
 
         | PlayerCreditsClick ->
-            model.presentationStates.toggleState CreditsModalVisible
-            model
+            { model with presentationStates = model.presentationStates.toggleState CreditsModalVisible }
 
         | PlaylistClick (txt, uri) ->
             load uri |> ignore
 
-            model.presentationStates.removeStates [CanPlay; Playing]
-            model.presentationStates.addState LoadingAfterPlaylistIsClicked
-
-            { model with currentPlaylistItem = (txt, uri) |> Some }
+            {
+                model with
+                    currentPlaylistItem = (txt, uri) |> Some
+                    presentationStates = model.presentationStates
+                                             .removeStates(CanPlay, Playing)
+                                             .addState LoadingAfterPlaylistIsClicked
+            }
 
         | PlayerError exn ->
             model.blazorServices.jsRuntime |> consoleErrorAsync [| "player error!"; $"{message.StringValue}"; exn |] |> ignore
