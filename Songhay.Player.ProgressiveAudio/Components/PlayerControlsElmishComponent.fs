@@ -93,7 +93,6 @@ type PlayerControlsElmishComponent() =
                 on.ended (fun _ -> dispatch PlayerAudioEndedEvent)
                 attr.src (if uriOption.IsSome then uriOption.Value else null)
                 attr.preload "metadata"
-                "data-has-set-current-time" => "no"
                 attr.ref audioElementRef
             }
             (model, dispatch) ||> playPauseBlock

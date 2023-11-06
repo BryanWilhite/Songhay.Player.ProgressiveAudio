@@ -40,17 +40,18 @@ export class ProgressiveAudioUtility {
     static setAudioCurrentTime(input: HTMLInputElement | null, audio: HTMLAudioElement | null) : void {
         if(audio && input) {
             audio.currentTime = parseFloat(input.value);
-            audio.dataset.hasSetCurrentTime = 'yes';
         }
-        console.info('setAudioCurrentTime',
-            {
-                readyState: audio?.readyState,
-                paused: audio?.paused,
-                currentTime: audio?.currentTime,
-                hasSetCurrentTime: audio?.dataset.hasSetCurrentTime,
-                inputValue: input?.value
-            }
-        );
+        if(audio?.currentTime === 0)
+        {
+            console.info('setAudioCurrentTime',
+                {
+                    readyState: audio?.readyState,
+                    paused: audio?.paused,
+                    currentTime: audio?.currentTime,
+                    inputValue: input?.value
+                }
+            );
+        }
     }
 
     // noinspection JSUnusedGlobalSymbols
@@ -59,19 +60,6 @@ export class ProgressiveAudioUtility {
 
         if(audio && audio.readyState > 2 && audio.paused) {
             await audio.play();
-        }
-        else if (audio && audio.dataset.hasSetCurrentTime === 'yes') {
-            await audio.play();
-            audio.dataset.hasSetCurrentTime = 'no';
-            console.info('startPlayAnimationAsync',
-                {
-                    readyState: audio?.readyState,
-                    paused: audio?.paused,
-                    currentTime: audio?.currentTime,
-                    hasSetCurrentTime: audio?.dataset.hasSetCurrentTime,
-                    audio
-                }
-            );
         }
         else {
             console.error('The audio could not play!',
@@ -115,7 +103,6 @@ export class ProgressiveAudioUtility {
                 readyState: audio?.readyState,
                 paused: audio?.paused,
                 currentTime: audio?.currentTime,
-                hasSetCurrentTime: audio?.dataset.hasSetCurrentTime,
                 audio
             }
         );
