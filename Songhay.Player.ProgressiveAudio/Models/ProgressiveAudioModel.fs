@@ -64,7 +64,7 @@ type ProgressiveAudioModel =
             playingCurrentTimeDisplay = "00:00"
             presentation = None
             presentationKey = None
-            presentationStates = AppStateSet.initialize
+            presentationStates = AppStates Set.empty
         }
 
     /// <summary>

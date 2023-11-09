@@ -1164,15 +1164,15 @@ class ProgressiveAudioUtility {
         const audio = this.getCurrentAudioElement();
         if (audio && input) {
             audio.currentTime = parseFloat(input.value);
+            audio.dataset.hasSetCurrentTime = 'yes';
         }
-        if ((audio === null || audio === void 0 ? void 0 : audio.currentTime) === 0) {
-            console.info('setAudioCurrentTime', {
-                readyState: audio === null || audio === void 0 ? void 0 : audio.readyState,
-                paused: audio === null || audio === void 0 ? void 0 : audio.paused,
-                currentTime: audio === null || audio === void 0 ? void 0 : audio.currentTime,
-                inputValue: input === null || input === void 0 ? void 0 : input.value
-            });
-        }
+        console.info('setAudioCurrentTime', {
+            readyState: audio === null || audio === void 0 ? void 0 : audio.readyState,
+            paused: audio === null || audio === void 0 ? void 0 : audio.paused,
+            currentTime: audio === null || audio === void 0 ? void 0 : audio.currentTime,
+            hasSetCurrentTime: audio === null || audio === void 0 ? void 0 : audio.dataset.hasSetCurrentTime,
+            inputValue: input === null || input === void 0 ? void 0 : input.value
+        });
     }
     // noinspection JSUnusedGlobalSymbols
     static startPlayAnimationAsync(instance) {
@@ -1181,6 +1181,17 @@ class ProgressiveAudioUtility {
             const fps = 1; // frames per second
             if (audio && audio.readyState > 2 && audio.paused) {
                 yield audio.play();
+            }
+            else if (audio && audio.dataset.hasSetCurrentTime === 'yes') {
+                yield audio.play();
+                audio.dataset.hasSetCurrentTime = 'no';
+                console.info('startPlayAnimationAsync', {
+                    readyState: audio === null || audio === void 0 ? void 0 : audio.readyState,
+                    paused: audio === null || audio === void 0 ? void 0 : audio.paused,
+                    currentTime: audio === null || audio === void 0 ? void 0 : audio.currentTime,
+                    hasSetCurrentTime: audio === null || audio === void 0 ? void 0 : audio.dataset.hasSetCurrentTime,
+                    audio
+                });
             }
             else {
                 console.error('The audio could not play!', 'startPlayAnimationAsync', {
@@ -1216,6 +1227,7 @@ class ProgressiveAudioUtility {
                 readyState: audio === null || audio === void 0 ? void 0 : audio.readyState,
                 paused: audio === null || audio === void 0 ? void 0 : audio.paused,
                 currentTime: audio === null || audio === void 0 ? void 0 : audio.currentTime,
+                hasSetCurrentTime: audio === null || audio === void 0 ? void 0 : audio.dataset.hasSetCurrentTime,
                 audio
             });
         });

@@ -20,6 +20,9 @@ open Songhay.Player.ProgressiveAudio.Models
 type PlayerControlsElmishComponent() =
     inherit ElmishComponent<ProgressiveAudioModel, ProgressiveAudioMessage>()
 
+    /// <summary><see cref="HtmlRef"/> for the <c>audio</c> element in the <see cref="playPauseBlock"/></summary>
+    let audioElementRef = HtmlRef()
+
     /// <summary><see cref="HtmlRef"/> for the <c>input[type="range"]</c> element in the <see cref="playPauseBlock"/></summary>
     let inputRangeElementRef = HtmlRef()
 
@@ -83,18 +86,16 @@ type PlayerControlsElmishComponent() =
 
         div {
             attr.id "audio-player-container"
-
-            forEach model.presentationPlayList.Value <| fun (_, uri) ->
-                audio {
-                    on.loadedmetadata (fun _ -> dispatch PlayerAudioMetadataLoadedEvent)
-                    on.loadstart (fun _ -> dispatch PlayerAudioLoadStartEvent)
-                    on.canplay (fun _ -> dispatch PlayerAudioCanPlayEvent)
-                    on.ended (fun _ -> dispatch PlayerAudioEndedEvent)
-                    attr.src uri.OriginalString
-                    attr.preload "metadata"
-                    "data-track-is-active" => (uriOption.IsSome && uriOption.Value = uri)
-                }
-
+            audio {
+                on.loadedmetadata (fun _ -> dispatch PlayerAudioMetadataLoadedEvent)
+                on.loadstart (fun _ -> dispatch PlayerAudioLoadStartEvent)
+                on.canplay (fun _ -> dispatch PlayerAudioCanPlayEvent)
+                on.ended (fun _ -> dispatch PlayerAudioEndedEvent)
+                attr.src (if uriOption.IsSome then uriOption.Value else null)
+                attr.preload "metadata"
+                "data-has-set-current-time" => "no"
+                attr.ref audioElementRef
+            }
             (model, dispatch) ||> playPauseBlock
         }
 
@@ -119,7 +120,7 @@ type PlayerControlsElmishComponent() =
     override this.View model dispatch =
 
         if model.blazorServices.playerControlsComp.IsNone then
-            dispatch <| GotPlayerControlsRefs {| playerControlsComp = this |}
+            dispatch <| GotPlayerControlsRefs {| audioElementRef = audioElementRef; playerControlsComp = this |}
         else
             ()
 
