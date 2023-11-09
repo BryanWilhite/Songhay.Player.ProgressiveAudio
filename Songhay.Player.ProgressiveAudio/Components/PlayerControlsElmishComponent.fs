@@ -86,15 +86,18 @@ type PlayerControlsElmishComponent() =
 
         div {
             attr.id "audio-player-container"
-            audio {
-                on.loadedmetadata (fun _ -> dispatch PlayerAudioMetadataLoadedEvent)
-                on.loadstart (fun _ -> dispatch PlayerAudioLoadStartEvent)
-                on.canplay (fun _ -> dispatch PlayerAudioCanPlayEvent)
-                on.ended (fun _ -> dispatch PlayerAudioEndedEvent)
-                attr.src (if uriOption.IsSome then uriOption.Value else null)
-                attr.preload "metadata"
-                attr.ref audioElementRef
-            }
+
+            forEach model.presentationPlayList.Value <| fun (_, uri) ->
+                audio {
+                    on.loadedmetadata (fun _ -> dispatch PlayerAudioMetadataLoadedEvent)
+                    on.loadstart (fun _ -> dispatch PlayerAudioLoadStartEvent)
+                    on.canplay (fun _ -> dispatch PlayerAudioCanPlayEvent)
+                    on.ended (fun _ -> dispatch PlayerAudioEndedEvent)
+                    attr.src uri.OriginalString
+                    attr.preload "metadata"
+                    "data-track-is-active" => (uriOption.IsSome && uriOption.Value = uri)
+                }
+
             (model, dispatch) ||> playPauseBlock
         }
 
