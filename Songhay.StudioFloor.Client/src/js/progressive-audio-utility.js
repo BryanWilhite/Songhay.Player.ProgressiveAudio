@@ -2,15 +2,20 @@ import { __awaiter } from "tslib";
 import { WindowAnimation } from 'songhay';
 export class ProgressiveAudioUtility {
     // noinspection JSUnusedGlobalSymbols
-    static handleAudioMetadataLoadedAsync(instance, audio) {
+    static getCurrentAudioElement() {
+        return window.document.querySelector('#audio-player-container>audio[data-track-is-active=true]');
+    }
+    // noinspection JSUnusedGlobalSymbols
+    static handleAudioMetadataLoadedAsync(instance) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield ProgressiveAudioUtility.invokeDotNetMethodAsync(instance, audio);
+            yield ProgressiveAudioUtility.invokeDotNetMethodAsync(instance);
         });
     }
-    static invokeDotNetMethodAsync(instance, audio) {
+    static invokeDotNetMethodAsync(instance) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             let data = null;
+            const audio = this.getCurrentAudioElement();
             try {
                 data = {
                     animationStatus: (_a = ProgressiveAudioUtility.playAnimation) === null || _a === void 0 ? void 0 : _a.getDiagnosticStatus(),
@@ -27,12 +32,8 @@ export class ProgressiveAudioUtility {
             }
         });
     }
-    // noinspection JSUnusedGlobalSymbols
-    static loadAudioTrack(audio, src) {
-        audio === null || audio === void 0 ? void 0 : audio.setAttribute('src', src);
-        audio === null || audio === void 0 ? void 0 : audio.load();
-    }
-    static setAudioCurrentTime(input, audio) {
+    static setAudioCurrentTime(input) {
+        const audio = this.getCurrentAudioElement();
         if (audio && input) {
             audio.currentTime = parseFloat(input.value);
         }
@@ -46,8 +47,9 @@ export class ProgressiveAudioUtility {
         }
     }
     // noinspection JSUnusedGlobalSymbols
-    static startPlayAnimationAsync(instance, audio) {
+    static startPlayAnimationAsync(instance) {
         return __awaiter(this, void 0, void 0, function* () {
+            const audio = this.getCurrentAudioElement();
             const fps = 1; // frames per second
             if (audio && audio.readyState > 2 && audio.paused) {
                 yield audio.play();
@@ -65,21 +67,22 @@ export class ProgressiveAudioUtility {
                 if (audio === null || audio === void 0 ? void 0 : audio.ended) {
                     console.warn('ended?');
                     audio.currentTime = 0;
-                    yield ProgressiveAudioUtility.stopPlayAnimationAsync(instance, audio);
+                    yield ProgressiveAudioUtility.stopPlayAnimationAsync(instance);
                     return;
                 }
-                yield ProgressiveAudioUtility.invokeDotNetMethodAsync(instance, audio);
+                yield ProgressiveAudioUtility.invokeDotNetMethodAsync(instance);
             }));
             WindowAnimation.animate();
         });
     }
-    static stopPlayAnimationAsync(instance, audio) {
+    static stopPlayAnimationAsync(instance) {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
+            const audio = this.getCurrentAudioElement();
             if (audio && audio.readyState > 0 && !audio.paused) {
                 audio.pause();
             }
-            yield ProgressiveAudioUtility.invokeDotNetMethodAsync(instance, audio);
+            yield ProgressiveAudioUtility.invokeDotNetMethodAsync(instance);
             WindowAnimation.cancelAnimation((_b = (_a = ProgressiveAudioUtility.playAnimation) === null || _a === void 0 ? void 0 : _a.id) !== null && _b !== void 0 ? _b : undefined);
             console.info('stopPlayAnimationAsync', {
                 readyState: audio === null || audio === void 0 ? void 0 : audio.readyState,
