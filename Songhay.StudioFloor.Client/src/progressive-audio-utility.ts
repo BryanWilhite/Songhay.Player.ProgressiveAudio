@@ -5,19 +5,12 @@ export class ProgressiveAudioUtility {
     static playAnimation: WindowAnimation | null = null;
 
     // noinspection JSUnusedGlobalSymbols
-    static getCurrentAudioElement() : HTMLAudioElement | null {
-        return window.document.querySelector('#audio-player-container>audio[data-track-is-active=true]');
+    static async handleAudioMetadataLoadedAsync(instance: DotNet.DotNetObject, audio: HTMLAudioElement | null) : Promise<void> {
+        await ProgressiveAudioUtility.invokeDotNetMethodAsync(instance, audio);
     }
 
-    // noinspection JSUnusedGlobalSymbols
-    static async handleAudioMetadataLoadedAsync(instance: DotNet.DotNetObject) : Promise<void> {
-        await ProgressiveAudioUtility.invokeDotNetMethodAsync(instance);
-    }
-
-    static async invokeDotNetMethodAsync(instance: DotNet.DotNetObject) : Promise<void> {
+    static async invokeDotNetMethodAsync(instance: DotNet.DotNetObject, audio: HTMLAudioElement | null) : Promise<void> {
         let data : {} | null = null;
-
-        const audio = this.getCurrentAudioElement();
 
         try {
             data = {
@@ -38,9 +31,13 @@ export class ProgressiveAudioUtility {
         }
     }
 
-    static setAudioCurrentTime(input: HTMLInputElement | null) : void {
-        const audio = this.getCurrentAudioElement();
+    // noinspection JSUnusedGlobalSymbols
+    static loadAudioTrack(audio: HTMLAudioElement | null, src: string) : void {
+        audio?.setAttribute('src', src);
+        audio?.load();
+    }
 
+    static setAudioCurrentTime(input: HTMLInputElement | null, audio: HTMLAudioElement | null) : void {
         if(audio && input) {
             audio.currentTime = parseFloat(input.value);
             audio.dataset.hasSetCurrentTime = 'yes';
@@ -57,8 +54,7 @@ export class ProgressiveAudioUtility {
     }
 
     // noinspection JSUnusedGlobalSymbols
-    static async startPlayAnimationAsync(instance: DotNet.DotNetObject) : Promise<void> {
-        const audio = this.getCurrentAudioElement();
+    static async startPlayAnimationAsync(instance: DotNet.DotNetObject, audio: HTMLAudioElement | null) : Promise<void> {
         const fps: number = 1; // frames per second
 
         if(audio && audio.readyState > 2 && audio.paused) {
@@ -95,23 +91,22 @@ export class ProgressiveAudioUtility {
             if(audio?.ended) { console.warn('ended?');
                 audio.currentTime = 0;
 
-                await ProgressiveAudioUtility.stopPlayAnimationAsync(instance);
+                await ProgressiveAudioUtility.stopPlayAnimationAsync(instance, audio);
 
                 return;
             }
 
-            await ProgressiveAudioUtility.invokeDotNetMethodAsync(instance);
+            await ProgressiveAudioUtility.invokeDotNetMethodAsync(instance, audio);
         });
 
         WindowAnimation.animate();
     }
 
-    static async stopPlayAnimationAsync(instance: DotNet.DotNetObject): Promise<void> {
-        const audio = this.getCurrentAudioElement();
+    static async stopPlayAnimationAsync(instance: DotNet.DotNetObject, audio: HTMLAudioElement | null): Promise<void> {
 
         if(audio && audio.readyState > 0 && !audio.paused) { audio.pause(); }
 
-        await ProgressiveAudioUtility.invokeDotNetMethodAsync(instance);
+        await ProgressiveAudioUtility.invokeDotNetMethodAsync(instance, audio);
 
         WindowAnimation.cancelAnimation(ProgressiveAudioUtility.playAnimation?.id ?? undefined);
 

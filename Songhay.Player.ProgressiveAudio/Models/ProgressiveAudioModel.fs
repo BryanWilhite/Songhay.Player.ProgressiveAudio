@@ -23,6 +23,7 @@ type ProgressiveAudioModel =
         blazorServices: {|
                           jsRuntime: IJSRuntime
                           sectionElementRef: HtmlRef option
+                          audioElementRef: HtmlRef option
                           playerControlsComp: Component option
                         |}
         /// <summary>current playlist item info</summary>
@@ -54,6 +55,7 @@ type ProgressiveAudioModel =
             blazorServices = {|
                                jsRuntime = jsRuntime
                                sectionElementRef = None
+                               audioElementRef = None
                                playerControlsComp = None
                             |}
             currentPlaylistItem = None
@@ -75,18 +77,25 @@ type ProgressiveAudioModel =
     static member updateModel (message: ProgressiveAudioMessage) (model: ProgressiveAudioModel) =
         let dotNetObjectReference() = DotNetObjectReference.Create(model.blazorServices.playerControlsComp.Value)
 
+        let audio() = model.blazorServices.audioElementRef.Value |> tryGetElementReference |> Result.valueOr raise
+
         let handleInputChange (htmlRef: HtmlRef) =
             let elementRef = htmlRef |> tryGetElementReference |> Result.valueOr raise
-            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropSetAudioCurrentTime, elementRef)
+            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropSetAudioCurrentTime, elementRef, audio())
 
         let handleMeta() =
-            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropHandleMetadataLoaded, dotNetObjectReference())
+            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropHandleMetadataLoaded, dotNetObjectReference(), audio())
+
+        let load (uri: Uri) =
+            let htmlRef = model.blazorServices.audioElementRef.Value
+            let elementRef = htmlRef |> tryGetElementReference |> Result.valueOr raise
+            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropLoadTrack, elementRef, uri.AbsoluteUri)
 
         let pause() =
-            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropStopAnimation, dotNetObjectReference())
+            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropStopAnimation, dotNetObjectReference(), audio())
 
         let play() =
-            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropStartAnimation, dotNetObjectReference())
+            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropStartAnimation, dotNetObjectReference(), audio())
 
         match message with
         | GetPlayerManifest _ -> { model with presentation = None }
@@ -96,6 +105,7 @@ type ProgressiveAudioModel =
                 model with blazorServices = {|
                                               jsRuntime = model.blazorServices.jsRuntime
                                               sectionElementRef = sectionElementRef |> Some
+                                              audioElementRef = model.blazorServices.audioElementRef
                                               playerControlsComp = model.blazorServices.playerControlsComp
                                             |}
             }
@@ -105,6 +115,7 @@ type ProgressiveAudioModel =
                 model with blazorServices = {|
                                               jsRuntime = model.blazorServices.jsRuntime
                                               sectionElementRef = model.blazorServices.sectionElementRef
+                                              audioElementRef = bag.audioElementRef |> Some
                                               playerControlsComp = bag.playerControlsComp |> Some
                                             |}
             }
@@ -219,6 +230,8 @@ type ProgressiveAudioModel =
             { model with presentationStates = model.presentationStates.toggleState CreditsModalVisible }
 
         | PlaylistClick (txt, uri) ->
+            load uri |> ignore
+
             {
                 model with
                     currentPlaylistItem = (txt, uri) |> Some
