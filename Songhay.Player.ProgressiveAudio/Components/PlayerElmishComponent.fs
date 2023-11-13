@@ -4,6 +4,7 @@ open Bolero
 open Bolero.Html
 
 open Songhay.Modules.Models
+
 open Songhay.Modules.Publications.Models
 
 open Songhay.Modules.Bolero.Models
@@ -35,6 +36,13 @@ type PlayerElmishComponent() =
     let sectionNode model dispatch =
         section {
             [ "player"; "progressive-audio" ] |> CssClasses.toHtmlClassFromList
+
+            $"data-{CanPlay.CssValue}" => if model.presentationStates.hasState CanPlay then "yes" else "no"
+            $"data-{CreditsModalVisible.CssValue}" => if model.presentationStates.hasState CreditsModalVisible then "yes" else "no"
+            $"data-{LoadingAfterPlaylistIsClicked.CssValue}" => if model.presentationStates.hasState LoadingAfterPlaylistIsClicked then "yes" else "no"
+            $"data-{Playing.CssValue}" => if model.presentationStates.hasState Playing then "yes" else "no"
+            $"data-{SeekingAfterSliderDrag.CssValue}" => if model.presentationStates.hasState SeekingAfterSliderDrag then "yes" else "no"
+
             attr.ref sectionElementRef
 
             PlayerTitleComponent.BComp <|

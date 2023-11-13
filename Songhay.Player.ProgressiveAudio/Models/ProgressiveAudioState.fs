@@ -1,5 +1,9 @@
 namespace Songhay.Player.ProgressiveAudio.Models
 
+open System
+
+open Songhay.Modules.StringUtility
+
 /// <summary>defines player states for the <see cref="Presentation"/></summary>
 type ProgressiveAudioState =
     /// <summary>when the event of the same name fires for the <c>audio</c> DOM element</summary>
@@ -13,3 +17,7 @@ type ProgressiveAudioState =
     | Playing
     /// <summary>after the input range slider for the <c>audio</c> DOM element is released</summary>
     | SeekingAfterSliderDrag
+
+    /// <summary>returns the <see cref="String"/> representation of this instance in kabob case</summary>
+    member this.CssValue =
+        this.ToString() |> toKabobCase |> Option.defaultValue String.Empty
