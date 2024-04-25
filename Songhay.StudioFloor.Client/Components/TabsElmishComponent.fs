@@ -67,5 +67,5 @@ type TabsElmishComponent() =
                 bulmaContainer
                     ContainerWidthFluid
                     NoCssClasses
-                    (PlayerElmishComponent.EComp model.paModel (ProgressiveAudioMessage >> dispatch))
+                    (PlayerElmishComponent.EComp DispatchForEveryView model.paModel (ProgressiveAudioMessage >> dispatch))
         }

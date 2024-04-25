@@ -3,6 +3,7 @@ namespace Songhay.Player.ProgressiveAudio.Components
 open Bolero
 open Bolero.Html
 
+open Microsoft.AspNetCore.Components
 open Songhay.Modules.Models
 
 open Songhay.Modules.Publications.Models
@@ -33,7 +34,7 @@ type PlayerElmishComponent() =
                 (bulmaLoader (HasClasses <| CssClasses (imageContainer (Square Square128) @ [p (All, L3)])))
 
     /// <summary>the <c>section.player</c> element</summary>
-    let sectionNode model dispatch =
+    let sectionNode elmishComponentHtmlRefPolicy model dispatch =
         section {
             [ "player"; "progressive-audio" ] |> CssClasses.toHtmlClassFromList
 
@@ -59,7 +60,7 @@ type PlayerElmishComponent() =
 
             (model, dispatch) ||> PlaylistElmishComponent.EComp
 
-            (model, dispatch) ||> PlayerControlsElmishComponent.EComp
+            (model, dispatch) ||> PlayerControlsElmishComponent.EComp elmishComponentHtmlRefPolicy
 
             (model, dispatch) ||> PlayerCreditsElmishComponent.EComp
 
@@ -77,10 +78,20 @@ type PlayerElmishComponent() =
     /// The conventional static member that returns
     /// this instance with <see cref="ecomp"/>
     /// </summary>
+    /// <param name="elmishComponentHtmlRefPolicy">the Elmish <see cref="HtmlRef"/> <c>dispatch</c> policy</param>
     /// <param name="model">the Elmish model of this domain</param>
     /// <param name="dispatch">the Elmish message dispatcher</param>
-    static member EComp model dispatch =
-        ecomp<PlayerElmishComponent, _, _> model dispatch { attr.empty() }
+    static member EComp (elmishComponentHtmlRefPolicy: ElmishComponentHtmlRefPolicy) model dispatch =
+        ecomp<PlayerElmishComponent, _, _> model dispatch
+            {
+                "ElmishComponentHtmlRefPolicy" => elmishComponentHtmlRefPolicy
+            }
+
+    /// <summary>
+    /// The conventional Elmish <see cref="HtmlRef"/> <c>dispatch</c> policy
+    /// </summary>
+     [<Parameter>]
+     member val ElmishComponentHtmlRefPolicy = DispatchOnce with get, set
 
     /// <summary>
     /// Overrides <see cref="ElmishComponent.View"/>
@@ -88,9 +99,10 @@ type PlayerElmishComponent() =
     /// <param name="model">the Elmish model of this domain</param>
     /// <param name="dispatch">the Elmish message dispatcher</param>
     override this.View model dispatch =
-        if model.blazorServices.sectionElementRef.IsNone then
+        match this.ElmishComponentHtmlRefPolicy with
+        | DispatchForEveryView
+        | DispatchOnce when model.blazorServices.sectionElementRef.IsNone ->
             dispatch <| GotPlayerSection sectionElementRef
-        else
-            ()
+        | _ -> ()
 
-        (model, dispatch) ||> sectionNode
+        (model, dispatch) ||> sectionNode this.ElmishComponentHtmlRefPolicy

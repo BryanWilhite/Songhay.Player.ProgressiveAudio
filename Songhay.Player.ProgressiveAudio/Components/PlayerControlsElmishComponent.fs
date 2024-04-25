@@ -27,7 +27,7 @@ type PlayerControlsElmishComponent() =
     let inputRangeElementRef = HtmlRef()
 
     /// <summary>the <c>div.controls</c> element</summary>
-    let rec playPauseBlock model dispatch =
+    let playPauseBlock model dispatch =
 
         div {
             [ "controls"; elementIsFlex; AlignCentered.CssClass ] |> CssClasses.toHtmlClassFromList
@@ -102,14 +102,20 @@ type PlayerControlsElmishComponent() =
     /// The conventional static member that returns
     /// this instance with <see cref="ecomp"/>
     /// </summary>
+    /// <param name="elmishComponentHtmlRefPolicy">the Elmish <see cref="HtmlRef"/> <c>dispatch</c> policy</param>
     /// <param name="model">the Elmish model of this domain</param>
     /// <param name="dispatch">the Elmish message dispatcher</param>
-    static member EComp model dispatch =
-        ecomp<PlayerControlsElmishComponent, _, _> model dispatch { attr.empty() }
+    static member EComp (elmishComponentHtmlRefPolicy: ElmishComponentHtmlRefPolicy) model dispatch =
+        ecomp<PlayerControlsElmishComponent, _, _> model dispatch
+            {
+                "ElmishComponentHtmlRefPolicy" => elmishComponentHtmlRefPolicy
+            }
 
-    /// <summary><see cref="Inject"/>s the <see cref="IJSRuntime"/> of this domain</summary>
-    [<Inject>]
-    member val JSRuntime = Unchecked.defaultof<IJSRuntime> with get, set
+    /// <summary>
+    /// The conventional Elmish <see cref="HtmlRef"/> <c>dispatch</c> policy
+    /// </summary>
+     [<Parameter>]
+     member val ElmishComponentHtmlRefPolicy = DispatchOnce with get, set
 
     /// <summary>
     /// Overrides <see cref="ElmishComponent.View"/>
@@ -117,11 +123,11 @@ type PlayerControlsElmishComponent() =
     /// <param name="model">the Elmish model of this domain</param>
     /// <param name="dispatch">the Elmish message dispatcher</param>
     override this.View model dispatch =
-
-        if model.blazorServices.playerControlsComp.IsNone then
+        match this.ElmishComponentHtmlRefPolicy with
+        | DispatchForEveryView
+        | DispatchOnce when model.blazorServices.audioElementRef.IsNone ->
             dispatch <| GotPlayerControlsRefs {| audioElementRef = audioElementRef; playerControlsComp = this |}
-        else
-            ()
+        | _ -> ()
 
         (model, dispatch) ||> container
 
