@@ -4,10 +4,21 @@ namespace Songhay.Modules.Bolero.Models
 /// defines Elmish <see cref="HtmlRef"/> <c>dispatch</c> policies
 /// </summary>
 type ElmishComponentHtmlRefPolicy =
+    /// <summary> <c>dispatch</c> conditionally when <see cref="ElmishComponent.View"/> is called</summary>
+    | DispatchConditionally
     /// <summary> <c>dispatch</c> when <see cref="ElmishComponent.View"/> is called</summary>
     | DispatchForEveryView
-    /// <summary> <c>dispatch</c> conditionally when <see cref="ElmishComponent.View"/> is called</summary>
-    /// <remarks>use a <c>when</c> guard to call <c>dispatch</c> conditionally in a <c>match</c> expression</remarks>
-    | DispatchConditionally
     /// <summary> do not <c>dispatch</c> when <see cref="ElmishComponent.View"/> is called</summary>
     | DoNotDispatch
+
+    /// <summary>
+    /// Evaluates an instance the <see cref="ElmishComponentHtmlRefPolicy"/>
+    /// </summary>
+    /// <param name="dispatch">the <see cref="Elmish.Dispatch{'message}"/></param>
+    /// <param name="message">the Elmish <c>'message</c></param>
+    /// <param name="condition">the condition for <see cref="ElmishComponentHtmlRefPolicy.DispatchConditionally"/></param>
+    member this.Evaluate (dispatch: Elmish.Dispatch<'message>) (message: 'message) condition =
+        match this with
+        | DispatchConditionally -> if condition then dispatch message
+        | DispatchForEveryView -> dispatch message
+        | DoNotDispatch -> ()

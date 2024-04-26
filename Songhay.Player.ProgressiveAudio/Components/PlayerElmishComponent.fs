@@ -99,11 +99,11 @@ type PlayerElmishComponent() =
     /// <param name="model">the Elmish model of this domain</param>
     /// <param name="dispatch">the Elmish message dispatcher</param>
     override this.View model dispatch =
-        match this.ElmishComponentHtmlRefPolicy with
-        | DispatchForEveryView ->
-            dispatch <| GotPlayerSection sectionElementRef
-        | DispatchConditionally when model.blazorServices.sectionElementRef.IsNone ->
-            dispatch <| GotPlayerSection sectionElementRef
-        | _ -> ()
+        (
+            dispatch,
+            GotPlayerSection sectionElementRef,
+            model.blazorServices.sectionElementRef.IsNone
+        )
+        |||> this.ElmishComponentHtmlRefPolicy.Evaluate
 
         (model, dispatch) ||> sectionNode this.ElmishComponentHtmlRefPolicy
