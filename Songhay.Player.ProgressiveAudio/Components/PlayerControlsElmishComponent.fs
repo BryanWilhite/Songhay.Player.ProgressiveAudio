@@ -123,11 +123,13 @@ type PlayerControlsElmishComponent() =
     /// <param name="model">the Elmish model of this domain</param>
     /// <param name="dispatch">the Elmish message dispatcher</param>
     override this.View model dispatch =
+
+        let dispatchHtmlRefs() =
+            dispatch <| GotPlayerControlsRefs {| audioElementRef = audioElementRef; playerControlsComp = this |}
+
         match this.ElmishComponentHtmlRefPolicy with
-        | DispatchForEveryView ->
-            dispatch <| GotPlayerControlsRefs {| audioElementRef = audioElementRef; playerControlsComp = this |}
-        | DispatchConditionally when model.blazorServices.audioElementRef.IsNone ->
-            dispatch <| GotPlayerControlsRefs {| audioElementRef = audioElementRef; playerControlsComp = this |}
+        | DispatchForEveryView -> dispatchHtmlRefs()
+        | DispatchConditionally when model.blazorServices.audioElementRef.IsNone -> dispatchHtmlRefs()
         | _ -> ()
 
         (model, dispatch) ||> container
