@@ -91,7 +91,7 @@ type PlayerElmishComponent() =
     /// The conventional Elmish <see cref="HtmlRef"/> <c>dispatch</c> policy
     /// </summary>
      [<Parameter>]
-     member val ElmishComponentHtmlRefPolicy = DispatchOnce with get, set
+     member val ElmishComponentHtmlRefPolicy = DispatchConditionally with get, set
 
     /// <summary>
     /// Overrides <see cref="ElmishComponent.View"/>
@@ -100,8 +100,9 @@ type PlayerElmishComponent() =
     /// <param name="dispatch">the Elmish message dispatcher</param>
     override this.View model dispatch =
         match this.ElmishComponentHtmlRefPolicy with
-        | DispatchForEveryView
-        | DispatchOnce when model.blazorServices.sectionElementRef.IsNone ->
+        | DispatchForEveryView ->
+            dispatch <| GotPlayerSection sectionElementRef
+        | DispatchConditionally when model.blazorServices.sectionElementRef.IsNone ->
             dispatch <| GotPlayerSection sectionElementRef
         | _ -> ()
 

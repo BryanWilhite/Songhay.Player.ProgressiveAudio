@@ -115,7 +115,7 @@ type PlayerControlsElmishComponent() =
     /// The conventional Elmish <see cref="HtmlRef"/> <c>dispatch</c> policy
     /// </summary>
      [<Parameter>]
-     member val ElmishComponentHtmlRefPolicy = DispatchOnce with get, set
+     member val ElmishComponentHtmlRefPolicy = DispatchConditionally with get, set
 
     /// <summary>
     /// Overrides <see cref="ElmishComponent.View"/>
@@ -124,8 +124,9 @@ type PlayerControlsElmishComponent() =
     /// <param name="dispatch">the Elmish message dispatcher</param>
     override this.View model dispatch =
         match this.ElmishComponentHtmlRefPolicy with
-        | DispatchForEveryView
-        | DispatchOnce when model.blazorServices.audioElementRef.IsNone ->
+        | DispatchForEveryView ->
+            dispatch <| GotPlayerControlsRefs {| audioElementRef = audioElementRef; playerControlsComp = this |}
+        | DispatchConditionally when model.blazorServices.audioElementRef.IsNone ->
             dispatch <| GotPlayerControlsRefs {| audioElementRef = audioElementRef; playerControlsComp = this |}
         | _ -> ()
 
