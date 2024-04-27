@@ -9,7 +9,7 @@ open Bolero.Html
 
 open Songhay.Modules.Bolero.Models
 open Songhay.Modules.Bolero.SvgUtility
-open Songhay.Modules.Bolero.Visuals.Bulma.CssClass
+open Songhay.Modules.Bolero.Visuals.Bulma
 
 open Songhay.Modules.Models
 open Songhay.Player.ProgressiveAudio.Models
@@ -30,7 +30,7 @@ type PlayerControlsElmishComponent() =
     let playPauseBlock model dispatch =
 
         div {
-            [ "controls"; elementIsFlex; AlignCentered.CssClass ] |> CssClasses.toHtmlClassFromList
+            [ "controls"; CssClass.elementIsFlex; AlignCentered.CssClass ] |> CssClasses.toHtmlClassFromList
             attr.id "play-pause-block"
 
             button {
@@ -48,7 +48,7 @@ type PlayerControlsElmishComponent() =
             }
 
             input {
-                m (L, L1) |> CssClasses.toHtmlClass
+                CssClass.m (L, L1) |> CssClasses.toHtmlClass
                 on.change (fun _ -> dispatch <| PlayerInputRangeChangeEvent inputRangeElementRef)
                 on.input (fun _ -> dispatch PlayerInputRangeInputEvent)
                 attr.disabled <| not (model.presentationStates.hasState CanPlay)
@@ -59,19 +59,24 @@ type PlayerControlsElmishComponent() =
                 attr.ref inputRangeElementRef
             }
             span {
-                [ elementIsFlex; elementFlexWrap NoWrap; elementFlexContentAlignment Center; m (L, L1) ] |> CssClasses.toHtmlClassFromList
+                [
+                    CssClass.elementIsFlex
+                    CssClass.elementFlexWrap NoWrap
+                    CssClass.elementFlexContentAlignment Center
+                    CssClass.m (L, L1)
+                ] |> CssClasses.toHtmlClassFromList
                 output {
-                    [ fontSize Size6; elementFlexSelfAlignment Center ] |> CssClasses.toHtmlClassFromList
+                    [ CssClass.fontSize Size6; CssClass.elementFlexSelfAlignment Center ] |> CssClasses.toHtmlClassFromList
                     attr.id "play-pause-progress-output"
                     attr.``for`` "play-pause-range"
                     text model.playingCurrentTimeDisplay
                 }
                 span {
-                    [ fontSize Size7; elementFlexSelfAlignment Center ] |> CssClasses.toHtmlClassFromList
+                    [ CssClass.fontSize Size7; CssClass.elementFlexSelfAlignment Center ] |> CssClasses.toHtmlClassFromList
                     text "/"
                 }
                 output {
-                    [ fontSize Size7; elementFlexSelfAlignment Center ] |> CssClasses.toHtmlClassFromList
+                    [ CssClass.fontSize Size7; CssClass.elementFlexSelfAlignment Center ] |> CssClasses.toHtmlClassFromList
                     attr.id "play-pause-duration-output"
                     attr.``for`` "play-pause-range"
                     text model.playingDurationDisplay

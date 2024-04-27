@@ -38,10 +38,10 @@ module ProgressiveAudioPresentationUtility =
         let buttonImgUrl = $"url({rxAkyinkyinSvgDataUrl})"
 
         [
-            CssVariableAndValue (CssVariable.fromInput "rx-player-width", CssValue "800px")
-            CssVariableAndValue (CssVariable.fromInput "rx-player-height", CssValue "600px")
-            CssVariableAndValue (CssVariable.fromInput "rx-player-background-image", CssValue bgImgUrl)
-            CssVariableAndValue (CssVariable.fromInput "rx-player-credits-button-background-image", CssValue buttonImgUrl)
+            CssCustomPropertyAndValue (CssCustomProperty.fromInput "rx-player-width", CssValue "800px")
+            CssCustomPropertyAndValue (CssCustomProperty.fromInput "rx-player-height", CssValue "600px")
+            CssCustomPropertyAndValue (CssCustomProperty.fromInput "rx-player-background-image", CssValue bgImgUrl)
+            CssCustomPropertyAndValue (CssCustomProperty.fromInput "rx-player-credits-button-background-image", CssValue buttonImgUrl)
         ]
 
     /// <summary>

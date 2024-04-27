@@ -6,8 +6,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Songhay.Modules.Bolero" Version="6.3.0" />
-      <PackageReference Include="Songhay.Modules.Publications" Version="6.3.1" />
+      <PackageReference Include="Songhay.Modules.Bolero" Version="6.4.0" />
+      <PackageReference Include="Songhay.Modules.Publications" Version="6.3.2" />
       <PackageReference Remove="FSharp.Core" />
     </ItemGroup>
 
@@ -15,7 +15,6 @@
       <Compile Include="ProgressiveAudioScalars.fs" />
       <Compile Include="ProgressiveAudioPresentationUtility.fs" />
       <Compile Include="Models\ElmishComponentHtmlRefPolicy.fs" />
-      <Compile Include="Models\AppStateSet.fs" />
       <Compile Include="Models\PlayerAnimationTickData.fs" />
       <Compile Include="Models\ProgressiveAudioMessage.fs" />
       <Compile Include="Models\ProgressiveAudioState.fs" />

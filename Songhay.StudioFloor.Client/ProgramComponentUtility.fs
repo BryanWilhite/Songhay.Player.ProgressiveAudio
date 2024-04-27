@@ -8,7 +8,6 @@ open Microsoft.FSharp.Core
 open Elmish
 
 open FsToolkit.ErrorHandling
-open Bolero.Remoting.Client
 
 open Songhay.Modules.HttpClientUtility
 open Songhay.Modules.HttpRequestMessageUtility
