@@ -16,9 +16,9 @@ type ElmishComponentHtmlRefPolicy =
     /// </summary>
     /// <param name="dispatch">the <see cref="Elmish.Dispatch{'message}"/></param>
     /// <param name="message">the Elmish <c>'message</c></param>
-    /// <param name="condition">the condition for <see cref="ElmishComponentHtmlRefPolicy.DispatchConditionally"/></param>
-    member this.Evaluate (dispatch: Elmish.Dispatch<'message>) (message: 'message) condition =
+    /// <param name="condition">the optional condition for <see cref="ElmishComponentHtmlRefPolicy.DispatchConditionally"/></param>
+    member this.Evaluate (dispatch: Elmish.Dispatch<'message>, message: 'message, ?condition: bool) =
         match this with
-        | DispatchConditionally -> if condition then dispatch message
+        | DispatchConditionally -> if condition.IsSome && condition.Value then dispatch message
         | DispatchForEveryView -> dispatch message
         | DoNotDispatch -> ()

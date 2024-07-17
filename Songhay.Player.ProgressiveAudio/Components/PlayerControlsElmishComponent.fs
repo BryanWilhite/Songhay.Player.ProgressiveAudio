@@ -128,12 +128,11 @@ type PlayerControlsElmishComponent() =
     /// <param name="model">the Elmish model of this domain</param>
     /// <param name="dispatch">the Elmish message dispatcher</param>
     override this.View model dispatch =
-        (
+        this.ElmishComponentHtmlRefPolicy.Evaluate(
             dispatch,
             GotPlayerControlsRefs {| audioElementRef = audioElementRef; playerControlsComp = this |},
             model.blazorServices.audioElementRef.IsNone
         )
-        |||> this.ElmishComponentHtmlRefPolicy.Evaluate
 
         (model, dispatch) ||> container
 
