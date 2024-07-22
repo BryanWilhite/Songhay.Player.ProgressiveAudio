@@ -14,7 +14,6 @@
     <ItemGroup>
       <Compile Include="ProgressiveAudioScalars.fs" />
       <Compile Include="ProgressiveAudioPresentationUtility.fs" />
-      <Compile Include="Models\ElmishComponentHtmlRefPolicy.fs" />
       <Compile Include="Models\PlayerAnimationTickData.fs" />
       <Compile Include="Models\ProgressiveAudioMessage.fs" />
       <Compile Include="Models\ProgressiveAudioState.fs" />
