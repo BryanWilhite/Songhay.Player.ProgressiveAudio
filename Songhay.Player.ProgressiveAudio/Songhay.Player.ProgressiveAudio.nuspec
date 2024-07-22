@@ -2,7 +2,7 @@
 <package>
     <metadata>
         <id>Songhay.Player.ProgressiveAudio</id>
-        <version>6.1.5</version>
+        <version>6.1.6</version>
         <description>Bolero Components, Elmish types and JSON handlers for b-roll player for progressive audio 🎤 content</description>
         <authors>Bryan D. Wilhite</authors>
         <title>Songhay Modules, Publications</title>
@@ -13,13 +13,13 @@
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <summary>Bolero Components, Elmish types and JSON handlers for b-roll player for progressive audio 🎤 content</summary>
         <readme>README.md</readme>
-        <releaseNotes>📰 https://github.com/BryanWilhite/Songhay.Player.ProgressiveAudio/issues/17 🐛</releaseNotes>
+        <releaseNotes>update of dependencies 📦🔝 🔨</releaseNotes>
         <copyright>(c) 2024 Bryan D. Wilhite</copyright>
         <tags>FSharp;Songhay;Modules;audio;MP3;SCSS;Typescript;SVG;Blazor;WebAssembly;Window;DOM;HTMLMediaElement</tags>
         <repository type="git" url="https://github.com/BryanWilhite/Songhay.Player.ProgressiveAudio"></repository>
         <dependencies>
             <group targetFramework=".NET6.0">
-                <dependency id="Songhay.Modules.Bolero" version="6.4.0" />
+                <dependency id="Songhay.Modules.Bolero" version="6.4.1" />
                 <dependency id="Songhay.Modules.Publications" version="6.3.2" />
             </group>
         </dependencies>
