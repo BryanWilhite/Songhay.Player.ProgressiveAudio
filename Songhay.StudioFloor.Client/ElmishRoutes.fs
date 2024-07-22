@@ -6,4 +6,4 @@ open Songhay.StudioFloor.Client.Models
 
 module ElmishRoutes =
 
-    let router = Router.infer SetPage (fun model -> model.page)
+    let router = Router.infer SetPage (_.page)

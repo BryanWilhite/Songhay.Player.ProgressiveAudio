@@ -21,10 +21,9 @@ type ProgressiveAudioModel =
     {
         /// <summary>conventional Blazor services of this domain</summary>
         blazorServices: {|
-                          jsRuntime: IJSRuntime
-                          sectionElementRef: HtmlRef option
-                          audioElementRef: HtmlRef option
-                          playerControlsComp: Component option
+                            sectionElementRef: HtmlRef option
+                            audioElementRef: HtmlRef option
+                            playerControlsComp: Component option
                         |}
         /// <summary>current playlist item info</summary>
         currentPlaylistItem: (DisplayText * Uri) option
@@ -49,11 +48,11 @@ type ProgressiveAudioModel =
     /// <summary>
     /// Centralizes the Elmish initialization routine.
     /// </summary>
-    /// <param name="jsRuntime">the <see cref="IJSRuntime"/></param>
-    static member initialize (jsRuntime: IJSRuntime) =
+    /// <param name="serviceProvider">the <see cref="IServiceProvider"/></param>
+    static member initialize (serviceProvider: IServiceProvider) =
+        Songhay.Modules.Bolero.ServiceProviderUtility.setBlazorServiceProvider serviceProvider
         {
             blazorServices = {|
-                               jsRuntime = jsRuntime
                                sectionElementRef = None
                                audioElementRef = None
                                playerControlsComp = None
@@ -75,27 +74,29 @@ type ProgressiveAudioModel =
     /// <param name="message">the <see cref="ProgressiveAudioMessage"/></param>
     /// <param name="model">the <see cref="ProgressiveAudioModel"/></param>
     static member updateModel (message: ProgressiveAudioMessage) (model: ProgressiveAudioModel) =
+        let jsRuntime = Songhay.Modules.Bolero.ServiceProviderUtility.getIJSRuntime()
+
         let dotNetObjectReference() = DotNetObjectReference.Create(model.blazorServices.playerControlsComp.Value)
 
         let audio() = model.blazorServices.audioElementRef.Value |> tryGetElementReference |> Result.valueOr raise
 
         let handleInputChange (htmlRef: HtmlRef) =
             let elementRef = htmlRef |> tryGetElementReference |> Result.valueOr raise
-            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropSetAudioCurrentTime, elementRef, audio())
+            jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropSetAudioCurrentTime, elementRef, audio())
 
         let handleMeta() =
-            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropHandleMetadataLoaded, dotNetObjectReference(), audio())
+            jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropHandleMetadataLoaded, dotNetObjectReference(), audio())
 
         let load (uri: Uri) =
             let htmlRef = model.blazorServices.audioElementRef.Value
             let elementRef = htmlRef |> tryGetElementReference |> Result.valueOr raise
-            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropLoadTrack, elementRef, uri.AbsoluteUri)
+            jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropLoadTrack, elementRef, uri.AbsoluteUri)
 
         let pause() =
-            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropStopAnimation, dotNetObjectReference(), audio())
+            jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropStopAnimation, dotNetObjectReference(), audio())
 
         let play() =
-            model.blazorServices.jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropStartAnimation, dotNetObjectReference(), audio())
+            jsRuntime.InvokeVoidAsync(rxProgressiveAudioInteropStartAnimation, dotNetObjectReference(), audio())
 
         match message with
         | GetPlayerManifest _ -> { model with presentation = None }
@@ -103,7 +104,6 @@ type ProgressiveAudioModel =
         | GotPlayerSection sectionElementRef ->
             {
                 model with blazorServices = {|
-                                              jsRuntime = model.blazorServices.jsRuntime
                                               sectionElementRef = sectionElementRef |> Some
                                               audioElementRef = model.blazorServices.audioElementRef
                                               playerControlsComp = model.blazorServices.playerControlsComp
@@ -113,7 +113,6 @@ type ProgressiveAudioModel =
         | GotPlayerControlsRefs bag ->
             {
                 model with blazorServices = {|
-                                              jsRuntime = model.blazorServices.jsRuntime
                                               sectionElementRef = model.blazorServices.sectionElementRef
                                               audioElementRef = bag.audioElementRef |> Some
                                               playerControlsComp = bag.playerControlsComp |> Some
@@ -125,7 +124,7 @@ type ProgressiveAudioModel =
                 data
                 |>
                 toPresentationOption
-                    model.blazorServices.jsRuntime
+                    jsRuntime
                     model.blazorServices.sectionElementRef
                     (fun (txt, uri) -> (txt, uri |> buildAudioRootUri))
 
@@ -155,7 +154,7 @@ type ProgressiveAudioModel =
                     model.presentationStates.hasState SeekingAfterSliderDrag
                 )
 
-            model.blazorServices.jsRuntime
+            jsRuntime
             |> consoleWarnAsync [| $"{message.StringValue}"; $"{nameof autoplay}: {autoplay}" |] |> ignore
 
             if autoplay then
@@ -172,16 +171,16 @@ type ProgressiveAudioModel =
                 { model with presentationStates = model.presentationStates.addState CanPlay }
 
         | PlayerAudioLoadStartEvent ->
-            model.blazorServices.jsRuntime |> consoleWarnAsync [| $"{message.StringValue}" |] |> ignore
+            jsRuntime |> consoleWarnAsync [| $"{message.StringValue}" |] |> ignore
             model
 
         | PlayerAudioMetadataLoadedEvent ->
-            model.blazorServices.jsRuntime |> consoleWarnAsync [| $"{message.StringValue}" |] |> ignore
+            jsRuntime |> consoleWarnAsync [| $"{message.StringValue}" |] |> ignore
             handleMeta() |> ignore
             model
 
         | PlayerAudioEndedEvent ->
-            model.blazorServices.jsRuntime |> consoleWarnAsync [| $"{message.StringValue}" |] |> ignore
+            jsRuntime |> consoleWarnAsync [| $"{message.StringValue}" |] |> ignore
 
             { model with presentationStates = model.presentationStates.removeState Playing }
 
@@ -192,7 +191,7 @@ type ProgressiveAudioModel =
                     if model.presentationStates.hasState CanPlay then
                         do! play()
                     else
-                        do! model.blazorServices.jsRuntime |> consoleWarnAsync [| "player cannot play!" |]
+                        do! jsRuntime |> consoleWarnAsync [| "player cannot play!" |]
             } |> ignore
 
             { model with presentationStates = model.presentationStates.toggleState Playing }
@@ -241,7 +240,7 @@ type ProgressiveAudioModel =
             }
 
         | PlayerError exn ->
-            model.blazorServices.jsRuntime |> consoleErrorAsync [| "player error!"; $"{message.StringValue}"; exn |] |> ignore
+            jsRuntime |> consoleErrorAsync [| "player error!"; $"{message.StringValue}"; exn |] |> ignore
             { model with error = Some exn.Message }
 
     /// <summary>
