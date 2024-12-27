@@ -2,7 +2,7 @@
 <package>
     <metadata>
         <id>Songhay.Player.ProgressiveAudio</id>
-        <version>6.1.6</version>
+        <version>8.0.0</version>
         <description>Bolero Components, Elmish types and JSON handlers for b-roll player for progressive audio 🎤 content</description>
         <authors>Bryan D. Wilhite</authors>
         <title>Songhay Modules, Publications</title>
@@ -13,20 +13,20 @@
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <summary>Bolero Components, Elmish types and JSON handlers for b-roll player for progressive audio 🎤 content</summary>
         <readme>README.md</readme>
-        <releaseNotes>update of dependencies 📦🔝 🔨</releaseNotes>
+        <releaseNotes>upgrade to .NET 8.0📦🔝</releaseNotes>
         <copyright>(c) 2024 Bryan D. Wilhite</copyright>
         <tags>FSharp;Songhay;Modules;audio;MP3;SCSS;Typescript;SVG;Blazor;WebAssembly;Window;DOM;HTMLMediaElement</tags>
         <repository type="git" url="https://github.com/BryanWilhite/Songhay.Player.ProgressiveAudio"></repository>
         <dependencies>
-            <group targetFramework=".NET6.0">
-                <dependency id="Songhay.Modules.Bolero" version="6.4.1" />
-                <dependency id="Songhay.Modules.Publications" version="6.3.2" />
+            <group targetFramework=".net8.0">
+                <dependency id="Songhay.Modules.Bolero" version="8.0.0" />
+                <dependency id="Songhay.Modules.Publications" version="8.0.0" />
             </group>
         </dependencies>
     </metadata>
     <files>
-        <file src="bin\Debug\net6.0\Songhay*.dll" target="lib\net6.0" />
-        <file src="bin\Debug\net6.0\Songhay*.json" target="lib\net6.0" />
+        <file src="bin\Debug\net8.0\Songhay*.dll" target="lib\net8.0" />
+        <file src="bin\Debug\net8.0\Songhay*.json" target="lib\net8.0" />
         <file src="**\*.fs" exclude="**\obj\**" target="src" />
         <file src="..\LICENSE.md" target="" />
         <file src="..\README.md" target=""/>
