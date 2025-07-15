@@ -1,0 +1,199 @@
+{
+  "uuid": "72b1391d-8295-4868-9218-98dcfc7b43bb",
+  "lastMigration": 33,
+  "name": "b-roll (Progressive Audio)",
+  "endpointPrefix": "api/player/v1",
+  "latency": 0,
+  "port": 3001,
+  "hostname": "",
+  "folders": [],
+  "routes": [
+    {
+      "uuid": "c42da09b-fa3f-4ad3-beba-aa7930447b33",
+      "type": "http",
+      "documentation": "audio/{presentationKey}",
+      "method": "get",
+      "endpoint": "audio/default",
+      "responses": [
+        {
+          "uuid": "4150d8de-384f-41d5-9664-e3834bc66dbd",
+          "body": "{\n  \"id\": {\n    \"Case\": \"Alphanumeric\",\n    \"Fields\": [\n      \"2005-12-10-22-19-14-IDAMAQDBIDANAQDB-1\"\n    ]\n  },\n  \"title\": \"Songhay Audio Presentation\",\n  \"cssVariables\": [\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-background-color\",\n        \"#ccff00\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-border-color\",\n        \"#006633\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-background-opacity\",\n        \"90%\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-credits-x\",\n        \"350px\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-credits-y\",\n        \"350px\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-credits-width\",\n        \"360px\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-credits-height\",\n        \"240px\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-credits-button-x\",\n        \"761px\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-credits-button-y\",\n        \"540px\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-player-x\",\n        \"500px\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-player-y\",\n        \"320px\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-playlist-background-color\",\n        \"#eaeaea\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-playlist-color\",\n        \"#000000\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-playlist-x\",\n        \"500px\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-playlist-y\",\n        \"100px\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-playlist-width\",\n        \"180px\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-playlist-height\",\n        \"160px\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-playlist-opacity\",\n        \"60%\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-prose-background-color\",\n        \"#eaeaea\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-prose-color\",\n        \"#000000\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-prose-x\",\n        \"10px\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-prose-y\",\n        \"100px\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-prose-width\",\n        \"450px\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-prose-height\",\n        \"320px\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-prose-opacity\",\n        \"60%\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-title-background-color\",\n        \"#6c6c6c\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-title-color\",\n        \"#ffffff\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-title-x\",\n        \"0px\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-title-y\",\n        \"0px\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-title-width\",\n        \"640px\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-title-height\",\n        \"36px\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-title-opacity\",\n        \"60%\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-title-margin-bottom\",\n        \"0px\"\n      ]\n    },\n    {\n      \"Case\": \"CssCustomPropertyAndValue\",\n      \"Fields\": [\n        \"--rx-player-title-margin-top\",\n        \"16px\"\n      ]\n    }\n  ],\n  \"parts\": [\n    {\n      \"Case\": \"PresentationDescription\",\n      \"Fields\": [\n        \"\\u003Cdiv\\u003EThis InfoPath Form data is packaged with the audio presentation directory image\\u00A0and is transformed \\u003Cem\\u003Eon the fly\\u003C/em\\u003E into play-list and prose data.\\u003C/div\\u003E\\u003Cdiv\\u003E\\u00A0\\u003C/div\\u003E\\u003Cdiv\\u003E\\u003Cstrong\\u003ENote:\\u003C/strong\\u003E The \\u201CWeb Presentation Items\\u201D in this form become the play-list data. The description written here\\u00A0becomes prose data.\\u003C/div\\u003E\\u003Cdiv\\u003E\\u00A0\\u003C/div\\u003E\\u003Cdiv\\u003E\\u003Ca href=\\u0022http://kintespace.com/kmail.html\\u0022 target=\\u0022_blank\\u0022\\u003Erasx()\\u003C/a\\u003E\\u003C/div\\u003E\"\n      ]\n    },\n    {\n      \"Case\": \"Credits\",\n      \"Fields\": [\n        [\n          {\n            \"role\": \"Audio Tracks\",\n            \"name\": \"Mikey Dread\"\n          },\n          {\n            \"role\": \"ActionScript and PHP\",\n            \"name\": \"Bryan Wilhite\"\n          },\n          {\n            \"role\": \"CSS XML and\\u00A0XSLT\",\n            \"name\": \"Bryan Wilhite\"\n          }\n        ]\n      ]\n    },\n    {\n      \"Case\": \"CopyRights\",\n      \"Fields\": [\n        [\n          {\n            \"year\": 2006,\n            \"name\": \"Songhay System\"\n          }\n        ]\n      ]\n    },\n    {\n      \"Case\": \"Playlist\",\n      \"Fields\": [\n        [\n          [\n            \"sound one\",\n            \"./default/mp3/Mikey Dread - 05.mp3\"\n          ],\n          [\n            \"sound two\",\n            \"./default/mp3/Mikey Dread - 06.mp3\"\n          ],\n          [\n            \"sound three\",\n            \"./default/mp3/Mikey Dread - 07.mp3\"\n          ]\n        ]\n      ]\n    }\n  ]\n}",
+          "latency": 250,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "7a008569-2a77-4890-9987-ec830281a8d9",
+      "type": "http",
+      "documentation": "audio/{presentationKey}/{subFolder}/{blobName}",
+      "method": "get",
+      "endpoint": "audio/default/mp3/Mikey%20Dread%20-%2005",
+      "responses": [
+        {
+          "uuid": "785af194-f288-41c2-9e51-736a133b4312",
+          "body": "{}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "FILE",
+          "filePath": "wwwroot/content/mp3/default/Mikey Dread - 05.mp3",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "fc3b353e-53d2-4955-ae33-b8b7566a3ee9",
+      "type": "http",
+      "documentation": "audio/{presentationKey}/{subFolder}/{blobName}",
+      "method": "get",
+      "endpoint": "audio/default/mp3/Mikey%20Dread%20-%2006",
+      "responses": [
+        {
+          "uuid": "1b3c6586-a696-4506-9b4d-3f7ada4a0aba",
+          "body": "{}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "FILE",
+          "filePath": "wwwroot/content/mp3/default/Mikey Dread - 06.mp3",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "1588ba0d-e424-4d32-8313-7e42549a136e",
+      "type": "http",
+      "documentation": "audio/{presentationKey}/{subFolder}/{blobName}",
+      "method": "get",
+      "endpoint": "audio/default/mp3/Mikey%20Dread%20-%2007",
+      "responses": [
+        {
+          "uuid": "92cc1ba5-e6f0-4af6-915c-6913c5787242",
+          "body": "{}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "FILE",
+          "filePath": "wwwroot/content/mp3/default/Mikey Dread - 07.mp3",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    }
+  ],
+  "rootChildren": [
+    {
+      "type": "route",
+      "uuid": "c42da09b-fa3f-4ad3-beba-aa7930447b33"
+    },
+    {
+      "type": "route",
+      "uuid": "7a008569-2a77-4890-9987-ec830281a8d9"
+    },
+    {
+      "type": "route",
+      "uuid": "fc3b353e-53d2-4955-ae33-b8b7566a3ee9"
+    },
+    {
+      "type": "route",
+      "uuid": "1588ba0d-e424-4d32-8313-7e42549a136e"
+    }
+  ],
+  "proxyMode": false,
+  "proxyHost": "",
+  "proxyRemovePrefix": false,
+  "tlsOptions": {
+    "enabled": false,
+    "type": "CERT",
+    "pfxPath": "",
+    "certPath": "",
+    "keyPath": "",
+    "caPath": "",
+    "passphrase": ""
+  },
+  "cors": true,
+  "headers": [
+    {
+      "key": "Content-Type",
+      "value": "application/json"
+    },
+    {
+      "key": "Access-Control-Allow-Origin",
+      "value": "*"
+    },
+    {
+      "key": "Access-Control-Allow-Methods",
+      "value": "GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS"
+    },
+    {
+      "key": "Access-Control-Allow-Headers",
+      "value": "Content-Type, Origin, Accept, Authorization, Content-Length, X-Requested-With"
+    }
+  ],
+  "proxyReqHeaders": [
+    {
+      "key": "",
+      "value": ""
+    }
+  ],
+  "proxyResHeaders": [
+    {
+      "key": "",
+      "value": ""
+    }
+  ],
+  "data": [],
+  "callbacks": []
+}
