@@ -92,7 +92,7 @@ module ProgressiveAudioPresentationUtility =
             let! elementRef = sectionElementRef
 
             getConventionalCssProperties(key.StringValue) @
-            presentation.cssVariables
+            presentation.cssCustomPropertiesAndValues
             |> List.iter
                     (
                         fun vv ->
