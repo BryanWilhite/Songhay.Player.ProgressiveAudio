@@ -9,6 +9,8 @@ open Bolero
 
 open Songhay.Modules.Models
 open Songhay.Modules.Publications.Models
+
+open Songhay.Modules.Bolero.Models
 open Songhay.Modules.Bolero.JsRuntimeUtility
 
 open Songhay.Player.ProgressiveAudio.ProgressiveAudioScalars
@@ -43,6 +45,8 @@ type ProgressiveAudioModel =
         presentationKey: Identifier option
         /// <summary>defines the <see cref="ProgressiveAudioState"/> collection</summary>
         presentationStates: AppStateSet<ProgressiveAudioState>
+        /// <summary>defines the conventional <see cref="RestApiMetadata"/></summary>
+        restApiMetadata: RestApiMetadata
     }
 
     /// <summary>
@@ -66,6 +70,7 @@ type ProgressiveAudioModel =
             presentation = None
             presentationKey = None
             presentationStates = AppStateSet.initialize
+            restApiMetadata = "PlayerApi" |> RestApiMetadata.fromConfiguration (Songhay.Modules.Bolero.ServiceProviderUtility.getIConfiguration())
         }
 
     /// <summary>
