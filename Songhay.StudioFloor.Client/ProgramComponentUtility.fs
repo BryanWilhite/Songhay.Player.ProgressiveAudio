@@ -16,7 +16,6 @@ open Songhay.Modules.Publications.Models
 open Songhay.Modules.Bolero.JsRuntimeUtility
 open Songhay.Modules.Bolero.RemoteHandlerUtility
 
-open Songhay.Player.ProgressiveAudio.ProgressiveAudioPresentationUtility
 open Songhay.Player.ProgressiveAudio.Models
 
 open Songhay.StudioFloor.Client.Models
@@ -36,7 +35,7 @@ module ProgramComponentUtility =
                 return output
             }
 
-    let getCommandForGetReadMe model =
+    let getCommandForGetReadMe _ =
         let success (result: Result<string, HttpStatusCode>) =
             let data = result |> Result.valueOr (fun code -> $"The expected README data is not here. [error code: {code}]")
             GotReadMe data
@@ -61,7 +60,6 @@ module ProgramComponentUtility =
 
         match message with
         | GetPlayerManifest key ->
-            let uri = key |> getPresentationManifestUri
             let success (result: Result<string, HttpStatusCode>) =
                 result
                 |> Result.either
@@ -84,5 +82,11 @@ module ProgramComponentUtility =
                             jsRuntime |> passErrorToConsole label ex |> StudioFloorMessage.Error
                     )
 
-            Cmd.OfAsync.either Remote.tryDownloadToStringAsync (httpClient, uri) success failure
+            let uriOption = model.paModel.restApiMetadata.ToUriFromClaim("route-for-audio-manifest", key)
+            if uriOption.IsSome then
+                Cmd.OfAsync.either Remote.tryDownloadToStringAsync (httpClient, uriOption.Value) success failure
+            else
+                failure <| exn($"{nameof model.paModel.restApiMetadata.ToUriFromClaim} returned {nameof None} for {nameof key} `{key}`.") |> ignore
+                Cmd.none
+
         | _ -> Cmd.none
