@@ -40,16 +40,6 @@ module ProgressiveAudioPresentationUtility =
         ($"{rxProgressiveAudioRoot}{presentationKey}/{presentationKey}_presentation.json", UriKind.Absolute) |> Uri
 
     /// <summary>
-    /// Gets the playlist item <see cref="Uri"/>
-    /// with the specified key and relative path.
-    /// </summary>
-    /// <param name="presentationKey">the Presentation key</param>
-    /// <param name="relativePath">the relative path to the playlist item</param>
-    let getPresentationPlaylistItemUri (presentationKey: string ) (relativePath: string) =
-        let segment = relativePath.TrimStart('.', '/')
-        ($"{rxProgressiveAudioApiRoot}/api/Player/v1/audio/{presentationKey}/{segment}", UriKind.Absolute) |> Uri
-
-    /// <summary>
     /// Gets the time display text
     /// from the specified <see cref="decimal"/> in seconds.
     /// </summary>

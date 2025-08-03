@@ -130,8 +130,7 @@ type ProgressiveAudioModel =
                 | Error msg ->
                     jsRuntime |> consoleErrorAsync [| $"{nameof Playlist} processing error for {txt}: {msg}" |] |> ignore
                     None
-                | Ok uri ->
-                    Some (txt, uri)
+                | Ok uri -> Some (txt, uri)
 
             let presentationOption =
                 data
@@ -265,10 +264,12 @@ type ProgressiveAudioModel =
     /// The <c>relativeUri</c> should be of the form <c>{presentationKey}/{subFolder}/{blobName}</c>
     /// </remarks>
     member this.buildPlaylistUriResult (relativeUri: Uri) =
-        if relativeUri.IsAbsoluteUri then Error "This member does not support absolute URIs."
+        if relativeUri.IsAbsoluteUri then
+            Error "This member does not support absolute URIs."
         else
             let names = relativeUri.AbsolutePath.TrimStart('.').Trim('/').Split('/')
-            if names.Length < 3 then Error $"The expected URI segments were not found [{nameof relativeUri.AbsolutePath}:`{relativeUri.AbsolutePath}`]."
+            if names.Length < 3 then
+                Error $"The expected number of URI segments were not found [{nameof relativeUri.AbsolutePath}:`{relativeUri.AbsolutePath}`]."
             else
                 let presentationKey = names[0]
                 let subFolder = names[1]
