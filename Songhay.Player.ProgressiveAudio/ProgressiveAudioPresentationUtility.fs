@@ -18,18 +18,6 @@ open Songhay.Player.ProgressiveAudio.ProgressiveAudioScalars
 module ProgressiveAudioPresentationUtility =
 
     /// <summary>
-    /// Builds an absolute <see cref="Uri"/>
-    /// from the conventional relative <see cref="Uri"/>.
-    /// </summary>
-    /// <param name="relativeUri">the conventional relative <see cref="Uri"/></param>
-    let buildAudioRootUri (relativeUri: Uri) =
-        if relativeUri.IsAbsoluteUri then relativeUri
-        else
-            let builder = UriBuilder(rxProgressiveAudioRoot)
-            builder.Path <- $"{builder.Path}{relativeUri.OriginalString.TrimStart([|'.';'/'|])}"
-            builder.Uri
-
-    /// <summary>
     /// Gets the conventional custom CSS properties for a <c>800×600</c> <see cref="Presentation"/>.
     /// </summary>
     /// <param name="presentationKey">the Presentation key</param>
@@ -78,12 +66,12 @@ module ProgressiveAudioPresentationUtility =
     /// </summary>
     /// <param name="jsRuntime">the <see cref="IJSRuntime"/></param>
     /// <param name="sectionElementRef">the <see cref="HtmlRef"/> targeted for <see cref="setComputedStylePropertyValueAsync"/></param>
-    /// <param name="playListMapper">maps the relative playlist paths to absolute paths</param>
+    /// <param name="playListChooser">maps the relative playlist paths to absolute paths</param>
     /// <param name="data"><see cref="Presentation"/> data pair</param>
     let toPresentationOption
         (jsRuntime: IJSRuntime)
         (sectionElementRef: HtmlRef option)
-        (playListMapper: DisplayText * Uri -> DisplayText * Uri)
+        (playListChooser: DisplayText * Uri -> (DisplayText * Uri) option)
         (data: Identifier * Presentation option) =
 
         option {
@@ -103,14 +91,14 @@ module ProgressiveAudioPresentationUtility =
                                 |> ignore
                     )
 
-            let map list =
+            let choose list =
                 list
-                |> List.map playListMapper
+                |> List.choose playListChooser
                 |> Playlist
 
             let parts =
                 presentation.parts
-                |> List.map(fun part -> match part with | Playlist list -> list |> map | _ -> part)
+                |> List.map(fun part -> match part with | Playlist list -> list |> choose | _ -> part)
 
             return { presentation with parts = parts }
         }
