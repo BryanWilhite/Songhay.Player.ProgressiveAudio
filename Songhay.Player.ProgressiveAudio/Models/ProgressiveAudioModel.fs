@@ -138,6 +138,7 @@ type ProgressiveAudioModel =
                 toPresentationOption
                     jsRuntime
                     model.blazorServices.sectionElementRef
+                    (model.restApiMetadata.ToUriFromClaim("route-for-audio-blob", $"{data |> fst}", "jpg", "background.jpg"))
                     chooseAudioPlaylistUri
 
             let currentItem =
