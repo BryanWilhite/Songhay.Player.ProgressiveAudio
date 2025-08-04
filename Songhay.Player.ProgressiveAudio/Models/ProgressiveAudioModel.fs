@@ -125,6 +125,7 @@ type ProgressiveAudioModel =
             }
 
         | GotPlayerManifest data ->
+
             let chooseAudioPlaylistUri (txt: DisplayText, relativeUri: Uri) =
                 match model.buildPlaylistUriResult relativeUri with
                 | Error msg ->
@@ -132,13 +133,15 @@ type ProgressiveAudioModel =
                     None
                 | Ok uri -> Some (txt, uri)
 
+            let bgImgUriOption = model.restApiMetadata.ToUriFromClaim("route-for-audio-blob", $"{(data |> fst).StringValue}", "jpg", "background.jpg") 
+
             let presentationOption =
                 data
                 |>
                 toPresentationOption
                     jsRuntime
                     model.blazorServices.sectionElementRef
-                    (model.restApiMetadata.ToUriFromClaim("route-for-audio-blob", $"{(data |> fst).StringValue}", "jpg", "background.jpg"))
+                    bgImgUriOption
                     chooseAudioPlaylistUri
 
             let currentItem =
@@ -265,12 +268,13 @@ type ProgressiveAudioModel =
     /// The <c>relativeUri</c> should be of the form <c>{presentationKey}/{subFolder}/{blobName}</c>
     /// </remarks>
     member this.buildPlaylistUriResult (relativeUri: Uri) =
+        let jsRuntime = Songhay.Modules.Bolero.ServiceProviderUtility.getIJSRuntime()
         if relativeUri.IsAbsoluteUri then
             Error "This member does not support absolute URIs."
         else
-            let names = relativeUri.AbsolutePath.TrimStart('.').Trim('/').Split('/')
+            let names = relativeUri.OriginalString.TrimStart('.').Trim('/').Split('/')
             if names.Length < 3 then
-                Error $"The expected number of URI segments were not found [{nameof relativeUri.AbsolutePath}:`{relativeUri.AbsolutePath}`]."
+                Error $"The expected number of URI segments were not found [{nameof relativeUri.OriginalString}:`{relativeUri.OriginalString}`]."
             else
                 let presentationKey = names[0]
                 let subFolder = names[1]
@@ -278,7 +282,9 @@ type ProgressiveAudioModel =
 
                 match this.restApiMetadata.ToUriFromClaim("route-for-audio-blob", presentationKey, subFolder, blobName) with
                 | None -> Error $"The call to {nameof this.restApiMetadata.ToUriFromClaim} returned {nameof None}."
-                | Some uri -> Ok uri
+                | Some uri ->
+                    jsRuntime |> consoleWarnAsync [| nameof this.buildPlaylistUriResult; uri |] |> ignore
+                    Ok uri
 
     /// <summary>
     /// Chooses any <see cref="RoleCredit"/> list of the current <see cref="Presentation"/>.

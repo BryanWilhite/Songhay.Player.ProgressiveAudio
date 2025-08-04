@@ -76,14 +76,13 @@ module ProgressiveAudioPresentationUtility =
                                 |> ignore
                     )
 
-            let choose list =
-                list
-                |> List.choose playListChooser
-                |> Playlist
-
             let parts =
                 presentation.parts
-                |> List.map(fun part -> match part with | Playlist list -> list |> choose | _ -> part)
+                |> List.choose(fun part ->
+                    match part with
+                    | Playlist list -> list |> List.choose playListChooser |> Playlist |> Some
+                    | _ -> Some part
+                    )
 
             return { presentation with parts = parts }
         }
