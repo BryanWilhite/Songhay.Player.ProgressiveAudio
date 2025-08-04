@@ -22,13 +22,14 @@ module ProgressiveAudioPresentationUtility =
     /// </summary>
     /// <param name="bgImgUri">the Presentation background image URI</param>
     let getConventionalCssProperties (bgImgUri: Uri) =
-        let buttonImgUrl = $"url({rxAkyinkyinSvgDataUrl})"
+        let cssUrlForBgImg = $"url({bgImgUri.OriginalString})"
+        let cssUrlForButtonBgSvg = $"url({rxAkyinkyinSvgDataUrl})"
 
         [
             CssCustomPropertyAndValue (CssCustomProperty.fromInput "rx-player-width", CssValue "800px")
             CssCustomPropertyAndValue (CssCustomProperty.fromInput "rx-player-height", CssValue "600px")
-            CssCustomPropertyAndValue (CssCustomProperty.fromInput "rx-player-background-image", CssValue bgImgUri.OriginalString)
-            CssCustomPropertyAndValue (CssCustomProperty.fromInput "rx-player-credits-button-background-image", CssValue buttonImgUrl)
+            CssCustomPropertyAndValue (CssCustomProperty.fromInput "rx-player-background-image", CssValue cssUrlForBgImg)
+            CssCustomPropertyAndValue (CssCustomProperty.fromInput "rx-player-credits-button-background-image", CssValue cssUrlForButtonBgSvg)
         ]
 
     /// <summary>
