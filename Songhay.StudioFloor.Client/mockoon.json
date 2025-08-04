@@ -44,7 +44,7 @@
       "type": "http",
       "documentation": "audio/{presentationKey}/{subFolder}/{blobName}",
       "method": "get",
-      "endpoint": "audio/default/mp3/Mikey%20Dread%20-%2005",
+      "endpoint": "audio/default/mp3/Mikey%20Dread%20-%2005.mp3",
       "responses": [
         {
           "uuid": "785af194-f288-41c2-9e51-736a133b4312",
@@ -54,7 +54,7 @@
           "label": "",
           "headers": [],
           "bodyType": "FILE",
-          "filePath": "wwwroot/content/mp3/default/Mikey Dread - 05.mp3",
+          "filePath": "wwwroot/content/default/mp3/Mikey Dread - 05.mp3",
           "databucketID": "",
           "sendFileAsBody": false,
           "rules": [],
@@ -62,6 +62,25 @@
           "disableTemplating": false,
           "fallbackTo404": false,
           "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "4dc9e7ea-a2df-4ce8-af94-1fc62f0aa901",
+          "body": "{}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": " (copy)",
+          "headers": [],
+          "bodyType": "FILE",
+          "filePath": "wwwroot/content/default/mp3/Mikey Dread - 05.mp3",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
           "crudKey": "id",
           "callbacks": []
         }
@@ -75,7 +94,7 @@
       "type": "http",
       "documentation": "audio/{presentationKey}/{subFolder}/{blobName}",
       "method": "get",
-      "endpoint": "audio/default/mp3/Mikey%20Dread%20-%2006",
+      "endpoint": "audio/default/mp3/Mikey%20Dread%20-%2006.mp3",
       "responses": [
         {
           "uuid": "1b3c6586-a696-4506-9b4d-3f7ada4a0aba",
@@ -85,7 +104,7 @@
           "label": "",
           "headers": [],
           "bodyType": "FILE",
-          "filePath": "wwwroot/content/mp3/default/Mikey Dread - 06.mp3",
+          "filePath": "wwwroot/content/default/mp3/Mikey Dread - 06.mp3",
           "databucketID": "",
           "sendFileAsBody": false,
           "rules": [],
@@ -106,7 +125,7 @@
       "type": "http",
       "documentation": "audio/{presentationKey}/{subFolder}/{blobName}",
       "method": "get",
-      "endpoint": "audio/default/mp3/Mikey%20Dread%20-%2007",
+      "endpoint": "audio/default/mp3/Mikey%20Dread%20-%2007.mp3",
       "responses": [
         {
           "uuid": "92cc1ba5-e6f0-4af6-915c-6913c5787242",
@@ -116,7 +135,7 @@
           "label": "",
           "headers": [],
           "bodyType": "FILE",
-          "filePath": "wwwroot/content/mp3/default/Mikey Dread - 07.mp3",
+          "filePath": "wwwroot/content/default/mp3/Mikey Dread - 07.mp3",
           "databucketID": "",
           "sendFileAsBody": false,
           "rules": [],
@@ -131,12 +150,66 @@
       "responseMode": null,
       "streamingMode": null,
       "streamingInterval": 0
+    },
+    {
+      "uuid": "4d9f4d71-2b6a-4635-91ae-5e89013f0315",
+      "type": "http",
+      "documentation": "audio/{presentationKey}/{subFolder}/{blobName}",
+      "method": "get",
+      "endpoint": "audio/default/jpg/background.jpg",
+      "responses": [
+        {
+          "uuid": "520d4bd8-ac77-4a9c-a30d-0b75bea6dda6",
+          "body": "{}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "FILE",
+          "filePath": "wwwroot/content/default/jpg/background.jpg",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "5a46c5b2-2919-42ee-8c21-f7e4ca9dda15",
+          "body": "{}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": " (copy)",
+          "headers": [],
+          "bodyType": "FILE",
+          "filePath": "wwwroot/content/default/mp3/Mikey Dread - 05.mp3",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
     }
   ],
   "rootChildren": [
     {
       "type": "route",
       "uuid": "c42da09b-fa3f-4ad3-beba-aa7930447b33"
+    },
+    {
+      "type": "route",
+      "uuid": "4d9f4d71-2b6a-4635-91ae-5e89013f0315"
     },
     {
       "type": "route",
