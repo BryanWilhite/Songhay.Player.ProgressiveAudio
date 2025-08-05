@@ -40,6 +40,7 @@ type PlaylistElmishComponent() =
                                 on.click (fun _ -> dispatch <| PlaylistClick (txt, uri))
                                 DomElementEvent.Click.PreventDefault
 
+                                attr.target "_blank"
                                 attr.href "#"
 
                                 text txt.Value

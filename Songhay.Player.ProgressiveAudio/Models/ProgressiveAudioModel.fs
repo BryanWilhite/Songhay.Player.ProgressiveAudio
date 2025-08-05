@@ -268,7 +268,6 @@ type ProgressiveAudioModel =
     /// The <c>relativeUri</c> should be of the form <c>{presentationKey}/{subFolder}/{blobName}</c>
     /// </remarks>
     member this.buildPlaylistUriResult (relativeUri: Uri) =
-        let jsRuntime = Songhay.Modules.Bolero.ServiceProviderUtility.getIJSRuntime()
         if relativeUri.IsAbsoluteUri then
             Error "This member does not support absolute URIs."
         else
@@ -282,9 +281,7 @@ type ProgressiveAudioModel =
 
                 match this.restApiMetadata.ToUriFromClaim("route-for-audio-blob", presentationKey, subFolder, blobName) with
                 | None -> Error $"The call to {nameof this.restApiMetadata.ToUriFromClaim} returned {nameof None}."
-                | Some uri ->
-                    jsRuntime |> consoleWarnAsync [| nameof this.buildPlaylistUriResult; uri |] |> ignore
-                    Ok uri
+                | Some uri -> Ok uri
 
     /// <summary>
     /// Chooses any <see cref="RoleCredit"/> list of the current <see cref="Presentation"/>.
