@@ -5,6 +5,7 @@ open Bolero.Html
 
 open Songhay.Modules.Bolero.Models
 open Songhay.Modules.Bolero.Visuals.Bulma.CssClass
+open Songhay.Modules.Models
 open Songhay.Player.ProgressiveAudio.Models
 
 /// <summary>
@@ -24,6 +25,7 @@ type PlaylistElmishComponent() =
                         li {
                             [
                                 "panel-block"
+                                p(B, L0)
                                 if model.currentPlaylistItem = Some (txt, uri) then "is-active"
                                 else ()
                             ] |> CssClasses.toHtmlClassFromList
@@ -31,17 +33,13 @@ type PlaylistElmishComponent() =
                                 [ "panel-icon"; fontSize Size5 ] |> CssClasses.toHtmlClassFromList
                                 text "⬤"
                             }
-                            a {
+                            button {
                                 [
-                                    fontSize Size7
+                                    buttonClass
+                                    "is-ghost"
                                     if not (model.presentationStates.hasState CanPlay) then "anchor-disabled"
                                 ] |> CssClasses.toHtmlClassFromList
-
                                 on.click (fun _ -> dispatch <| PlaylistClick (txt, uri))
-                                DomElementEvent.Click.PreventDefault
-
-                                attr.target "_blank"
-                                attr.href "#"
 
                                 text txt.Value
                             }
