@@ -4,6 +4,7 @@ open Bolero
 open Bolero.Html
 
 open Songhay.Modules.Bolero.Models
+open Songhay.Modules.Bolero.Visuals.BodyElement
 open Songhay.Modules.Bolero.Visuals.Bulma.CssClass
 open Songhay.Modules.Models
 open Songhay.Player.ProgressiveAudio.Models
@@ -25,24 +26,22 @@ type PlaylistElmishComponent() =
                         li {
                             [
                                 "panel-block"
-                                p(B, L0)
                                 if model.currentPlaylistItem = Some (txt, uri) then "is-active"
-                                else ()
-                            ] |> CssClasses.toHtmlClassFromList
+                            ]
+                            |> CssClasses.toHtmlClassFromList
+
                             span {
                                 [ "panel-icon"; fontSize Size5 ] |> CssClasses.toHtmlClassFromList
                                 text "⬤"
                             }
-                            button {
-                                [
-                                    buttonClass
-                                    "is-ghost"
-                                    if not (model.presentationStates.hasState CanPlay) then "anchor-disabled"
-                                ] |> CssClasses.toHtmlClassFromList
-                                on.click (fun _ -> dispatch <| PlaylistClick (txt, uri))
 
-                                text txt.Value
-                            }
+                            anchorButtonElement
+                                (HasClasses <| CssClasses [
+                                    fontSize Size7
+                                    if not (model.presentationStates.hasState CanPlay) then "anchor-disabled"
+                                ])
+                                (HasAttr <| on.click (fun _ -> dispatch <| PlaylistClick (txt, uri)))
+                                (text txt.Value)
                         }
                 | false ->
                     li { text "[ Loading… ]" }
