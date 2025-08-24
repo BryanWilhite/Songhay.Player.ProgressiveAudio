@@ -9,8 +9,7 @@ open FsToolkit.ErrorHandling
 open Songhay.Modules.Models
 open Songhay.Modules.Publications.Models
 open Songhay.Modules.Bolero.JsRuntimeUtility
-
-open Songhay.Player.ProgressiveAudio.ProgressiveAudioScalars
+open Songhay.Modules.Bolero.SvgUtility
 
 /// <summary>
 /// Shared utilities for Progressive Audio Presentations

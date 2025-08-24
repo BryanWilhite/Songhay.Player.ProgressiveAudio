@@ -7,11 +7,13 @@ open FsToolkit.ErrorHandling
 
 open Bolero
 
+open Songhay.Modules.Bolero
 open Songhay.Modules.Models
 open Songhay.Modules.Publications.Models
 
 open Songhay.Modules.Bolero.Models
 open Songhay.Modules.Bolero.JsRuntimeUtility
+open Songhay.Modules.Bolero.ServiceProviderUtility
 
 open Songhay.Player.ProgressiveAudio.ProgressiveAudioScalars
 open Songhay.Player.ProgressiveAudio.ProgressiveAudioPresentationUtility
@@ -46,7 +48,7 @@ type ProgressiveAudioModel =
         /// <summary>defines the <see cref="ProgressiveAudioState"/> collection</summary>
         presentationStates: AppStateSet<ProgressiveAudioState>
         /// <summary>defines the conventional <see cref="RestApiMetadata"/></summary>
-        restApiMetadata: RestApiMetadata
+        restApiMetadataOption: RestApiMetadata option
     }
 
     /// <summary>
@@ -54,7 +56,7 @@ type ProgressiveAudioModel =
     /// </summary>
     /// <param name="serviceProvider">the <see cref="IServiceProvider"/></param>
     static member initialize (serviceProvider: IServiceProvider) =
-        Songhay.Modules.Bolero.ServiceProviderUtility.setBlazorServiceProvider serviceProvider
+        setBlazorServiceProvider serviceProvider
         {
             blazorServices = {|
                                sectionElementRef = None
@@ -70,7 +72,9 @@ type ProgressiveAudioModel =
             presentation = None
             presentationKey = None
             presentationStates = AppStateSet.initialize
-            restApiMetadata = "PlayerApi" |> RestApiMetadata.fromConfiguration (Songhay.Modules.Bolero.ServiceProviderUtility.getIConfiguration())
+            restApiMetadataOption = "PlayerApi"
+                                    |> RestApiMetadata.fromConfiguration (getIConfiguration())
+                                    |> RestApiMetadata.toRestApiMetadataOption (getILogger().LogException)
         }
 
     /// <summary>
@@ -79,7 +83,7 @@ type ProgressiveAudioModel =
     /// <param name="message">the <see cref="ProgressiveAudioMessage"/></param>
     /// <param name="model">the <see cref="ProgressiveAudioModel"/></param>
     static member updateModel (message: ProgressiveAudioMessage) (model: ProgressiveAudioModel) =
-        let jsRuntime = Songhay.Modules.Bolero.ServiceProviderUtility.getIJSRuntime()
+        let jsRuntime = getIJSRuntime()
 
         let dotNetObjectReference() = DotNetObjectReference.Create(model.blazorServices.playerControlsComp.Value)
 
@@ -133,7 +137,19 @@ type ProgressiveAudioModel =
                     None
                 | Ok uri -> Some (txt, uri)
 
-            let bgImgUriOption = model.restApiMetadata.ToUriFromClaim("route-for-audio-blob", $"{(data |> fst).StringValue}", "jpg", "background.jpg") 
+            let bgImgUriOption = model.restApiMetadataOption
+                                    |> Option.either
+                                        (
+                                            fun restApiMetadata ->
+                                                restApiMetadata.ToUriResultFromClaim("route-for-audio-blob", $"{(data |> fst).StringValue}", "jpg", "background.jpg")
+                                                |> Result.teeError (getILogger().LogException)
+                                        )
+                                        (
+                                            fun () ->
+                                                Error <| exn $"The expected {nameof model.restApiMetadataOption} is not here."
+                                                |> Result.teeError (getILogger().LogException)
+                                        )
+                                    |> Option.ofResult
 
             let presentationOption =
                 data
@@ -279,9 +295,15 @@ type ProgressiveAudioModel =
                 let subFolder = names[1]
                 let blobName = names[2]
 
-                match this.restApiMetadata.ToUriFromClaim("route-for-audio-blob", presentationKey, subFolder, blobName) with
-                | None -> Error $"The call to {nameof this.restApiMetadata.ToUriFromClaim} returned {nameof None}."
-                | Some uri -> Ok uri
+                this.restApiMetadataOption
+                |> Option.either
+                    (
+                        fun restApiMetadata ->
+                            restApiMetadata.ToUriResultFromClaim("route-for-audio-blob", presentationKey, subFolder, blobName)
+                            |> Result.teeError (getILogger().LogException)
+                            |> Result.mapError _.Message
+                    )
+                    (fun () -> Error $"The expected {nameof this.restApiMetadataOption} is not here.")
 
     /// <summary>
     /// Chooses any <see cref="RoleCredit"/> list of the current <see cref="Presentation"/>.

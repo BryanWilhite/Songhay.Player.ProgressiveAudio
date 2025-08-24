@@ -9,6 +9,7 @@ open Elmish
 
 open FsToolkit.ErrorHandling
 
+open Songhay.Modules.Bolero
 open Songhay.Modules.HttpClientUtility
 open Songhay.Modules.HttpRequestMessageUtility
 open Songhay.Modules.Models
@@ -21,8 +22,8 @@ open Songhay.Player.ProgressiveAudio.Models
 open Songhay.StudioFloor.Client.Models
 
 module ProgramComponentUtility =
-    let httpClient = Songhay.Modules.Bolero.ServiceProviderUtility.getHttpClient()
-    let jsRuntime = Songhay.Modules.Bolero.ServiceProviderUtility.getIJSRuntime()
+    let httpClient = ServiceProviderUtility.getHttpClient()
+    let jsRuntime = ServiceProviderUtility.getIJSRuntime()
 
     module Remote =
         let tryDownloadToStringAsync (client: HttpClient, uri: Uri) =
@@ -82,11 +83,26 @@ module ProgramComponentUtility =
                             jsRuntime |> passErrorToConsole label ex |> StudioFloorMessage.Error
                     )
 
-            let uriOption = model.paModel.restApiMetadata.ToUriFromClaim("route-for-audio-manifest", key)
-            if uriOption.IsSome then
-                Cmd.OfAsync.either Remote.tryDownloadToStringAsync (httpClient, uriOption.Value) success failure
-            else
-                failure <| exn($"{nameof model.paModel.restApiMetadata.ToUriFromClaim} returned {nameof None} for {nameof key} `{key}`.") |> ignore
-                Cmd.none
+            let uriResult = model.paModel.restApiMetadataOption
+                            |> Option.either
+                                (
+                                    fun restApiMetadata ->
+                                        restApiMetadata.ToUriResultFromClaim("route-for-audio-manifest", key)
+                                        |> Result.teeError jsRuntime.LogException
+                                )
+                                (
+                                    fun () ->
+                                        Result.Error <| exn $"The expected {nameof model.paModel.restApiMetadataOption} is not here."
+                                        |> Result.teeError jsRuntime.LogException
+                                )
+
+            uriResult
+            |> Result.either
+                (fun uri -> Cmd.OfAsync.either Remote.tryDownloadToStringAsync (httpClient, uri) success failure)
+                (
+                    fun e ->
+                        failure <| exn($"{nameof e.Message}: {e.Message} [{nameof key} `{key}`].") |> ignore
+                        Cmd.none
+                )
 
         | _ -> Cmd.none
