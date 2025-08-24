@@ -22,7 +22,7 @@ type PlayerCreditsElmishComponent() =
     /// <summary>the child node customizing <see cref="bulmaModalContainer"/></summary>
     let modalNode (model: ProgressiveAudioModel) dispatch =
         let creditItemsNode =
-            model.presentationCredits
+            model.PresentationCredits
             |> Option.either
                 (fun roleCredits ->
                     forEach roleCredits <| fun roleCredit ->

@@ -20,9 +20,9 @@ type PlaylistElmishComponent() =
         ol {
             [ panel; "track-list" ] |> CssClasses.toHtmlClassFromList
             attr.id "playlist"
-            cond model.presentationPlayList.IsSome <| function
+            cond model.PresentationPlayList.IsSome <| function
                 | true ->
-                    forEach model.presentationPlayList.Value <| fun (txt, uri) ->
+                    forEach model.PresentationPlayList.Value <| fun (txt, uri) ->
                         li {
                             [
                                 "panel-block"

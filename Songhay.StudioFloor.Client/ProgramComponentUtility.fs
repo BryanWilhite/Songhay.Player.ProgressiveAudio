@@ -83,7 +83,7 @@ module ProgramComponentUtility =
                             jsRuntime |> passErrorToConsole label ex |> StudioFloorMessage.Error
                     )
 
-            let uriResult = model.paModel.toUriResultFromClaim("route-for-audio-manifest", key)
+            let uriResult = model.paModel.ToUriResultFromClaim("route-for-audio-manifest", key)
 
             uriResult
             |> Result.either

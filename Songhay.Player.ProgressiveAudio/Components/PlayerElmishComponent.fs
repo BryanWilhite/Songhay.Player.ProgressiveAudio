@@ -54,8 +54,8 @@ type PlayerElmishComponent() =
                     | _ -> "[ Loading… ]"
 
             PlayerProseComponent.BComp <|
-                match model.presentationDescription.IsSome with
-                    | true -> model.presentationDescription.Value
+                match model.PresentationDescription.IsSome with
+                    | true -> model.PresentationDescription.Value
                     | _ -> "[ Loading… ]"
 
             (model, dispatch) ||> PlaylistElmishComponent.EComp

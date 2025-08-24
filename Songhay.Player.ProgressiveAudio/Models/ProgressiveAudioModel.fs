@@ -131,14 +131,14 @@ type ProgressiveAudioModel =
         | GotPlayerManifest data ->
 
             let chooseAudioPlaylistUri (txt: DisplayText, relativeUri: Uri) =
-                match model.buildPlaylistUriResult relativeUri with
+                match model.BuildPlaylistUriResult relativeUri with
                 | Error msg ->
                     jsRuntime |> consoleErrorAsync [| $"{nameof Playlist} processing error for {txt}: {msg}" |] |> ignore
                     None
                 | Ok uri -> Some (txt, uri)
 
             let bgImgUriOption =
-                model.toUriResultFromClaim("route-for-audio-blob", $"{(data |> fst).StringValue}", "jpg", "background.jpg")
+                model.ToUriResultFromClaim("route-for-audio-blob", $"{(data |> fst).StringValue}", "jpg", "background.jpg")
                 |> Option.ofResult
 
             let presentationOption =
@@ -268,7 +268,7 @@ type ProgressiveAudioModel =
     /// <summary>
     /// An <c>option</c> wrapper for <see cref="RestApiMetadata.ToUriResultFromClaim"/>.
     /// </summary>
-    member this.toUriResultFromClaim(key: string, [<ParamArray>] args: string[]) =
+    member this.ToUriResultFromClaim(key: string, [<ParamArray>] args: string[]) =
         this.restApiMetadataOption
         |> Option.either
             (
@@ -286,7 +286,7 @@ type ProgressiveAudioModel =
     /// <remarks>
     /// The <c>relativeUri</c> should be of the form <c>{presentationKey}/{subFolder}/{blobName}</c>
     /// </remarks>
-    member this.buildPlaylistUriResult (relativeUri: Uri) =
+    member this.BuildPlaylistUriResult (relativeUri: Uri) =
         if relativeUri.IsAbsoluteUri then
             Error "This member does not support absolute URIs."
         else
@@ -298,13 +298,13 @@ type ProgressiveAudioModel =
                 let subFolder = names[1]
                 let blobName = names[2]
 
-                this.toUriResultFromClaim("route-for-audio-blob", presentationKey, subFolder, blobName)
+                this.ToUriResultFromClaim("route-for-audio-blob", presentationKey, subFolder, blobName)
                 |> Result.mapError _.Message
 
     /// <summary>
     /// Chooses any <see cref="RoleCredit"/> list of the current <see cref="Presentation"/>.
     /// </summary>
-    member this.presentationCredits =
+    member this.PresentationCredits =
         option {
             let! pres = this.presentation
             return! pres.credits
@@ -313,7 +313,7 @@ type ProgressiveAudioModel =
     /// <summary>
     /// Chooses any <see cref="Description"/> <see cref="string"/> of the current <see cref="Presentation"/>.
     /// </summary>
-    member this.presentationDescription =
+    member this.PresentationDescription =
         option {
             let! pres = this.presentation
             return! pres.description
@@ -322,7 +322,7 @@ type ProgressiveAudioModel =
     /// <summary>
     /// Chooses any <see cref="Playlist"/> tuple list of the current <see cref="Presentation"/>.
     /// </summary>
-    member this.presentationPlayList =
+    member this.PresentationPlayList =
         option {
             let! pres = this.presentation
             return! pres.playList
