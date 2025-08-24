@@ -83,18 +83,7 @@ module ProgramComponentUtility =
                             jsRuntime |> passErrorToConsole label ex |> StudioFloorMessage.Error
                     )
 
-            let uriResult = model.paModel.restApiMetadataOption
-                            |> Option.either
-                                (
-                                    fun restApiMetadata ->
-                                        restApiMetadata.ToUriResultFromClaim("route-for-audio-manifest", key)
-                                        |> Result.teeError jsRuntime.LogException
-                                )
-                                (
-                                    fun () ->
-                                        Result.Error <| exn $"The expected {nameof model.paModel.restApiMetadataOption} is not here."
-                                        |> Result.teeError jsRuntime.LogException
-                                )
+            let uriResult = model.paModel.toUriResultFromClaim("route-for-audio-manifest", key)
 
             uriResult
             |> Result.either
