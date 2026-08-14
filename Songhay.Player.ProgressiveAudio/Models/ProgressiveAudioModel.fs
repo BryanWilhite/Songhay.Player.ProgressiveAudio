@@ -7,11 +7,10 @@ open FsToolkit.ErrorHandling
 
 open Bolero
 
-open Songhay.Modules.Bolero
+open Songhay.Modules
 open Songhay.Modules.Models
 open Songhay.Modules.Publications.Models
 
-open Songhay.Modules.Bolero.Models
 open Songhay.Modules.Bolero.JsRuntimeUtility
 open Songhay.Modules.Bolero.ServiceProviderUtility
 
@@ -153,7 +152,7 @@ type ProgressiveAudioModel =
             let currentItem =
                 option {
                     let! presentation = presentationOption
-                    let! playList = presentation.playList
+                    let! playList = presentation.playlist
 
                     return playList |> List.head
                 }
@@ -322,8 +321,8 @@ type ProgressiveAudioModel =
     /// <summary>
     /// Chooses any <see cref="Playlist"/> tuple list of the current <see cref="Presentation"/>.
     /// </summary>
-    member this.PresentationPlayList =
+    member this.PresentationPlaylist =
         option {
             let! pres = this.presentation
-            return! pres.playList
+            return! pres.playlist
         }

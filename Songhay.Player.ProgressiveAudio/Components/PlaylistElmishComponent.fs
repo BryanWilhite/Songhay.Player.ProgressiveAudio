@@ -6,7 +6,6 @@ open Bolero.Html
 open Songhay.Modules.Bolero.Models
 open Songhay.Modules.Bolero.Visuals.BodyElement
 open Songhay.Modules.Bolero.Visuals.Bulma.CssClass
-open Songhay.Modules.Models
 open Songhay.Player.ProgressiveAudio.Models
 
 /// <summary>
@@ -20,9 +19,9 @@ type PlaylistElmishComponent() =
         ol {
             [ panel; "track-list" ] |> CssClasses.toHtmlClassFromList
             attr.id "playlist"
-            cond model.PresentationPlayList.IsSome <| function
+            cond model.PresentationPlaylist.IsSome <| function
                 | true ->
-                    forEach model.PresentationPlayList.Value <| fun (txt, uri) ->
+                    forEach model.PresentationPlaylist.Value <| fun (txt, uri) ->
                         li {
                             [
                                 "panel-block"

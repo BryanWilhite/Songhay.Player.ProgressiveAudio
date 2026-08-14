@@ -1,7 +1,6 @@
 module Songhay.Modules.Models.Tests.AppStateSetTests
 
 open Xunit
-open FsUnit.Xunit
 
 open Songhay.Modules.Models
 
@@ -12,9 +11,9 @@ let ``hasState test`` () =
 
     let actual = AppStateSet<MyAppState>.initialize.addStates(StateOne, StateThree)
 
-    actual.hasState StateOne |> should be True
-    actual.hasState StateTwo |> should be False
-    actual.hasState StateThree |> should be True
+    actual.hasState StateOne |> Assert.True
+    actual.hasState StateTwo |> Assert.False
+    actual.hasState StateThree |> Assert.True
 
 [<Fact>]
 let ``removeStates test`` () =
@@ -24,9 +23,9 @@ let ``removeStates test`` () =
                      .addStates(StateOne, StateTwo, StateThree)
                      .removeStates(StateTwo, StateThree)
 
-    actual.hasState StateOne |> should be True
-    actual.hasState StateTwo |> should be False
-    actual.hasState StateThree |> should be False
+    actual.hasState StateOne |> Assert.True
+    actual.hasState StateTwo |> Assert.False
+    actual.hasState StateThree |> Assert.False
 
 
 [<Fact>]
@@ -37,12 +36,12 @@ let ``toggleState test`` () =
                      .addStates(StateOne, StateTwo, StateThree)
                      .toggleState(StateTwo)
 
-    actual.hasState StateTwo |> should be False
+    actual.hasState StateTwo |> Assert.False
 
-    actual.states.Count |> should equal 2
+    Assert.Equal(2, actual.states.Count)
 
     let actual = actual.toggleState(StateTwo)
 
-    actual.hasState StateTwo |> should be True
+    actual.hasState StateTwo |> Assert.True
 
-    actual.states.Count |> should equal 3
+    Assert.Equal(3, actual.states.Count)
