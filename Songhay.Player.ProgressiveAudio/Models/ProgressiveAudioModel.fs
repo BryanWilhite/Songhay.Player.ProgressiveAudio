@@ -30,6 +30,8 @@ type ProgressiveAudioModel =
                         |}
         /// <summary>current playlist item info</summary>
         currentPlaylistItem: (DisplayText * Uri) option
+        /// <summary>playlist of absolute URIs</summary>
+        playlist: (DisplayText * Uri) list option
         /// <summary>current error text</summary>
         error: string option
         /// <summary>the latest value of <see cref="PlayerAnimationTickData.audioCurrentTime"/></summary>
@@ -63,6 +65,7 @@ type ProgressiveAudioModel =
                                playerControlsComp = None
                             |}
             currentPlaylistItem = None
+            playlist = None
             error = None
             playingDuration = 0m
             playingDurationDisplay = "00:00"
@@ -129,39 +132,40 @@ type ProgressiveAudioModel =
 
         | GotPlayerManifest data ->
 
-            let chooseAudioPlaylistUri (txt: DisplayText, relativeUri: Uri) =
-                match model.BuildPlaylistUriResult relativeUri with
-                | Error msg ->
-                    jsRuntime |> consoleErrorAsync [| $"{nameof Playlist} processing error for {txt}: {msg}" |] |> ignore
-                    None
-                | Ok uri -> Some (txt, uri)
-
             let bgImgUriOption =
-                model.ToUriResultFromClaim("route-for-audio-blob", $"{(data |> fst).StringValue}", "jpg", "background.jpg")
+                model.ToUriResultFromClaim("cdn-route-for-background", $"{(data |> fst).StringValue}")
                 |> Option.ofResult
 
-            let presentationOption =
-                data
-                |>
-                toPresentationOption
-                    jsRuntime
-                    model.blazorServices.sectionElementRef
-                    bgImgUriOption
-                    chooseAudioPlaylistUri
+            data
+            |>
+            initializePresentation
+                jsRuntime
+                model.blazorServices.sectionElementRef
+                bgImgUriOption
+
+            let modifiedPlaylist =
+                option {
+                    let! presentation = data |> snd
+                    let! meta = model.restApiMetadataOption
+                    let! playlist = meta.GetApiBase() |> ApiBase |> presentation.toPlaylistWithApiBase None
+
+                    return playlist
+                }
 
             let currentItem =
                 option {
-                    let! presentation = presentationOption
-                    let! playList = presentation.playlist
+                    let! playlist = modifiedPlaylist
+                    let! head = playlist |> List.head
 
-                    return playList |> List.head
+                    return head
                 }
 
             {
                 model with
-                    presentation = presentationOption
+                    presentation = data |> snd
                     presentationKey = data |> fst |> Some 
                     currentPlaylistItem = currentItem
+                    playlist = modifiedPlaylist
             }
 
         | PlayerAudioCanPlayEvent ->
@@ -276,29 +280,6 @@ type ProgressiveAudioModel =
                     |> Result.teeError (getILogger().LogException)
             )
             (fun () -> Error <| exn $"The expected {nameof this.restApiMetadataOption} is not here.")
-
-    /// <summary>
-    /// Builds an absolute <see cref="Uri"/>
-    /// from the conventional relative <see cref="Uri"/>.
-    /// </summary>
-    /// <param name="relativeUri">the conventional relative <see cref="Uri"/></param>
-    /// <remarks>
-    /// The <c>relativeUri</c> should be of the form <c>{presentationKey}/{subFolder}/{blobName}</c>
-    /// </remarks>
-    member this.BuildPlaylistUriResult (relativeUri: Uri) =
-        if relativeUri.IsAbsoluteUri then
-            Error "This member does not support absolute URIs."
-        else
-            let names = relativeUri.OriginalString.TrimStart('.').Trim('/').Split('/')
-            if names.Length < 3 then
-                Error $"The expected number of URI segments were not found [{nameof relativeUri.OriginalString}:`{relativeUri.OriginalString}`]."
-            else
-                let presentationKey = names[0]
-                let subFolder = names[1]
-                let blobName = names[2]
-
-                this.ToUriResultFromClaim("route-for-audio-blob", presentationKey, subFolder, blobName)
-                |> Result.mapError _.Message
 
     /// <summary>
     /// Chooses any <see cref="RoleCredit"/> list of the current <see cref="Presentation"/>.

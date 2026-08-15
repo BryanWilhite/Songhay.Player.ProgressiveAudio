@@ -49,13 +49,11 @@ module ProgressiveAudioPresentationUtility =
     /// <param name="jsRuntime">the <see cref="IJSRuntime"/></param>
     /// <param name="sectionElementRef">the <see cref="HtmlRef"/> targeted for <see cref="setComputedStylePropertyValueAsync"/></param>
     /// <param name="bgImgUriOption">the Presentation background image URI</param>
-    /// <param name="playListChooser">maps the relative playlist paths to absolute paths</param>
     /// <param name="data"><see cref="Presentation"/> data pair</param>
-    let toPresentationOption
+    let initializePresentation
         (jsRuntime: IJSRuntime)
         (sectionElementRef: HtmlRef option)
         (bgImgUriOption: Uri option)
-        (playListChooser: DisplayText * Uri -> (DisplayText * Uri) option)
         (data: Identifier * Presentation option) =
 
         option {
@@ -74,14 +72,4 @@ module ProgressiveAudioPresentationUtility =
                                 |> setComputedStylePropertyValueAsync elementRef n.Value v.Value
                                 |> ignore
                     )
-
-            let parts =
-                presentation.parts
-                |> List.choose(fun part ->
-                    match part with
-                    | Playlist list -> list |> List.choose playListChooser |> Playlist |> Some
-                    | _ -> Some part
-                    )
-
-            return { presentation with parts = parts }
-        }
+        } |> ignore
