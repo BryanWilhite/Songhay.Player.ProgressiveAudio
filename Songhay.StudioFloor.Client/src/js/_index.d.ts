@@ -1,2 +1,2 @@
-export { BoleroUtility } from './bolero-utility';
+export { BlazorInteropUtility } from './blazor-interop-utility';
 export { ProgressiveAudioUtility } from './progressive-audio-utility';

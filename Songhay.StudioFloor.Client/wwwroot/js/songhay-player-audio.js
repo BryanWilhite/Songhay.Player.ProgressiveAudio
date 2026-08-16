@@ -40,7 +40,7 @@ __webpack_require__.r(__webpack_exports__);
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  BoleroUtility: () => (/* reexport */ BoleroUtility),
+  BlazorInteropUtility: () => (/* reexport */ BlazorInteropUtility),
   ProgressiveAudioUtility: () => (/* reexport */ ProgressiveAudioUtility)
 });
 
@@ -576,160 +576,6 @@ class DisplayItemUtility {
     }
 }
 //# sourceMappingURL=display-item.utility.js.map
-;// CONCATENATED MODULE: ./node_modules/songhay/core/utilities/dom.utility.js
-/**
- * static members for DOM manipulation
- *
- * @export
- */
-class DomUtility {
-    /**
-     * gets the child element, extending @type {HTMLElement}
-     * from the specified query @type {string},
-     */
-    static getChildHtmlElementByQuery(element, query) {
-        if (!element) {
-            console.warn('the expected parent element is not here');
-            return null;
-        }
-        return element.querySelector(query);
-    }
-    /**
-     * gets the child elements, extending @type {HTMLElement}
-     * from the specified query @type {string},
-     */
-    static getChildHtmlElementsByQuery(element, query) {
-        if (!element) {
-            console.warn('the expected parent element is not here');
-            return null;
-        }
-        return element.querySelectorAll(query);
-    }
-    /**
-     * gets the child elements, extending @type {HTMLElement}
-     * from the specified query @type {string},
-     */
-    static getClosestHtmlElementByQuery(element, query) {
-        if (!element) {
-            console.warn('the expected parent element is not here');
-            return null;
-        }
-        return element.closest(query);
-    }
-    /**
-     * gets the element, extending @type {HTMLElement}
-     * from the specified @type {ElementRef},
-     * usually derived from @ViewChild
-     */
-    static getHtmlElement(elementRef) {
-        const el = elementRef['nativeElement'];
-        if (!el) {
-            console.warn('the expected element is not here');
-            return null;
-        }
-        return el;
-    }
-    /**
-     * get an array of @type {Element}
-     * from the specified collection
-     */
-    static getHtmlElements(collection) {
-        const children = Array.from(collection);
-        if (!children) {
-            console.warn('the expected element children are not here');
-            return [];
-        }
-        if (!children.length) {
-            console.warn('the expected number of element children is not here');
-            return [];
-        }
-        return children;
-    }
-    /**
-     * gets the @type {HTMLHeadingElement}
-     * from the specified heading level
-     */
-    static getHtmlHeadingElement(level = 0, windowDocument = document) {
-        if (!windowDocument) {
-            return null;
-        }
-        const heading = 0 < level && level < 7
-            ? windowDocument.createElement(`h${level}`)
-            : windowDocument.createElement('h2');
-        return heading;
-    }
-    /**
-     * gets the @type {CSSStyleDeclaration}
-     * from the specified @type {Element}
-     */
-    static getStyleDeclaration(element) {
-        if (!element) {
-            return null;
-        }
-        const style = element['style'];
-        if (!style) {
-            console.warn('the expected CSS style declaration is not here');
-            return null;
-        }
-        return style;
-    }
-    /**
-     * returns an element extending @type {HTMLElement[]}
-     * from the specified markup
-     */
-    static parseAsHtmlElement(markup, expectedElementName = 'div') {
-        if (!markup) {
-            return null;
-        }
-        const elements = DomUtility.parseAsHtmlElements(markup, expectedElementName);
-        if (!elements.length) {
-            return null;
-        }
-        return elements[0];
-    }
-    /**
-     * returns an array of elements extending @type {HTMLElement[]}
-     * from the specified markup
-     */
-    static parseAsHtmlElements(markup, expectedElementName) {
-        if (!markup) {
-            return [];
-        }
-        const parser = new DOMParser();
-        const supportedType = 'text/xml';
-        const localDocument = parser.parseFromString(markup, supportedType);
-        const elements = localDocument.getElementsByTagName(expectedElementName);
-        return Array.from(elements).map(e => e);
-    }
-    /**
-     * runs the specified function of @type {() => void}
-     * when `DOMContentLoaded` fires for the browser window
-     */
-    static runWhenElementEvent(element, eventName, f) {
-        if (!f) {
-            return;
-        }
-        element.addEventListener(eventName, (e) => f(e));
-    }
-    /**
-     * runs the specified function of @type {() => void}
-     * when `DOMContentLoaded` fires for the browser window
-     */
-    static runWhenWindowContentLoaded(f) {
-        if (!f) {
-            return;
-        }
-        window.addEventListener('DOMContentLoaded', (e) => f(e));
-    }
-    /**
-     * returns a @type {Promise} that resolves
-     * in the specified milliseconds
-     */
-    static timeout(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-}
-//# sourceMappingURL=dom.utility.js.map
 ;// CONCATENATED MODULE: ./node_modules/songhay/core/index.js
 
 
@@ -746,12 +592,22 @@ class DomUtility {
 
 
 //# sourceMappingURL=index.js.map
-;// CONCATENATED MODULE: ./src/bolero-utility.ts
+;// CONCATENATED MODULE: ./src/blazor-interop-utility.ts
 
-class BoleroUtility {
+class BlazorInteropUtility {
+    static getComputedStylePropertyValue(element, propertyName) {
+        return CssUtility.getComputedStylePropertyValue(element, propertyName);
+    }
+    static getComputedStylePropertyValueById(elementId, propertyName) {
+        return CssUtility.getComputedStylePropertyValueById(elementId, propertyName);
+    }
+    static getComputedStylePropertyValueByQuery(query, propertyName) {
+        return CssUtility.getComputedStylePropertyValueByQuery(query, propertyName);
+    }
+    static setComputedStylePropertyValue(element, propertyName, propertyValue) {
+        CssUtility.setComputedStylePropertyValue(element, propertyName, propertyValue);
+    }
 }
-BoleroUtility.css = CssUtility;
-BoleroUtility.dom = DomUtility;
 
 ;// CONCATENATED MODULE: ./node_modules/tslib/tslib.es6.mjs
 /******************************************************************************

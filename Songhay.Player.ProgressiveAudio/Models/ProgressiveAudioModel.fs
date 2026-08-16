@@ -298,12 +298,3 @@ type ProgressiveAudioModel =
             let! pres = this.presentation
             return! pres.description
         }
-
-    /// <summary>
-    /// Chooses any <see cref="Playlist"/> tuple list of the current <see cref="Presentation"/>.
-    /// </summary>
-    member this.PresentationPlaylist =
-        option {
-            let! pres = this.presentation
-            return! pres.playlist
-        }
