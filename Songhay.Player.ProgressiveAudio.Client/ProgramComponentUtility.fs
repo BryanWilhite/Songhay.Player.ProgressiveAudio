@@ -64,7 +64,7 @@ module ProgramComponentUtility =
                             jsRuntime |> passErrorToConsole label ex |> Error
                     )
 
-            let uriResult = model.ToUriResultFromClaim("route-for-audio-manifest", key)
+            let uriResult = model.ToUriResultFromClaim("cdn-route-for-manifest", key)
             uriResult
             |> Result.either
                 (fun uri -> Cmd.OfAsync.either Remote.tryDownloadToStringAsync (httpClient, uri) success failure)
