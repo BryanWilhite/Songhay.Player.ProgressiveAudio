@@ -7,16 +7,12 @@
             "dom",
             "dom.iterable"
         ],
-        "moduleResolution": "node",
+        "moduleResolution": "node10",
 
         "baseUrl": "./",
         "outDir": "./src/js",
-        "typeRoots": [
-            "node_modules/@types"
-        ],
-
         "allowSyntheticDefaultImports": true,
-        "declaration": true,
+        "declaration": false,
         "downlevelIteration": false,
         "emitDecoratorMetadata": true,
         "esModuleInterop": true,
