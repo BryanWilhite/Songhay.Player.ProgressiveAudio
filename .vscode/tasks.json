@@ -2,6 +2,32 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "bash: publish_client_to_mirror",
+            "command": "bash",
+            "args": [
+                "./shell/publish_client_to_mirror.sh"
+            ],
+            "isBackground": false,
+            "options": {
+                "cwd": "${workspaceRoot}"
+            },
+            "type": "shell",
+            "problemMatcher": []
+        },
+        {
+            "label": "bash: rsync_client_default_assets",
+            "command": "bash",
+            "args": [
+                "./shell/rsync_client_default_assets.sh"
+            ],
+            "isBackground": false,
+            "options": {
+                "cwd": "${workspaceRoot}"
+            },
+            "type": "shell",
+            "problemMatcher": []
+        },
+        {
             "label": "dotnet build [Solution]",
             "command": "dotnet",
             "type": "shell",
