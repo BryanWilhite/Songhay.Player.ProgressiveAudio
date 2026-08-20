@@ -40,7 +40,7 @@ dotnet publish \
 echo "running rsync from default Blazor publish location to local S3 mirror..."
 
 rsync_from="../Songhay.Player.ProgressiveAudio.Client/bin/Release/net10.0/publish/wwwroot/"
-rsync_to="../../s3-buckets/wasabi/b-roll-players/audio-p/songhay/"
+rsync_to="../../s3-buckets/wasabi/b-roll-players$base_href"
 
 rsync -r --delete-after \
     --checksum \
