@@ -15,44 +15,55 @@ if [ -n "$(git status --porcelain)" ]; then
 fi
 
 echo "Git repository is clean. Proceeding..."
-
 SCRIPT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 client_project_name="Songhay.Player.ProgressiveAudio.Client"
 publication_project_name="Songhay.Publications.KinteSpace"
 
 base_href="/b-roll/audio-p/"
-index_path="../$client_project_name/wwwroot/index.html"
+
+client_project_dir="../$client_project_name/bin/Release/net10.0/publish/wwwroot/"
+publication_assets_dir="../../$publication_project_name/src${base_href}wwwroot/"
+publication_dir="../../$publication_project_name/app-staging$base_href"
 
 echo "Setting location to $SCRIPT_ROOT...";
 cd $SCRIPT_ROOT
 
-echo "renaming base.href in Blazor index.html..."
+echo "running rsync from publication assets directory to Blazor client wwwroot directory..."
 
-pwsh -c "(Get-Content $index_path) -replace '<base href=\"/\">', '<base href=\"$base_href\">' | Set-Content $index_path"
-
-echo "deleting existing file at publish target..."
-rm -rf "../$client_project_name/bin/Release/net10.0/publish"
-
-echo "publishing Blazor project to default location..."
-
-dotnet publish "../$client_project_name/$client_project_name.fsproj" \
-    --configuration:Release \
-    -p:CompressionEnabled=false \
-    /property:GenerateFullPaths=true \
-    /consoleloggerparameters:NoSummary \
-    --runtime linux-x64
-
-echo "running rsync from default Blazor publish location to local S3 mirror..."
-
-rsync_from="../$client_project_name/bin/Release/net10.0/publish/wwwroot/"
-rsync_to="../../$publication_project_name/app-staging$base_href"
+rsync_from=$publication_assets_dir
+rsync_to=$client_project_dir
 
 rsync -r --delete-after \
     --checksum \
     --links \
     --progress \
     --stats \
+    --exclude .gitkeep \
+    "$rsync_from" "$rsync_to"
+
+echo "deleting any existing files at publish target..."
+
+rm -rf "../$client_project_name/bin/Release/net10.0/publish"
+
+echo "publishing Blazor project to default location..."
+
+dotnet publish "../$client_project_name/$client_project_name.fsproj" \
+    --configuration:Release -p:CompressionEnabled=false \
+    /property:GenerateFullPaths=true /consoleloggerparameters:NoSummary \
+    --runtime linux-x64
+
+echo "running rsync from default Blazor publish location to local publication mirror..."
+
+rsync_from=$client_project_dir
+rsync_to=$publication_dir
+
+rsync -r --delete-after \
+    --checksum \
+    --links \
+    --progress \
+    --stats \
+    --exclude .gitkeep \
     "$rsync_from" "$rsync_to"
 
 echo "Rolling back any repo changes..."
