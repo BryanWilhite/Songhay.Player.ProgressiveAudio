@@ -39,7 +39,6 @@ rsync -r --delete-after \
     --links \
     --progress \
     --stats \
-    --exclude .gitkeep \
     "$rsync_from" "$rsync_to"
 
 exit 0
