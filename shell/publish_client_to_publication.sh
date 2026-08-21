@@ -18,20 +18,26 @@ echo "Git repository is clean. Proceeding..."
 
 SCRIPT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+client_project_name="Songhay.Player.ProgressiveAudio.Client"
+publication_project_name="Songhay.Publications.KinteSpace"
+
+base_href="/b-roll/audio-p/"
+index_path="../$client_project_name/wwwroot/index.html"
+
 echo "Setting location to $SCRIPT_ROOT...";
 cd $SCRIPT_ROOT
 
 echo "renaming base.href in Blazor index.html..."
 
-base_href="/b-roll/audio-p/"
-index_path="../Songhay.Player.ProgressiveAudio.Client/wwwroot/index.html"
-
 pwsh -c "(Get-Content $index_path) -replace '<base href=\"/\">', '<base href=\"$base_href\">' | Set-Content $index_path"
+
+echo "deleting existing file at publish target..."
+rm -r "../$client_project_name/bin/Release/net10.0/publish"
 
 echo "publishing Blazor project to default location..."
 
 dotnet publish \
-    ../Songhay.Player.ProgressiveAudio.Client/Songhay.Player.ProgressiveAudio.Client.fsproj \
+    "../$client_project_name/$client_project_name.fsproj" \
     --configuration:Release \
     -p:CompressionEnabled=false \
     /property:GenerateFullPaths=true \
@@ -40,8 +46,8 @@ dotnet publish \
 
 echo "running rsync from default Blazor publish location to local S3 mirror..."
 
-rsync_from="../Songhay.Player.ProgressiveAudio.Client/bin/Release/net10.0/publish/wwwroot/"
-rsync_to="../../Songhay.Publications.KinteSpace/app-staging$base_href"
+rsync_from="../$client_project_name/bin/Release/net10.0/publish/wwwroot/"
+rsync_to="../../$publication_project_name/app-staging$base_href"
 
 rsync -r --delete-after \
     --checksum \
