@@ -31,9 +31,9 @@ pwsh -c "(Get-Content $index_path) -replace '<base href=\"/\">', '<base href=\"$
 echo "publishing Blazor project to default location..."
 
 dotnet publish \
-    ../Songhay.Player.ProgressiveAudio.Client/Songhay.Player.ProgressiveAudio.Client.fsproj \
+    -o ../Songhay.Player.ProgressiveAudio.Client/Songhay.Player.ProgressiveAudio.Client.fsproj \
     --configuration:Release \
-    -p:BlazorEnableCompression=false \
+    -p:CompressionEnabled=false \
     /property:GenerateFullPaths=true \
     /consoleloggerparameters:NoSummary \
     --runtime linux-x64
