@@ -32,12 +32,11 @@ echo "renaming base.href in Blazor index.html..."
 pwsh -c "(Get-Content $index_path) -replace '<base href=\"/\">', '<base href=\"$base_href\">' | Set-Content $index_path"
 
 echo "deleting existing file at publish target..."
-rm -r "../$client_project_name/bin/Release/net10.0/publish"
+rm -rf "../$client_project_name/bin/Release/net10.0/publish"
 
 echo "publishing Blazor project to default location..."
 
-dotnet publish \
-    "../$client_project_name/$client_project_name.fsproj" \
+dotnet publish "../$client_project_name/$client_project_name.fsproj" \
     --configuration:Release \
     -p:CompressionEnabled=false \
     /property:GenerateFullPaths=true \
