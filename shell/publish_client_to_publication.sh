@@ -22,7 +22,8 @@ publication_project_name="Songhay.Publications.KinteSpace"
 
 base_href="/b-roll/audio-p/"
 
-client_project_dir="../$client_project_name/bin/Release/net10.0/publish/wwwroot/"
+client_assets_dir="../$client_project_name/wwwroot/"
+client_publish_dir="../$client_project_name/bin/Release/net10.0/publish/wwwroot/"
 publication_assets_dir="../../$publication_project_name/src${base_href}wwwroot/"
 publication_dir="../../$publication_project_name/app-staging$base_href"
 
@@ -30,8 +31,8 @@ echo "Setting location to $SCRIPT_ROOT...";
 cd $SCRIPT_ROOT
 
 rsync_from=$publication_assets_dir
-rsync_to=$client_project_dir
-echo "running rsync from ``$rsync_from`` to ``$rsync_to``..."
+rsync_to=$client_assets_dir
+echo "running rsync from \`$rsync_from\` to \`$rsync_to\`..."
 
 rsync -r --delete-after \
     --checksum \
@@ -55,7 +56,7 @@ dotnet publish "../$client_project_name/$client_project_name.fsproj" \
 
 echo "running rsync from default Blazor publish location to local publication mirror..."
 
-rsync_from=$client_project_dir
+rsync_from=$client_publish_dir
 rsync_to=$publication_dir
 
 rsync -r --delete-after \
