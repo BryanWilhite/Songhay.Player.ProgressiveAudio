@@ -29,10 +29,9 @@ publication_dir="../../$publication_project_name/app-staging$base_href"
 echo "Setting location to $SCRIPT_ROOT...";
 cd $SCRIPT_ROOT
 
-echo "running rsync from publication assets directory to Blazor client wwwroot directory..."
-
 rsync_from=$publication_assets_dir
 rsync_to=$client_project_dir
+echo "running rsync from ``$rsync_from`` to ``$rsync_to``..."
 
 rsync -r --delete-after \
     --checksum \
