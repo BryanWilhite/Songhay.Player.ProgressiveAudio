@@ -42,6 +42,8 @@ rsync -r --delete-after \
     --exclude .gitkeep \
     "$rsync_from" "$rsync_to"
 
+exit 0
+
 echo "deleting any existing files at publish target..."
 
 rm -rf "../$client_project_name/bin/Release/net10.0/publish"
